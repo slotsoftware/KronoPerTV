@@ -449,7 +449,6 @@
         .cq-giant { font-size: clamp(2rem, min(25cqw, 55cqh), 15rem); line-height: 0.8; letter-spacing: -0.02em; }
         .cq-table-th { font-size: clamp(0.6rem, min(2.5cqw, 3cqh), 1rem); }
         .cq-table-td { font-size: clamp(0.7rem, min(3cqw, 4cqh), 1.5rem); }
-        .cq-pilot { font-size: clamp(0.8rem, min(8cqw, 16cqh), 3.5rem); line-height: 1.15; text-wrap: balance; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
         .drag-handle { 
             cursor: grab; 
@@ -660,7 +659,13 @@
                 </div>
                 <div>
                     <label for="car-model-input" class="block text-xs font-bold text-gray-500 mb-1 uppercase" data-i18n="carModel">Modelo del Coche</label>
-                    <select id="car-model-input" class="silver-input w-full p-2 rounded-md font-bold truncate"></select>
+                    <div class="flex items-center relative z-10">
+                        <select id="car-model-input" class="silver-input w-full p-2 rounded-md truncate pr-12"></select>
+                        <div class="absolute right-0 -top-2 transform translate-x-2 -translate-y-1/4 w-24 h-24 sm:w-32 sm:h-32 bg-white border-2 border-gray-300 rounded-lg overflow-hidden flex items-center justify-center shadow-2xl z-20 pointer-events-none">
+                            <img id="config-car-img" src="" class="w-full h-full object-cover hidden" alt="Coche">
+                            <svg id="config-car-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-300"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+                        </div>
+                    </div>
                 </div>
                 
                 <div>
@@ -901,17 +906,6 @@
     <!-- ================= CONTENEDOR MODO TV (NUEVO DISEÑO HORIZONTAL) ================= -->
     <div id="tv-dashboard" class="hidden h-screen tv-bg text-white w-full flex-col font-sans overflow-hidden p-2 md:p-4 relative z-20" data-theme="default">
         
-        <!-- SEMÁFORO GIGANTE TV (OVERLAY) -->
-        <div id="tv-traffic-light-overlay" class="absolute inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-md transition-all duration-500 opacity-0 pointer-events-none">
-            <div class="flex space-x-3 sm:space-x-8 p-6 sm:p-12 rounded-[2rem] bg-slate-900/90 border border-slate-700 shadow-[0_0_100px_rgba(0,0,0,0.9)] transform scale-75 transition-transform duration-500" id="tv-big-traffic-light">
-                <div class="tv-light w-14 h-14 sm:w-32 sm:h-32 rounded-full bg-slate-800 border-4 border-slate-600 shadow-inner transition-all duration-200"></div>
-                <div class="tv-light w-14 h-14 sm:w-32 sm:h-32 rounded-full bg-slate-800 border-4 border-slate-600 shadow-inner transition-all duration-200"></div>
-                <div class="tv-light w-14 h-14 sm:w-32 sm:h-32 rounded-full bg-slate-800 border-4 border-slate-600 shadow-inner transition-all duration-200"></div>
-                <div class="tv-light w-14 h-14 sm:w-32 sm:h-32 rounded-full bg-slate-800 border-4 border-slate-600 shadow-inner transition-all duration-200"></div>
-                <div class="tv-light w-14 h-14 sm:w-32 sm:h-32 rounded-full bg-slate-800 border-4 border-slate-600 shadow-inner transition-all duration-200"></div>
-            </div>
-        </div>
-
         <!-- HEADER TV -->
         <div class="flex justify-between items-center mb-3">
             <div class="flex items-center space-x-5">
@@ -1039,6 +1033,15 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:animate-pulse"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
                     </button>
 
+                    <!-- NUEVO: SEMÁFORO TV (MODO OSCURO) -->
+                    <div id="tv-traffic-light" class="flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-slate-800/80 border border-slate-600 shadow-lg hidden sm:flex">
+                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
+                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
+                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
+                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
+                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
+                    </div>
+
                     <div id="tv-status" class="text-xl lg:text-2xl font-rajdhani font-bold uppercase tracking-widest px-6 py-2 rounded-xl bg-slate-800/80 border border-slate-600 text-slate-400 shadow-lg" data-i18n="tvStatusWaiting">
                         ESPERANDO...
                     </div>
@@ -1065,7 +1068,7 @@
                 <div class="p-2 md:p-3 flex-1 flex flex-col items-center justify-center relative overflow-hidden h-full">
                     <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
                     <span class="text-slate-400 font-rajdhani font-semibold uppercase tracking-widest cq-title mb-1 z-10 pointer-events-none" data-i18n="pilotCar">Piloto / Coche</span>
-                    <span id="tv-pilot-car" class="cq-pilot w-full px-2 font-bold text-white text-center z-10 pointer-events-none">Cargando...</span>
+                    <span id="tv-pilot-car" class="cq-value font-bold text-white text-center z-10 leading-tight pointer-events-none">Cargando...</span>
                 </div>
             </div>
 
@@ -2995,6 +2998,7 @@
             pilotNameInput.addEventListener('input', (e) => { localStorage.setItem('krono_pilot_name', e.target.value); broadcastState(); triggerDebouncedCloudSync(); });
             carModelInput.addEventListener('change', (e) => { 
                 localStorage.setItem('krono_car_model', e.target.value); 
+                if (typeof updateConfigCarImage === 'function') updateConfigCarImage();
                 broadcastState(); 
                 triggerDebouncedCloudSync(); 
             });
@@ -3965,127 +3969,88 @@
                 }
 
                 // === TV AUDIO STATE MACHINE ===
-                const tvTrafficOverlay = document.getElementById('tv-traffic-light-overlay');
-                const tvBigTrafficContainer = document.getElementById('tv-big-traffic-light');
-
-                const showTVTrafficLight = () => {
-                    if(tvTrafficOverlay) {
-                        tvTrafficOverlay.classList.remove('opacity-0', 'pointer-events-none');
-                        if(tvBigTrafficContainer) {
-                            tvBigTrafficContainer.classList.remove('scale-75');
-                            tvBigTrafficContainer.classList.add('scale-100');
-                        }
-                    }
-                };
-
-                const hideTVTrafficLight = () => {
-                    if(tvTrafficOverlay) {
-                        tvTrafficOverlay.classList.add('opacity-0', 'pointer-events-none');
-                        if(tvBigTrafficContainer) {
-                            tvBigTrafficContainer.classList.remove('scale-100');
-                            tvBigTrafficContainer.classList.add('scale-75');
-                        }
-                    }
-                };
-                
-                const resetLightClass = "tv-light w-14 h-14 sm:w-32 sm:h-32 rounded-full bg-slate-800 border-4 border-slate-600 shadow-inner transition-all duration-200";
-
                 if (isFirstPayload) {
                     tvPrevState.lapCount = tvData.currentLap || 0;
                     tvPrevState.isRaceActive = tvData.isRaceActive || false;
                     tvPrevState.raceAborted = tvData.raceAborted || false;
                     tvPrevState.isCountdown = tvData.isCountdown || false;
                     tvPrevState.isPaused = tvData.isPaused || false;
-                    isFirstPayload = false;
+                isFirstPayload = false;
+            } else {
+                if (Tone.context.state !== 'running') Tone.context.resume();
+                
+                const targetLang = tvData.currentLang || currentLang;
+                const tvLights = document.querySelectorAll('.tv-light');
+                
+                // 1. Salida Nula
+                if (tvData.raceAborted && !tvPrevState.raceAborted) {
+                    polySynth.triggerAttackRelease(["C2", "F#2"], "1");
+                    speak(translations[targetLang].voiceFalseStart);
+                    if(tvCountdownInterval) clearInterval(tvCountdownInterval);
                     
-                    if (tvData.isCountdown) showTVTrafficLight();
-                } else {
-                    if (Tone.context.state !== 'running') Tone.context.resume();
+                    tvLights.forEach(l => {
+                        l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-red-600 border border-red-400 shadow-[0_0_15px_#dc2626] animate-pulse";
+                    });
+                    setTimeout(() => {
+                        tvLights.forEach(l => { l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"; });
+                    }, 3000);
+                }
+                
+                // 2. Semáforo Verde (Inicio Carrera)
+                if (tvData.isRaceActive && !tvPrevState.isRaceActive && !tvData.raceAborted && !tvPrevState.isPaused) {
+                    polySynth.triggerAttackRelease(["C5", "E5", "G5"], "0.5");
+                    tvLights.forEach(l => {
+                        l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-emerald-500 border border-emerald-400 shadow-[0_0_15px_#10b981] transition-all duration-200";
+                    });
+                    setTimeout(() => {
+                        tvLights.forEach(l => { l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"; });
+                    }, 3000);
+                }
+                
+                // 3. Nueva Vuelta
+                if ((tvData.currentLap > tvPrevState.lapCount) && tvData.lapHistory && tvData.lapHistory.length > 0) {
+                    const newLapData = tvData.lapHistory[tvData.lapHistory.length - 1];
                     
-                    const targetLang = tvData.currentLang || currentLang;
-                    const tvLights = document.querySelectorAll('.tv-light');
+                    let sIdx = tvData.audioConfig ? tvData.audioConfig.soundIndex : 0;
+                    const snd = soundOptions[sIdx] || soundOptions[0];
+                    playSound(snd.freq, snd.dur);
                     
-                    // 1. Salida Nula
-                    if (tvData.raceAborted && !tvPrevState.raceAborted) {
-                        polySynth.triggerAttackRelease(["C2", "F#2"], "1");
-                        speak(translations[targetLang].voiceFalseStart);
-                        if(tvCountdownInterval) clearInterval(tvCountdownInterval);
-                        
-                        showTVTrafficLight();
-                        tvLights.forEach(l => {
-                            l.className = "tv-light w-14 h-14 sm:w-32 sm:h-32 rounded-full bg-red-600 border-4 border-red-400 shadow-[0_0_50px_rgba(220,38,38,1)] animate-pulse";
-                        });
-                        setTimeout(() => {
-                            tvLights.forEach(l => { l.className = resetLightClass; });
-                            hideTVTrafficLight();
-                        }, 3000);
+                    const isBest = newLapData.time === tvData.bestLapTime;
+                    
+                    let extraMsg = "";
+                    let remaining = tvData.totalLaps !== Infinity ? tvData.totalLaps - tvData.currentLap : Infinity;
+                    if (remaining === 5) extraMsg = `${translations[targetLang].voiceRemaining} 5 ${translations[targetLang].voiceLaps}.`;
+                    if (remaining === 1) { 
+                        extraMsg = translations[targetLang].voiceLastLap; 
+                        playFinalLapSound(); 
                     }
                     
-                    // 2. Semáforo Verde (Inicio Carrera)
-                    if (tvData.isRaceActive && !tvPrevState.isRaceActive && !tvData.raceAborted && !tvPrevState.isPaused) {
-                        polySynth.triggerAttackRelease(["C5", "E5", "G5"], "0.5");
-                        
-                        showTVTrafficLight();
-                        tvLights.forEach(l => {
-                            l.className = "tv-light w-14 h-14 sm:w-32 sm:h-32 rounded-full bg-emerald-500 border-4 border-emerald-400 shadow-[0_0_60px_rgba(16,185,129,1)] transition-all duration-200";
-                        });
-                        setTimeout(() => {
-                            hideTVTrafficLight();
-                            setTimeout(() => {
-                                tvLights.forEach(l => { l.className = resetLightClass; });
-                            }, 500); // Limpiar colores después del fundido
-                        }, 2500);
-                    }
-                    
-                    // 3. Nueva Vuelta
-                    if ((tvData.currentLap > tvPrevState.lapCount) && tvData.lapHistory && tvData.lapHistory.length > 0) {
-                        const newLapData = tvData.lapHistory[tvData.lapHistory.length - 1];
-                        
-                        let sIdx = tvData.audioConfig ? tvData.audioConfig.soundIndex : 0;
-                        const snd = soundOptions[sIdx] || soundOptions[0];
-                        playSound(snd.freq, snd.dur);
-                        
-                        const isBest = newLapData.time === tvData.bestLapTime;
-                        
-                        let extraMsg = "";
-                        let remaining = tvData.totalLaps !== Infinity ? tvData.totalLaps - tvData.currentLap : Infinity;
-                        if (remaining === 5) extraMsg = `${translations[targetLang].voiceRemaining} 5 ${translations[targetLang].voiceLaps}.`;
-                        if (remaining === 1) { 
-                            extraMsg = translations[targetLang].voiceLastLap; 
-                            playFinalLapSound(); 
-                        }
-                        
-                        announceLap(tvData.currentLap, newLapData.time, isBest, extraMsg);
-                    }
-                    
-                    // 4. Fin de Carrera o Reinicio Manual
-                    if (!tvData.isRaceActive && tvPrevState.isRaceActive && tvData.lapHistory && tvData.lapHistory.length > 0 && !tvData.raceAborted) {
-                        announceRaceFinish(tvData.pilot);
-                    }
-                    
-                    if (!tvData.isRaceActive && !tvData.isCountdown && !tvData.raceAborted) {
-                         hideTVTrafficLight(); // Ocultar si se resetea forzosamente
-                    }
-                    
-                    // 5. Inicio Cuenta Atrás (Semáforos Rojos)
-                    if (tvData.isCountdown && !tvPrevState.isCountdown) {
-                        let count = 0;
-                        showTVTrafficLight();
-                        tvLights.forEach(l => { l.className = resetLightClass; });
+                    announceLap(tvData.currentLap, newLapData.time, isBest, extraMsg);
+                }
+                
+                // 4. Fin de Carrera
+                if (!tvData.isRaceActive && tvPrevState.isRaceActive && tvData.lapHistory && tvData.lapHistory.length > 0 && !tvData.raceAborted) {
+                    announceRaceFinish(tvData.pilot);
+                }
+                
+                // 5. Inicio Cuenta Atrás (Semáforos Rojos)
+                if (tvData.isCountdown && !tvPrevState.isCountdown) {
+                    let count = 0;
+                    tvLights.forEach(l => { l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"; });
 
-                        if(tvCountdownInterval) clearInterval(tvCountdownInterval);
-                        tvCountdownInterval = setInterval(() => {
-                            if (!tvData.isCountdown || tvData.raceAborted || count >= 5) {
-                                clearInterval(tvCountdownInterval);
-                                return;
-                            }
-                            synth.triggerAttackRelease("C4", "8n");
-                            tvLights[count].className = "tv-light w-14 h-14 sm:w-32 sm:h-32 rounded-full bg-red-500 border-4 border-red-400 shadow-[0_0_50px_rgba(239,68,68,0.8)] transition-all duration-200";
-                            count++;
-                        }, 1000);
-                    }
-                    
-                    // Actualizar estado previo
+                    if(tvCountdownInterval) clearInterval(tvCountdownInterval);
+                    tvCountdownInterval = setInterval(() => {
+                        if (!tvData.isCountdown || tvData.raceAborted || count >= 5) {
+                            clearInterval(tvCountdownInterval);
+                            return;
+                        }
+                        synth.triggerAttackRelease("C4", "8n");
+                        tvLights[count].className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-red-500 border border-red-400 shadow-[0_0_10px_#ef4444] transition-all duration-200";
+                        count++;
+                    }, 1000);
+                }
+                
+                // Actualizar estado previo
                     tvPrevState.lapCount = tvData.currentLap || 0;
                     tvPrevState.isRaceActive = tvData.isRaceActive || false;
                     tvPrevState.raceAborted = tvData.raceAborted || false;
@@ -4210,24 +4175,6 @@
                     window.drawTVConsistencyGraph('tv-consistency-graph', tvData.lapHistory);
                 } else {
                     tvLapDeltaContainer.classList.add('hidden');
-                    
-                    // Limpieza total del UI (Gráficos, Tabla y Tiempos) al Reiniciar
-                    if (tvLapTbody) tvLapTbody.innerHTML = '';
-                    
-                    if (!tvData.isRaceActive && !tvData.isCountdown) {
-                        const tvRT = document.getElementById('tv-race-time');
-                        const tvCLT = document.getElementById('tv-current-lap-time');
-                        if (tvRT) tvRT.textContent = "00:00.0";
-                        if (tvCLT) tvCLT.textContent = "00.000";
-                    }
-                    
-                    ['tv-lap-graph', 'tv-speed-graph', 'tv-combined-graph', 'tv-consistency-graph'].forEach(id => {
-                        const canvas = document.getElementById(id);
-                        if (canvas) {
-                            const ctx = canvas.getContext('2d');
-                            ctx.clearRect(0, 0, 10000, 10000); 
-                        }
-                    });
                 }
             }
 
@@ -4367,11 +4314,9 @@
                 const pInput = document.getElementById('pilot-name-input');
                 if(pInput) pInput.value = sPilot;
             }
-            const sCar = localStorage.getItem('krono_car_model');
-            if (sCar) {
-                const cInput = document.getElementById('car-model-input');
-                if(cInput) cInput.value = sCar;
-            }
+            
+            // Inicializamos la lista de coches en el panel de configuración
+            if(typeof updateConfigCarList === 'function') updateConfigCarList();
 
             // NUEVO: Forzar actualización inicial asegurada (Espera pacientemente a que Firebase cargue)
             if (!isTVMode) {
@@ -4553,6 +4498,7 @@
                     const carName = car.name || `${car.marca || 'Coche'} ${car.ref || ''}`.trim() || 'Coche Desconocido';
                     opt.value = carName;
                     opt.textContent = carName;
+                    if(car.image) opt.dataset.image = car.image;
                     carSelect.appendChild(opt);
                 });
             }
@@ -4563,6 +4509,26 @@
             } else if (carSelect.options.length > 0) {
                 carSelect.value = carSelect.options[0].value;
                 localStorage.setItem('krono_car_model', carSelect.value);
+            }
+            
+            updateConfigCarImage();
+        };
+
+        window.updateConfigCarImage = function() {
+            const carSelect = document.getElementById('car-model-input');
+            const imgEl = document.getElementById('config-car-img');
+            const iconEl = document.getElementById('config-car-icon');
+            if(!carSelect || !imgEl || !iconEl) return;
+            
+            const selectedOpt = carSelect.options[carSelect.selectedIndex];
+            if (selectedOpt && selectedOpt.dataset.image) {
+                imgEl.src = selectedOpt.dataset.image;
+                imgEl.classList.remove('hidden');
+                iconEl.classList.add('hidden');
+            } else {
+                imgEl.src = "";
+                imgEl.classList.add('hidden');
+                iconEl.classList.remove('hidden');
             }
         };
 
@@ -4673,6 +4639,7 @@
                 const carInput = document.getElementById('car-model-input');
                 if(carInput) {
                     carInput.value = car.name;
+                    if(typeof updateConfigCarImage === 'function') updateConfigCarImage();
                 }
             }
         }
@@ -4710,6 +4677,7 @@
             saveGarageToLocal();
             populateDropdown();
             renderGarageCar(currentGarageIndex);
+            if (typeof updateConfigCarList === 'function') updateConfigCarList();
             toggleGarageEdit(false);
         }
 
@@ -4800,6 +4768,7 @@
             saveGarageToLocal();
             populateDropdown();
             renderGarageCar(currentGarageIndex);
+            if (typeof updateConfigCarList === 'function') updateConfigCarList();
             toggleGarageEdit(true);
         });
 
@@ -4820,6 +4789,7 @@
                     });
                     document.getElementById('garage-img').src = "";
                 }
+                if (typeof updateConfigCarList === 'function') updateConfigCarList();
                 toggleGarageEdit(false);
             }
         });
@@ -4873,6 +4843,7 @@
                         garageCars[currentGarageIndex].image = base64Str;
                         document.getElementById('garage-img').src = base64Str;
                         saveGarageToLocal();
+                        if (typeof updateConfigCarList === 'function') updateConfigCarList();
                     }
                 };
                 img.src = e.target.result;
@@ -5000,6 +4971,7 @@
                     currentGarageIndex = 0;
                     populateDropdown();
                     renderGarageCar(currentGarageIndex);
+                    if (typeof updateConfigCarList === 'function') updateConfigCarList();
                     
                     // Ahora guardamos (la validación de tamaño se hace dentro automáticamente)
                     saveGarageToLocal();
