@@ -542,15 +542,15 @@
 
         /* --- ESTILOS GARAJE RT SLOT (FULLSCREEN FIT NEON SPECTACULAR) --- */
         .g-box { border: 1px solid #dc2626; border-radius: 8px; background-color: rgba(10, 0, 0, 0.6); padding: 8px 12px; box-shadow: inset 0 0 10px rgba(220, 38, 38, 0.05); }
-        .g-row { display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 1px 0; min-height: 20px; }
+        .g-row { display: flex; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); padding: 1px 0; min-height: 24px; }
         .g-row:last-child { border-bottom: none; }
-        .g-lbl { color: #9ca3af; font-size: 9px; text-transform: uppercase; width: 40%; text-align: right; padding-right: 8px; white-space: nowrap; }
-        .g-val { color: #ffffff; font-size: 10px; font-weight: 700; width: 60%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Arial', sans-serif; }
-        .g-inp { background: rgba(0,0,0,0.8); border: 1px solid #4b5563; color: #fff; font-size: 10px; width: 60%; padding: 1px 4px; display: none; font-family: 'Arial', sans-serif; outline: none; height: 18px; border-radius: 4px; transition: all 0.2s ease;}
+        .g-lbl { color: #9ca3af; font-size: 11px; text-transform: uppercase; width: 40%; text-align: right; padding-right: 8px; white-space: nowrap; }
+        .g-val { color: #ffffff; font-size: 12px; font-weight: 700; width: 60%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Arial', sans-serif; }
+        .g-inp { background: rgba(0,0,0,0.8); border: 1px solid #4b5563; color: #fff; font-size: 12px; width: 60%; padding: 1px 4px; display: none; font-family: 'Arial', sans-serif; outline: none; height: 22px; border-radius: 4px; transition: all 0.2s ease;}
         .g-inp:focus { border-color: #22d3ee; box-shadow: 0 0 10px rgba(34,211,238,0.6), inset 0 0 5px rgba(34,211,238,0.2); background: rgba(15,25,35,0.9); }
         .g-editing .g-val { display: none; }
         .g-editing .g-inp { display: block; }
-        .g-header { color: #fca5a5; font-size: 11px; font-weight: 800; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+        .g-header { color: #fca5a5; font-size: 13px; font-weight: 800; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
 
         /* --- ESTILOS RANKING (CARRETERA DESGASTADA & ESCALA AZULES) --- */
         .worn-asphalt-bg {
@@ -1003,6 +1003,11 @@
                         <span class="font-rajdhani font-bold tracking-widest text-sm uppercase hidden sm:block">Garaje</span>
                     </button>
 
+                    <!-- NUEVO: BOTÓN INICIAR MODO TV -->
+                    <button id="tv-remote-start-btn" class="p-3 rounded-xl bg-slate-800/80 border border-slate-600 text-green-400 hover:text-white hover:bg-green-900/60 hover:border-green-500 transition shadow-lg group" title="Iniciar Carrera">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="group-hover:scale-110 transition-transform"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    </button>
+
                     <!-- NUEVO: BOTÓN PAUSA/REANUDAR MODO TV -->
                     <button id="tv-remote-pause-btn" class="p-3 rounded-xl bg-slate-800/80 border border-slate-600 text-yellow-400 hover:text-white hover:bg-yellow-900/60 hover:border-yellow-500 transition shadow-lg group" title="Pausa / Reanudar Carrera">
                         <svg id="tv-pause-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="group-hover:scale-110 transition-transform"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
@@ -1027,6 +1032,15 @@
                     <button id="tv-ai-theme-btn" class="p-3 rounded-xl bg-slate-800/80 border border-slate-600 text-cyan-400 hover:text-white hover:bg-cyan-900/50 hover:border-cyan-400 transition shadow-[0_0_10px_rgba(34,211,238,0.2)] group" title="IA Auto-Configuración Visual">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:animate-pulse"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
                     </button>
+
+                    <!-- NUEVO: SEMÁFORO TV (MODO OSCURO) -->
+                    <div id="tv-traffic-light" class="flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-slate-800/80 border border-slate-600 shadow-lg hidden sm:flex">
+                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
+                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
+                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
+                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
+                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
+                    </div>
 
                     <div id="tv-status" class="text-xl lg:text-2xl font-rajdhani font-bold uppercase tracking-widest px-6 py-2 rounded-xl bg-slate-800/80 border border-slate-600 text-slate-400 shadow-lg" data-i18n="tvStatusWaiting">
                         ESPERANDO...
@@ -1354,26 +1368,26 @@
                     <div class="italic font-black text-3xl tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-red-400 to-orange-400 drop-shadow-[0_0_15px_rgba(239,68,68,1)] leading-none">PERSONAL <span class="text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">CARS</span></div>
                     
                     <div class="flex items-center space-x-2">
-                        <span class="text-[10px] font-bold uppercase text-red-300 drop-shadow-[0_0_5px_rgba(239,68,68,0.8)] hidden sm:inline">Seleccionar Coche</span>
-                        <select id="garage-car-select" class="bg-black/80 border border-red-500 text-white font-bold text-xs px-2 py-1 w-48 outline-none focus:border-red-400 focus:shadow-[0_0_15px_rgba(239,68,68,0.6)] rounded transition-shadow"></select>
-                        <span id="garage-car-id" class="text-red-300 border border-red-500 px-2 py-1 text-xs font-bold bg-red-950/60 rounded tracking-widest shadow-[0_0_10px_rgba(239,68,68,0.4)]">ID000</span>
+                        <span class="text-xs font-bold uppercase text-red-300 drop-shadow-[0_0_5px_rgba(239,68,68,0.8)] hidden sm:inline">Seleccionar Coche</span>
+                        <select id="garage-car-select" class="bg-black/80 border border-red-500 text-white font-bold text-sm px-2 py-1 w-48 outline-none focus:border-red-400 focus:shadow-[0_0_15px_rgba(239,68,68,0.6)] rounded transition-shadow"></select>
+                        <span id="garage-car-id" class="text-red-300 border border-red-500 px-2 py-1 text-sm font-bold bg-red-950/60 rounded tracking-widest shadow-[0_0_10px_rgba(239,68,68,0.4)]">ID000</span>
                     </div>
                 </div>
                 
                 <!-- Derecha: Botones Control -->
                 <div class="flex items-center space-x-2">
-                    <button id="garage-add-btn" class="bg-red-900/40 border border-red-500 hover:bg-red-500 text-red-100 px-3 py-1 text-[10px] font-bold uppercase transition rounded shadow-[0_0_10px_rgba(239,68,68,0.3)] hover:shadow-[0_0_20px_rgba(239,68,68,0.8)]">Añadir</button>
-                    <button id="garage-edit-btn" class="bg-blue-900/40 border border-blue-500 hover:bg-blue-500 text-blue-100 px-3 py-1 text-[10px] font-bold uppercase transition rounded shadow-[0_0_10px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.8)]">Editar</button>
-                    <button id="garage-save-btn" class="hidden bg-green-900/40 border border-green-500 hover:bg-green-500 text-green-100 px-3 py-1 text-[10px] font-bold uppercase transition rounded shadow-[0_0_15px_rgba(34,197,94,0.6)] hover:shadow-[0_0_25px_rgba(34,197,94,1)]">Guardar</button>
-                    <button id="garage-delete-btn" class="bg-gray-800/50 border border-gray-500 hover:bg-red-800/80 hover:border-red-500 text-gray-300 px-3 py-1 text-[10px] font-bold uppercase transition rounded shadow-[0_0_10px_rgba(107,114,128,0.3)] hover:shadow-[0_0_15px_rgba(239,68,68,0.6)]">Eliminar</button>
+                    <button id="garage-add-btn" class="bg-red-900/40 border border-red-500 hover:bg-red-500 text-red-100 px-3 py-1 text-[11px] font-bold uppercase transition rounded shadow-[0_0_10px_rgba(239,68,68,0.3)] hover:shadow-[0_0_20px_rgba(239,68,68,0.8)]">Añadir</button>
+                    <button id="garage-edit-btn" class="bg-blue-900/40 border border-blue-500 hover:bg-blue-500 text-blue-100 px-3 py-1 text-[11px] font-bold uppercase transition rounded shadow-[0_0_10px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.8)]">Editar</button>
+                    <button id="garage-save-btn" class="hidden bg-green-900/40 border border-green-500 hover:bg-green-500 text-green-100 px-3 py-1 text-[11px] font-bold uppercase transition rounded shadow-[0_0_15px_rgba(34,197,94,0.6)] hover:shadow-[0_0_25px_rgba(34,197,94,1)]">Guardar</button>
+                    <button id="garage-delete-btn" class="bg-gray-800/50 border border-gray-500 hover:bg-red-800/80 hover:border-red-500 text-gray-300 px-3 py-1 text-[11px] font-bold uppercase transition rounded shadow-[0_0_10px_rgba(107,114,128,0.3)] hover:shadow-[0_0_15px_rgba(239,68,68,0.6)]">Eliminar</button>
                     <div class="w-px h-6 bg-red-500/50 mx-1 shadow-[0_0_10px_rgba(239,68,68,0.8)]"></div>
-                    <button id="close-garage-btn" class="text-gray-400 hover:text-red-400 hover:drop-shadow-[0_0_10px_rgba(239,68,68,1)] font-bold text-lg px-2 transition-all">X</button>
+                    <button id="close-garage-btn" class="text-gray-400 hover:text-red-400 hover:drop-shadow-[0_0_10px_rgba(239,68,68,1)] font-bold text-xl px-2 transition-all">X</button>
                 </div>
             </div>
 
             <!-- Contenedor de Edición de Nombre -->
             <div id="garage-name-edit-container" class="hidden shrink-0 mb-2 relative z-10">
-                <input type="text" id="g-inp-name" class="w-full bg-black/80 border-2 border-blue-500 text-white px-3 py-1.5 rounded text-sm font-bold outline-none shadow-[0_0_15px_rgba(59,130,246,0.4),inset_0_0_10px_rgba(59,130,246,0.2)] focus:shadow-[0_0_25px_rgba(59,130,246,0.8),inset_0_0_15px_rgba(59,130,246,0.4)] transition-shadow" placeholder="Nombre completo del coche...">
+                <input type="text" id="g-inp-name" class="w-full bg-black/80 border-2 border-blue-500 text-white px-3 py-1.5 rounded text-base font-bold outline-none shadow-[0_0_15px_rgba(59,130,246,0.4),inset_0_0_10px_rgba(59,130,246,0.2)] focus:shadow-[0_0_25px_rgba(59,130,246,0.8),inset_0_0_15px_rgba(59,130,246,0.4)] transition-shadow" placeholder="Nombre completo del coche...">
             </div>
 
             <!-- Content Layout -->
@@ -1387,11 +1401,11 @@
                         <div class="absolute inset-0 bg-gradient-to-t from-cyan-900/30 via-transparent to-transparent pointer-events-none"></div>
                         <img id="garage-img" src="" alt="Coche" class="absolute inset-0 w-full h-full object-cover z-0">
                         <div id="garage-img-overlay" class="absolute inset-0 bg-black/80 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity hidden z-10 gap-3 backdrop-blur-sm">
-                            <button id="btn-galeria" class="text-cyan-300 text-[10px] font-bold uppercase tracking-widest border border-cyan-400 px-4 py-2 rounded flex items-center hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_20px_rgba(34,211,238,0.8)] transition-all">
+                            <button id="btn-galeria" class="text-cyan-300 text-[11px] font-bold uppercase tracking-widest border border-cyan-400 px-4 py-2 rounded flex items-center hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_20px_rgba(34,211,238,0.8)] transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
                                 Galería
                             </button>
-                            <button id="btn-camara" class="text-cyan-300 text-[10px] font-bold uppercase tracking-widest border border-cyan-400 px-4 py-2 rounded flex items-center hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_20px_rgba(34,211,238,0.8)] transition-all">
+                            <button id="btn-camara" class="text-cyan-300 text-[11px] font-bold uppercase tracking-widest border border-cyan-400 px-4 py-2 rounded flex items-center hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_20px_rgba(34,211,238,0.8)] transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
                                 Cámara
                             </button>
@@ -1402,13 +1416,13 @@
 
                     <!-- Caja Info Básica (Red glow) -->
                     <div class="shrink-0 grid grid-cols-2 gap-x-2 gap-y-3 text-center pb-2 pt-3 px-3 bg-gradient-to-b from-transparent to-red-950/40 rounded-lg border border-red-500/40 shadow-[0_0_15px_rgba(239,68,68,0.1),inset_0_0_15px_rgba(239,68,68,0.1)]">
-                        <div class="flex flex-col"><span class="text-red-300/80 text-[8px] uppercase tracking-wider drop-shadow-[0_0_2px_rgba(239,68,68,0.8)]">Marca</span><span id="g-val-marca" class="font-bold text-[11px] text-white"></span><input id="g-inp-marca" class="g-inp mx-auto text-center w-full" list="list-marcas"></div>
-                        <div class="flex flex-col"><span class="text-red-300/80 text-[8px] uppercase tracking-wider drop-shadow-[0_0_2px_rgba(239,68,68,0.8)]">Referencia</span><span id="g-val-ref" class="font-bold text-[11px] text-white"></span><input id="g-inp-ref" class="g-inp mx-auto text-center w-full"></div>
-                        <div class="flex flex-col"><span class="text-red-300/80 text-[8px] uppercase tracking-wider drop-shadow-[0_0_2px_rgba(239,68,68,0.8)]">Año</span><span id="g-val-year" class="font-bold text-[11px] text-white"></span><input id="g-inp-year" class="g-inp mx-auto text-center w-full"></div>
-                        <div class="flex flex-col"><span class="text-red-300/80 text-[8px] uppercase tracking-wider drop-shadow-[0_0_2px_rgba(239,68,68,0.8)]">Categoría</span><span id="g-val-cat" class="font-bold text-[11px] text-white"></span><input id="g-inp-cat" class="g-inp mx-auto text-center w-full" list="list-categorias"></div>
-                        <div class="flex flex-col"><span class="text-red-300/80 text-[8px] uppercase tracking-wider drop-shadow-[0_0_2px_rgba(239,68,68,0.8)]">Piloto</span><span id="g-val-pilot" class="font-bold text-[11px] text-white"></span><input id="g-inp-pilot" class="g-inp mx-auto text-center w-full"></div>
-                        <div class="flex flex-col"><span class="text-red-300/80 text-[8px] uppercase tracking-wider drop-shadow-[0_0_2px_rgba(239,68,68,0.8)]">Copiloto</span><span id="g-val-copilot" class="font-bold text-[11px] text-white"></span><input id="g-inp-copilot" class="g-inp mx-auto text-center w-full"></div>
-                        <div class="col-span-2 flex flex-col border-t border-red-500/50 pt-2 mt-1 shadow-[0_-5px_10px_rgba(239,68,68,0.1)]"><span class="text-red-300/80 text-[8px] uppercase tracking-wider drop-shadow-[0_0_2px_rgba(239,68,68,0.8)]">Analógico / Digital</span><span id="g-val-sys" class="font-bold text-[12px] text-red-400 drop-shadow-[0_0_5px_rgba(239,68,68,0.6)]"></span><input id="g-inp-sys" class="g-inp mx-auto text-center w-3/4" list="list-sistemas"></div>
+                        <div class="flex flex-col"><span class="text-red-300/80 text-[10px] uppercase tracking-wider drop-shadow-[0_0_2px_rgba(239,68,68,0.8)]">Marca</span><span id="g-val-marca" class="font-bold text-[12px] text-white"></span><input id="g-inp-marca" class="g-inp mx-auto text-center w-full" list="list-marcas"></div>
+                        <div class="flex flex-col"><span class="text-red-300/80 text-[10px] uppercase tracking-wider drop-shadow-[0_0_2px_rgba(239,68,68,0.8)]">Referencia</span><span id="g-val-ref" class="font-bold text-[12px] text-white"></span><input id="g-inp-ref" class="g-inp mx-auto text-center w-full"></div>
+                        <div class="flex flex-col"><span class="text-red-300/80 text-[10px] uppercase tracking-wider drop-shadow-[0_0_2px_rgba(239,68,68,0.8)]">Año</span><span id="g-val-year" class="font-bold text-[12px] text-white"></span><input id="g-inp-year" class="g-inp mx-auto text-center w-full"></div>
+                        <div class="flex flex-col"><span class="text-red-300/80 text-[10px] uppercase tracking-wider drop-shadow-[0_0_2px_rgba(239,68,68,0.8)]">Categoría</span><span id="g-val-cat" class="font-bold text-[12px] text-white"></span><input id="g-inp-cat" class="g-inp mx-auto text-center w-full" list="list-categorias"></div>
+                        <div class="flex flex-col"><span class="text-red-300/80 text-[10px] uppercase tracking-wider drop-shadow-[0_0_2px_rgba(239,68,68,0.8)]">Piloto</span><span id="g-val-pilot" class="font-bold text-[12px] text-white"></span><input id="g-inp-pilot" class="g-inp mx-auto text-center w-full"></div>
+                        <div class="flex flex-col"><span class="text-red-300/80 text-[10px] uppercase tracking-wider drop-shadow-[0_0_2px_rgba(239,68,68,0.8)]">Copiloto</span><span id="g-val-copilot" class="font-bold text-[12px] text-white"></span><input id="g-inp-copilot" class="g-inp mx-auto text-center w-full"></div>
+                        <div class="col-span-2 flex flex-col border-t border-red-500/50 pt-2 mt-1 shadow-[0_-5px_10px_rgba(239,68,68,0.1)]"><span class="text-red-300/80 text-[10px] uppercase tracking-wider drop-shadow-[0_0_2px_rgba(239,68,68,0.8)]">Analógico / Digital</span><span id="g-val-sys" class="font-bold text-[13px] text-red-400 drop-shadow-[0_0_5px_rgba(239,68,68,0.6)]"></span><input id="g-inp-sys" class="g-inp mx-auto text-center w-3/4" list="list-sistemas"></div>
                     </div>
                 </div>
 
@@ -1417,21 +1431,21 @@
                     
                     <!-- Rendimiento en Pista (Neon Cyan) -->
                     <div class="g-box shrink-0 border-cyan-400 bg-gradient-to-b from-cyan-950/60 to-black shadow-[0_0_20px_rgba(34,211,238,0.25),inset_0_0_15px_rgba(34,211,238,0.15)] rounded-lg">
-                        <div class="g-header shrink-0 mb-2 border-b border-cyan-400/50 pb-1 text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.9)] tracking-widest text-xs">Rendimiento Histórico en Pista</div>
+                        <div class="g-header shrink-0 mb-2 border-b border-cyan-400/50 pb-1 text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.9)] tracking-widest text-sm">Rendimiento Histórico en Pista</div>
                         <div class="grid grid-cols-6 gap-x-2 gap-y-2 text-center items-center px-1">
-                            <div class="flex flex-col"><span class="text-cyan-500/90 text-[8px] uppercase font-bold drop-shadow-[0_0_2px_rgba(34,211,238,0.5)]">Mejor Vuelta</span><span id="g-val-bestLap" class="font-black text-cyan-300 text-[12px] drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span><input id="g-inp-bestLap" class="g-inp mx-auto text-center w-full"></div>
-                            <div class="flex flex-col"><span class="text-gray-400 text-[8px] uppercase font-bold">T. Acumulado</span><span id="g-val-totalTime" class="font-bold text-white text-[11px] drop-shadow-[0_0_3px_rgba(255,255,255,0.5)]"></span><input id="g-inp-totalTime" class="g-inp mx-auto text-center w-full"></div>
-                            <div class="flex flex-col"><span class="text-gray-400 text-[8px] uppercase font-bold">Recorrido</span><span id="g-val-totalDist" class="font-bold text-white text-[11px] drop-shadow-[0_0_3px_rgba(255,255,255,0.5)]"></span><input id="g-inp-totalDist" class="g-inp mx-auto text-center w-full"></div>
-                            <div class="flex flex-col"><span class="text-gray-400 text-[8px] uppercase font-bold">Vel. Media</span><span id="g-val-avgSpd" class="font-bold text-white text-[11px] drop-shadow-[0_0_3px_rgba(255,255,255,0.5)]"></span><input id="g-inp-avgSpd" class="g-inp mx-auto text-center w-full"></div>
-                            <div class="flex flex-col"><span class="text-blue-400 text-[8px] uppercase font-bold drop-shadow-[0_0_2px_rgba(59,130,246,0.8)]">Escala 1:32</span><span id="g-val-avgSpd32" class="font-bold text-blue-300 text-[11px] drop-shadow-[0_0_5px_rgba(96,165,250,0.6)]"></span><input id="g-inp-avgSpd32" class="g-inp mx-auto text-center w-full"></div>
+                            <div class="flex flex-col"><span class="text-cyan-500/90 text-[9px] uppercase font-bold drop-shadow-[0_0_2px_rgba(34,211,238,0.5)]">Mejor Vuelta</span><span id="g-val-bestLap" class="font-black text-cyan-300 text-[14px] drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span><input id="g-inp-bestLap" class="g-inp mx-auto text-center w-full"></div>
+                            <div class="flex flex-col"><span class="text-gray-400 text-[9px] uppercase font-bold">T. Acumulado</span><span id="g-val-totalTime" class="font-bold text-white text-[12px] drop-shadow-[0_0_3px_rgba(255,255,255,0.5)]"></span><input id="g-inp-totalTime" class="g-inp mx-auto text-center w-full"></div>
+                            <div class="flex flex-col"><span class="text-gray-400 text-[9px] uppercase font-bold">Recorrido</span><span id="g-val-totalDist" class="font-bold text-white text-[12px] drop-shadow-[0_0_3px_rgba(255,255,255,0.5)]"></span><input id="g-inp-totalDist" class="g-inp mx-auto text-center w-full"></div>
+                            <div class="flex flex-col"><span class="text-gray-400 text-[9px] uppercase font-bold">Vel. Media</span><span id="g-val-avgSpd" class="font-bold text-white text-[12px] drop-shadow-[0_0_3px_rgba(255,255,255,0.5)]"></span><input id="g-inp-avgSpd" class="g-inp mx-auto text-center w-full"></div>
+                            <div class="flex flex-col"><span class="text-blue-400 text-[9px] uppercase font-bold drop-shadow-[0_0_2px_rgba(59,130,246,0.8)]">Escala 1:32</span><span id="g-val-avgSpd32" class="font-bold text-blue-300 text-[12px] drop-shadow-[0_0_5px_rgba(96,165,250,0.6)]"></span><input id="g-inp-avgSpd32" class="g-inp mx-auto text-center w-full"></div>
                             
                             <!-- Grafiquita de constancia -->
                             <div class="flex flex-col items-center justify-center relative w-full pt-1">
-                                <span class="text-gray-400 text-[8px] uppercase font-bold mb-1 leading-none">Constancia</span>
+                                <span class="text-gray-400 text-[9px] uppercase font-bold mb-1 leading-none">Constancia</span>
                                 <div class="w-full bg-black/80 rounded-full h-2.5 border border-cyan-900 relative overflow-hidden shadow-[inset_0_0_5px_rgba(0,0,0,1)]">
                                     <div id="g-bar-consistency" class="bg-cyan-400 h-full rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(34,211,238,1)]" style="width: 0%"></div>
                                 </div>
-                                <span id="g-val-consistency" class="text-[10px] font-bold text-cyan-100 mt-0.5 drop-shadow-[0_0_3px_rgba(255,255,255,0.5)]"></span>
+                                <span id="g-val-consistency" class="text-[12px] font-bold text-cyan-100 mt-0.5 drop-shadow-[0_0_3px_rgba(255,255,255,0.5)]"></span>
                                 <input id="g-inp-consistency" class="g-inp mx-auto text-center w-full absolute bottom-0" placeholder="%">
                             </div>
                         </div>
@@ -1439,7 +1453,7 @@
 
                     <!-- Ficha Técnica (Neon Red) -->
                     <div class="g-box flex-1 flex flex-col min-h-0 border-red-500 bg-gradient-to-br from-red-950/40 to-black shadow-[0_0_20px_rgba(239,68,68,0.2),inset_0_0_15px_rgba(239,68,68,0.1)] rounded-lg">
-                        <div class="g-header shrink-0 mb-2 border-b border-red-500/50 pb-1 text-red-400 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)] tracking-widest text-xs">Ficha Técnica</div>
+                        <div class="g-header shrink-0 mb-2 border-b border-red-500/50 pb-1 text-red-400 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)] tracking-widest text-sm">Ficha Técnica</div>
                         <div class="flex-1 grid grid-cols-2 gap-x-6 overflow-hidden">
                             <!-- Col 1 -->
                             <div class="flex flex-col justify-evenly">
@@ -1476,12 +1490,12 @@
                     <!-- Información de Compra (Neon Purple/Magenta) -->
                     <div class="g-box shrink-0 border-fuchsia-500 bg-gradient-to-tr from-fuchsia-950/40 to-black shadow-[0_0_20px_rgba(217,70,239,0.2),inset_0_0_10px_rgba(217,70,239,0.15)] mt-auto rounded-lg">
                         <div class="grid grid-cols-3 gap-y-3 gap-x-4 text-center items-center py-1">
-                            <div class="flex flex-col"><span class="text-fuchsia-400 text-[8px] uppercase font-bold drop-shadow-[0_0_2px_rgba(217,70,239,0.8)]">Caja</span><span id="g-val-caja" class="font-bold text-[11px] text-fuchsia-100"></span><input id="g-inp-caja" class="g-inp mx-auto text-center w-full" list="list-cajas"></div>
-                            <div class="flex flex-col"><span class="text-fuchsia-400 text-[8px] uppercase font-bold drop-shadow-[0_0_2px_rgba(217,70,239,0.8)]">Estado</span><span id="g-val-estado" class="font-bold text-[11px] text-fuchsia-100"></span><input id="g-inp-estado" class="g-inp mx-auto text-center w-full" list="list-estados"></div>
-                            <div class="flex flex-col"><span class="text-fuchsia-400 text-[8px] uppercase font-bold drop-shadow-[0_0_2px_rgba(217,70,239,0.8)]">Precio</span><span id="g-val-precio" class="font-black text-[12px] text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.8)]"></span><input id="g-inp-precio" class="g-inp mx-auto text-center w-full"></div>
-                            <div class="flex flex-col"><span class="text-fuchsia-400 text-[8px] uppercase font-bold drop-shadow-[0_0_2px_rgba(217,70,239,0.8)]">Comprado en</span><span id="g-val-compradoEn" class="font-bold text-[11px] text-fuchsia-100"></span><input id="g-inp-compradoEn" class="g-inp mx-auto text-center w-full" list="list-tiendas"></div>
-                            <div class="flex flex-col"><span class="text-fuchsia-400 text-[8px] uppercase font-bold drop-shadow-[0_0_2px_rgba(217,70,239,0.8)]">Fecha</span><span id="g-val-fecha" class="font-bold text-[11px] text-fuchsia-100"></span><input id="g-inp-fecha" class="g-inp mx-auto text-center w-full"></div>
-                            <div class="flex flex-col"><span class="text-fuchsia-400 text-[8px] uppercase font-bold drop-shadow-[0_0_2px_rgba(217,70,239,0.8)]">Colección</span><span id="g-val-coleccion" class="font-bold text-[11px] text-fuchsia-100"></span><input id="g-inp-coleccion" class="g-inp mx-auto text-center w-full"></div>
+                            <div class="flex flex-col"><span class="text-fuchsia-400 text-[10px] uppercase font-bold drop-shadow-[0_0_2px_rgba(217,70,239,0.8)]">Caja</span><span id="g-val-caja" class="font-bold text-[13px] text-fuchsia-100"></span><input id="g-inp-caja" class="g-inp mx-auto text-center w-full" list="list-cajas"></div>
+                            <div class="flex flex-col"><span class="text-fuchsia-400 text-[10px] uppercase font-bold drop-shadow-[0_0_2px_rgba(217,70,239,0.8)]">Estado</span><span id="g-val-estado" class="font-bold text-[13px] text-fuchsia-100"></span><input id="g-inp-estado" class="g-inp mx-auto text-center w-full" list="list-estados"></div>
+                            <div class="flex flex-col"><span class="text-fuchsia-400 text-[10px] uppercase font-bold drop-shadow-[0_0_2px_rgba(217,70,239,0.8)]">Precio</span><span id="g-val-precio" class="font-black text-[14px] text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.8)]"></span><input id="g-inp-precio" class="g-inp mx-auto text-center w-full"></div>
+                            <div class="flex flex-col"><span class="text-fuchsia-400 text-[10px] uppercase font-bold drop-shadow-[0_0_2px_rgba(217,70,239,0.8)]">Comprado en</span><span id="g-val-compradoEn" class="font-bold text-[13px] text-fuchsia-100"></span><input id="g-inp-compradoEn" class="g-inp mx-auto text-center w-full" list="list-tiendas"></div>
+                            <div class="flex flex-col"><span class="text-fuchsia-400 text-[10px] uppercase font-bold drop-shadow-[0_0_2px_rgba(217,70,239,0.8)]">Fecha</span><span id="g-val-fecha" class="font-bold text-[13px] text-fuchsia-100"></span><input id="g-inp-fecha" class="g-inp mx-auto text-center w-full"></div>
+                            <div class="flex flex-col"><span class="text-fuchsia-400 text-[10px] uppercase font-bold drop-shadow-[0_0_2px_rgba(217,70,239,0.8)]">Colección</span><span id="g-val-coleccion" class="font-bold text-[13px] text-fuchsia-100"></span><input id="g-inp-coleccion" class="g-inp mx-auto text-center w-full"></div>
                         </div>
                     </div>
 
@@ -1600,14 +1614,14 @@
 
             <!-- Pie de Exportación (Oculto o compacto al final) -->
             <div class="flex justify-end items-center mt-2 pt-2 border-t border-red-900/50 shrink-0 gap-2">
-                <button id="garage-import-btn" class="bg-[#111] border border-gray-700 hover:bg-blue-900/40 text-gray-400 hover:text-blue-400 px-3 py-1 rounded text-[10px] font-bold uppercase transition flex items-center shadow-[0_0_10px_rgba(59,130,246,0.1)]">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 14 12 9 7 14"/><line x1="12" y1="9" x2="12" y2="21"/></svg>
+                <button id="garage-import-btn" class="bg-[#111] border border-gray-700 hover:bg-blue-900/40 text-gray-400 hover:text-blue-400 px-3 py-1 rounded text-xs font-bold uppercase transition flex items-center shadow-[0_0_10px_rgba(59,130,246,0.1)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 14 12 9 7 14"/><line x1="12" y1="9" x2="12" y2="21"/></svg>
                     Importar JSON
                 </button>
                 <input type="file" id="garage-import-input" accept=".json" class="hidden">
                 <div class="w-px h-4 bg-gray-700 mx-1"></div>
-                <button id="garage-export-btn" class="bg-[#111] border border-gray-700 hover:bg-gray-800 text-gray-400 hover:text-white px-3 py-1 rounded text-[10px] font-bold uppercase transition flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <button id="garage-export-btn" class="bg-[#111] border border-gray-700 hover:bg-gray-800 text-gray-400 hover:text-white px-3 py-1 rounded text-xs font-bold uppercase transition flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     Exportar JSON
                 </button>
             </div>
@@ -2489,6 +2503,27 @@
         }
 
         async function startTrafficLight() {
+            // BLOQUEO DE SEGURIDAD: Solo iniciar si la cámara está activa
+            if (!isProcessing) {
+                const titleEl = falseStartAlert.querySelector('h2');
+                const pEl = falseStartAlert.querySelector('p');
+                const oldTitle = titleEl.textContent;
+                const oldP = pEl.textContent;
+                
+                titleEl.textContent = "CÁMARA APAGADA";
+                pEl.textContent = "Enciende el sensor para iniciar";
+                falseStartAlert.classList.add('show');
+                
+                setTimeout(() => {
+                    falseStartAlert.classList.remove('show');
+                    setTimeout(() => {
+                        titleEl.textContent = oldTitle;
+                        pEl.textContent = oldP;
+                    }, 500);
+                }, 3000);
+                return;
+            }
+
             if (Tone.context.state !== 'running') {
                 await Tone.start();
             }
@@ -2790,7 +2825,6 @@
 
         async function loadLeaderboard() {
             let records = [];
-            let isDemo = false;
 
             rankingBody.innerHTML = `<div class="text-center p-4 text-blue-400/80 font-medium font-rajdhani tracking-widest animate-pulse">Sincronizando telemetría global...</div>`;
             
@@ -2804,32 +2838,13 @@
                     console.error("Error loading leaderboard", e);
                 }
             }
-
-            // MODO DEMO: Si no hay datos en la nube, inyectamos ejemplos ficticios con muchos datos
-            if (records.length === 0) {
-                isDemo = true;
-                records = [
-                    { pilot: "Albert Closa", car: "Porsche 911 GT3 R Gulf", bestLap: 4125, trackLength: 15.0, avgSpeed: 12.8, consistency: 98.5 },
-                    { pilot: "Ayrton Senna", car: "McLaren MP4/4 Honda", bestLap: 4250, trackLength: 15.0, avgSpeed: 12.4, consistency: 99.1 },
-                    { pilot: "Ken Miles", car: "Ford GT40 Mk II Le Mans", bestLap: 4580, trackLength: 15.0, avgSpeed: 11.5, consistency: 96.8 },
-                    { pilot: "Niki Lauda", car: "Ferrari 312T2 Scuderia", bestLap: 4890, trackLength: 15.0, avgSpeed: 10.8, consistency: 97.2 },
-                    { pilot: "Michael Schumacher", car: "Benetton Ford B194", bestLap: 5120, trackLength: 15.0, avgSpeed: 10.2, consistency: 95.4 }
-                ];
-            }
             
             records.sort((a, b) => a.bestLap - b.bestLap);
             records = records.slice(0, 25); // Solo el TOP 25
 
             rankingBody.innerHTML = '';
-            
-            if (isDemo) {
-                const demoAlert = document.createElement('div');
-                demoAlert.className = "text-center text-blue-300/60 text-[10px] uppercase tracking-[0.3em] font-bold mb-6 font-rajdhani border border-blue-900/30 bg-blue-950/20 py-1 w-max mx-auto px-4 rounded-full backdrop-blur-sm";
-                demoAlert.innerText = "— DEMO: MOSTRANDO TELEMETRÍA FICTICIA —";
-                rankingBody.appendChild(demoAlert);
-            }
 
-            if (records.length === 0 && !isDemo) {
+            if (records.length === 0) {
                  rankingBody.innerHTML = `<div class="text-center p-4 text-slate-400 font-rajdhani tracking-widest">${translations[currentLang].noRecords}</div>`;
             } else {
                  const leaderLap = records[0].bestLap; // Referencia para el Delta
@@ -3783,6 +3798,7 @@
             const tvExitBtn = document.getElementById('tv-exit-btn');
 
             // --- BOTONES CONTROL REMOTO TV ---
+            const tvRemoteStartBtn = document.getElementById('tv-remote-start-btn'); // NUEVO BOTÓN
             const tvRemotePauseBtn = document.getElementById('tv-remote-pause-btn');
             const tvRemoteResetBtn = document.getElementById('tv-remote-reset-btn');
             const tvAiLayoutBtn = document.getElementById('tv-ai-layout-btn'); // NUEVO BOTÓN
@@ -3810,6 +3826,9 @@
             }
 
             // Usamos .onclick en lugar de addEventListener para evitar duplicados si se entra y sale del modo TV
+            if (tvRemoteStartBtn) {
+                tvRemoteStartBtn.onclick = () => sendRemoteCommand('START_RACE');
+            }
             if (tvRemotePauseBtn) {
                 tvRemotePauseBtn.onclick = () => sendRemoteCommand('PAUSE');
             }
@@ -3956,65 +3975,82 @@
                     tvPrevState.raceAborted = tvData.raceAborted || false;
                     tvPrevState.isCountdown = tvData.isCountdown || false;
                     tvPrevState.isPaused = tvData.isPaused || false;
-                    isFirstPayload = false;
-                } else {
-                    if (Tone.context.state !== 'running') Tone.context.resume();
+                isFirstPayload = false;
+            } else {
+                if (Tone.context.state !== 'running') Tone.context.resume();
+                
+                const targetLang = tvData.currentLang || currentLang;
+                const tvLights = document.querySelectorAll('.tv-light');
+                
+                // 1. Salida Nula
+                if (tvData.raceAborted && !tvPrevState.raceAborted) {
+                    polySynth.triggerAttackRelease(["C2", "F#2"], "1");
+                    speak(translations[targetLang].voiceFalseStart);
+                    if(tvCountdownInterval) clearInterval(tvCountdownInterval);
                     
-                    const targetLang = tvData.currentLang || currentLang;
+                    tvLights.forEach(l => {
+                        l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-red-600 border border-red-400 shadow-[0_0_15px_#dc2626] animate-pulse";
+                    });
+                    setTimeout(() => {
+                        tvLights.forEach(l => { l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"; });
+                    }, 3000);
+                }
+                
+                // 2. Semáforo Verde (Inicio Carrera)
+                if (tvData.isRaceActive && !tvPrevState.isRaceActive && !tvData.raceAborted && !tvPrevState.isPaused) {
+                    polySynth.triggerAttackRelease(["C5", "E5", "G5"], "0.5");
+                    tvLights.forEach(l => {
+                        l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-emerald-500 border border-emerald-400 shadow-[0_0_15px_#10b981] transition-all duration-200";
+                    });
+                    setTimeout(() => {
+                        tvLights.forEach(l => { l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"; });
+                    }, 3000);
+                }
+                
+                // 3. Nueva Vuelta
+                if ((tvData.currentLap > tvPrevState.lapCount) && tvData.lapHistory && tvData.lapHistory.length > 0) {
+                    const newLapData = tvData.lapHistory[tvData.lapHistory.length - 1];
                     
-                    // 1. Salida Nula
-                    if (tvData.raceAborted && !tvPrevState.raceAborted) {
-                        polySynth.triggerAttackRelease(["C2", "F#2"], "1");
-                        speak(translations[targetLang].voiceFalseStart);
-                        if(tvCountdownInterval) clearInterval(tvCountdownInterval);
+                    let sIdx = tvData.audioConfig ? tvData.audioConfig.soundIndex : 0;
+                    const snd = soundOptions[sIdx] || soundOptions[0];
+                    playSound(snd.freq, snd.dur);
+                    
+                    const isBest = newLapData.time === tvData.bestLapTime;
+                    
+                    let extraMsg = "";
+                    let remaining = tvData.totalLaps !== Infinity ? tvData.totalLaps - tvData.currentLap : Infinity;
+                    if (remaining === 5) extraMsg = `${translations[targetLang].voiceRemaining} 5 ${translations[targetLang].voiceLaps}.`;
+                    if (remaining === 1) { 
+                        extraMsg = translations[targetLang].voiceLastLap; 
+                        playFinalLapSound(); 
                     }
                     
-                    // 2. Semáforo Verde (Inicio Carrera)
-                    if (tvData.isRaceActive && !tvPrevState.isRaceActive && !tvData.raceAborted && !tvPrevState.isPaused) {
-                        polySynth.triggerAttackRelease(["C5", "E5", "G5"], "0.5");
-                    }
-                    
-                    // 3. Nueva Vuelta
-                    if ((tvData.currentLap > tvPrevState.lapCount) && tvData.lapHistory && tvData.lapHistory.length > 0) {
-                        const newLapData = tvData.lapHistory[tvData.lapHistory.length - 1];
-                        
-                        let sIdx = tvData.audioConfig ? tvData.audioConfig.soundIndex : 0;
-                        const snd = soundOptions[sIdx] || soundOptions[0];
-                        playSound(snd.freq, snd.dur);
-                        
-                        const isBest = newLapData.time === tvData.bestLapTime;
-                        
-                        let extraMsg = "";
-                        let remaining = tvData.totalLaps !== Infinity ? tvData.totalLaps - tvData.currentLap : Infinity;
-                        if (remaining === 5) extraMsg = `${translations[targetLang].voiceRemaining} 5 ${translations[targetLang].voiceLaps}.`;
-                        if (remaining === 1) { 
-                            extraMsg = translations[targetLang].voiceLastLap; 
-                            playFinalLapSound(); 
+                    announceLap(tvData.currentLap, newLapData.time, isBest, extraMsg);
+                }
+                
+                // 4. Fin de Carrera
+                if (!tvData.isRaceActive && tvPrevState.isRaceActive && tvData.lapHistory && tvData.lapHistory.length > 0 && !tvData.raceAborted) {
+                    announceRaceFinish(tvData.pilot);
+                }
+                
+                // 5. Inicio Cuenta Atrás (Semáforos Rojos)
+                if (tvData.isCountdown && !tvPrevState.isCountdown) {
+                    let count = 0;
+                    tvLights.forEach(l => { l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"; });
+
+                    if(tvCountdownInterval) clearInterval(tvCountdownInterval);
+                    tvCountdownInterval = setInterval(() => {
+                        if (!tvData.isCountdown || tvData.raceAborted || count >= 5) {
+                            clearInterval(tvCountdownInterval);
+                            return;
                         }
-                        
-                        announceLap(tvData.currentLap, newLapData.time, isBest, extraMsg);
-                    }
-                    
-                    // 4. Fin de Carrera
-                    if (!tvData.isRaceActive && tvPrevState.isRaceActive && tvData.lapHistory && tvData.lapHistory.length > 0 && !tvData.raceAborted) {
-                        announceRaceFinish(tvData.pilot);
-                    }
-                    
-                    // 5. Inicio Cuenta Atrás (Semáforos Rojos)
-                    if (tvData.isCountdown && !tvPrevState.isCountdown) {
-                        let count = 0;
-                        if(tvCountdownInterval) clearInterval(tvCountdownInterval);
-                        tvCountdownInterval = setInterval(() => {
-                            if (!tvData.isCountdown || tvData.raceAborted || count >= 5) {
-                                clearInterval(tvCountdownInterval);
-                                return;
-                            }
-                            synth.triggerAttackRelease("C4", "8n");
-                            count++;
-                        }, 1000);
-                    }
-                    
-                    // Actualizar estado previo
+                        synth.triggerAttackRelease("C4", "8n");
+                        tvLights[count].className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-red-500 border border-red-400 shadow-[0_0_10px_#ef4444] transition-all duration-200";
+                        count++;
+                    }, 1000);
+                }
+                
+                // Actualizar estado previo
                     tvPrevState.lapCount = tvData.currentLap || 0;
                     tvPrevState.isRaceActive = tvData.isRaceActive || false;
                     tvPrevState.raceAborted = tvData.raceAborted || false;
@@ -4374,10 +4410,12 @@
                     referencePixels = null; // Reiniciar fondo de cámara
                 }
 
-                stopRace(false); // 1. Ponemos todos los datos y tiempos en blanco
-                setTimeout(() => {
-                    startTrafficLight(); // 2. Iniciamos el semáforo y la carrera tras un breve respiro
-                }, 350);
+                // Ahora SÓLO resetea la carrera, pero NO arranca el semáforo automáticamente
+                stopRace(false); 
+            } else if (action === 'START_RACE') {
+                if (!isRaceActive && !isCountdown) {
+                    startTrafficLight();
+                }
             }
         }
 
@@ -4456,8 +4494,10 @@
             } else {
                 garageCars.forEach(car => {
                     const opt = document.createElement('option');
-                    opt.value = car.name;
-                    opt.textContent = car.name;
+                    // Garantizamos que haya texto aunque falte el campo name en el JSON
+                    const carName = car.name || `${car.marca || 'Coche'} ${car.ref || ''}`.trim() || 'Coche Desconocido';
+                    opt.value = carName;
+                    opt.textContent = carName;
                     if(car.image) opt.dataset.image = car.image;
                     carSelect.appendChild(opt);
                 });
@@ -4520,7 +4560,36 @@
         }
 
         function saveGarageToLocal() {
-            localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
+            try {
+                let jsonStr = JSON.stringify(garageCars);
+                
+                // Prevención proactiva: Si el JSON es mayor de ~4.5MB, es casi seguro que fallará en móviles
+                if (jsonStr.length > 4500000) {
+                    alert("⚠️ El archivo de garaje es demasiado grande para la memoria del móvil.\n\nPara poder guardarlo sin que falle la app, se van a limpiar las fotos. Los datos, especificaciones y tiempos de los coches se mantendrán intactos.");
+                    
+                    garageCars.forEach(car => car.image = "");
+                    jsonStr = JSON.stringify(garageCars);
+                    
+                    // Actualizar UI para reflejar pérdida de foto
+                    if (typeof updateConfigCarList === 'function') updateConfigCarList();
+                    renderGarageCar(currentGarageIndex);
+                }
+                
+                localStorage.setItem('krono_garage_cars', jsonStr);
+            } catch (e) {
+                console.error("Error saving garage:", e);
+                // Si falla por CUALQUIER otro error de cuota o límite en móviles
+                alert("⚠️ Límite de memoria del navegador superado.\n\nLimpiando fotos de los coches para intentar guardar los datos a la fuerza...");
+                
+                garageCars.forEach(car => car.image = "");
+                try {
+                    localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
+                    if (typeof updateConfigCarList === 'function') updateConfigCarList();
+                    renderGarageCar(currentGarageIndex);
+                } catch (e2) {
+                    alert("Error crítico: No se ha podido guardar el garaje. Revisa el espacio del dispositivo.");
+                }
+            }
         }
 
         function populateDropdown() {
@@ -4540,7 +4609,7 @@
             const car = garageCars[index];
             
             document.getElementById('garage-car-id').textContent = car.id || "ID---";
-            document.getElementById('garage-img').src = car.image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%23dc2626' stroke-width='1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2'/%3E%3Ccircle cx='7' cy='17' r='2'/%3E%3Cpath d='M9 17h6'/%3E%3Ccircle cx='17' cy='17' r='2'/%3E%3C/svg%3E";
+            document.getElementById('garage-img').src = car.image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cfilter id='neonGlow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='1.5' result='blur' /%3E%3CfeMerge%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='SourceGraphic' /%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Ctext x='50' y='54' font-family='Arial, sans-serif' font-size='12' font-weight='900' stroke='none' fill='%2322d3ee' text-anchor='middle' letter-spacing='1' filter='url(%23neonGlow)'%3EPHOTO CAR%3C/text%3E%3C/svg%3E";
             
             document.getElementById('g-inp-name').value = car.name || "";
 
@@ -4800,6 +4869,9 @@
             return importedData.map(car => {
                 // Si el coche ya viene en el formato plano de la app (exportado previamente desde aquí)
                 if (car.marca !== undefined && car.metadata === undefined) {
+                    // Garantizar que tenga nombre y un ID por si viene de una versión antigua
+                    if (!car.name) car.name = `${car.marca || 'Coche'} ${car.ref || ''}`.trim() || 'Coche Importado';
+                    if (!car.id) car.id = `ID${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
                     return car; 
                 }
 
@@ -4868,8 +4940,24 @@
             const reader = new FileReader();
             reader.onload = (event) => {
                 try {
-                    const importedData = JSON.parse(event.target.result);
-                    if (!Array.isArray(importedData)) throw new Error("El archivo JSON debe contener una lista (Array) de coches.");
+                    let importedData = JSON.parse(event.target.result);
+                    
+                    // Flexibilidad en el formato del JSON: forzar conversión a Array si viene como Objeto
+                    if (!Array.isArray(importedData)) {
+                        if (typeof importedData === 'object' && importedData !== null) {
+                            // Caso A: { "cars": [...] }
+                            const keys = Object.keys(importedData);
+                            if (keys.length === 1 && Array.isArray(importedData[keys[0]])) {
+                                importedData = importedData[keys[0]];
+                            } 
+                            // Caso B: { "1": {...}, "2": {...} }
+                            else {
+                                importedData = Object.values(importedData);
+                            }
+                        } else {
+                            throw new Error("El archivo JSON debe contener una lista de coches.");
+                        }
+                    }
                     
                     const parsedCars = parseImportedCars(importedData);
                     
@@ -4879,11 +4967,14 @@
                         garageCars = garageCars.concat(parsedCars);
                     }
                     
-                    saveGarageToLocal();
+                    // Aseguramos primero la actualización de la interfaz UI en memoria
                     currentGarageIndex = 0;
                     populateDropdown();
                     renderGarageCar(currentGarageIndex);
                     if (typeof updateConfigCarList === 'function') updateConfigCarList();
+                    
+                    // Ahora guardamos (la validación de tamaño se hace dentro automáticamente)
+                    saveGarageToLocal();
                     
                     // Notificación visual de éxito en el propio botón
                     const originalText = importBtn.innerHTML;
