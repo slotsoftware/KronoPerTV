@@ -1714,6 +1714,23 @@
                 </div>
             </div>
             
+            <!-- NUEVO: SECCIÓN DE RENDIMIENTO HISTÓRICO ACUMULADO -->
+            <div id="modal-historical-section" class="mb-6 bg-slate-800 rounded-lg border border-slate-600 overflow-hidden shadow-md text-white hidden">
+                <div class="bg-slate-900 px-4 py-2 border-b border-slate-700 flex justify-between items-center">
+                    <h4 class="text-xs font-bold text-cyan-400 uppercase tracking-widest flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1.5 animate-pulse"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        Rendimiento Histórico
+                    </h4>
+                    <span class="text-[9px] font-bold bg-cyan-900/50 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/50 tracking-widest shadow-[0_0_8px_rgba(34,211,238,0.3)]">ACTUALIZADO</span>
+                </div>
+                <div class="grid grid-cols-4 gap-1 p-2 sm:p-3 text-center">
+                    <div class="flex flex-col"><span class="text-[8px] sm:text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Mejor V.</span><span id="modal-hist-best" class="font-black text-emerald-400 text-xs sm:text-sm truncate drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]"></span></div>
+                    <div class="flex flex-col border-l border-slate-700"><span class="text-[8px] sm:text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Distancia</span><span id="modal-hist-dist" class="font-black text-purple-400 text-xs sm:text-sm truncate drop-shadow-[0_0_5px_rgba(168,85,247,0.5)]"></span></div>
+                    <div class="flex flex-col border-l border-slate-700"><span class="text-[8px] sm:text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Vel. Media</span><span id="modal-hist-spd" class="font-black text-cyan-400 text-xs sm:text-sm truncate drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]"></span></div>
+                    <div class="flex flex-col border-l border-slate-700"><span class="text-[8px] sm:text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Constancia</span><span id="modal-hist-cons" class="font-black text-yellow-400 text-xs sm:text-sm truncate drop-shadow-[0_0_5px_rgba(250,204,21,0.5)]"></span></div>
+                </div>
+            </div>
+            
             <button id="modal-restart-btn" class="w-full bg-gradient-to-r from-gray-700 to-gray-900 hover:from-gray-600 hover:to-gray-800 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center transform hover:scale-[1.02]" data-i18n="restartFull">
                 VOLVER A EMPEZAR
             </button>
@@ -2054,6 +2071,7 @@
         let lastCompletedLapTime = 0;
         let consistency = 0; 
         let lastDelta = 0;   
+        let statsSavedForCurrentLaps = false;
 
         // Audio
         const soundOptions = [
@@ -2451,6 +2469,7 @@
             const lapData = { lap: currentLap + 1, time: completedLapTime, speed: lapSpeed, delta: lapDelta };
             lapHistory.push(lapData);
             lastCompletedLapTime = completedLapTime;
+            statsSavedForCurrentLaps = false;
             
             const isBest = calculateStats(completedLapTime, lapSpeed);
             currentLap++;
@@ -2698,8 +2717,9 @@
             if (lapIntervalId) clearInterval(lapIntervalId);
             
             // Siempre actualizar rendimiento histórico si hay vueltas (incluso al abortar)
-            if (currentLap > 0) {
+            if (currentLap > 0 && !statsSavedForCurrentLaps) {
                 updateGarageCarStatsAfterRace();
+                statsSavedForCurrentLaps = true;
             }
 
             broadcastState(); 
@@ -2727,6 +2747,27 @@
                         row.innerHTML = `<td class="py-2 px-2 text-left">${l.lap}</td><td class="py-2 px-2">${(l.time/1000).toFixed(3)}</td><td class="py-2 px-2 ${dColor}">${dText}</td><td class="py-2 px-2 text-right">${l.speed.toFixed(1)}</td>`;
                         tbody.appendChild(row);
                     });
+                    
+                    // --- MOSTRAR RENDIMIENTO HISTÓRICO ACTUALIZADO ---
+                    const histSection = document.getElementById('modal-historical-section');
+                    const activeCarName = document.getElementById('car-model-input').value;
+                    const carIndex = garageCars.findIndex(c => {
+                        const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
+                        return cName === activeCarName;
+                    });
+                    
+                    if (carIndex !== -1) {
+                        const car = garageCars[carIndex];
+                        document.getElementById('modal-hist-best').textContent = car.bestLap || "-";
+                        document.getElementById('modal-hist-dist').textContent = car.totalDist || "-";
+                        document.getElementById('modal-hist-spd').textContent = car.avgSpd || "-";
+                        document.getElementById('modal-hist-cons').textContent = (car.consistency && parseFloat(car.consistency) > 0) ? `${car.consistency}%` : "-";
+                        histSection.classList.remove('hidden');
+                    } else {
+                        histSection.classList.add('hidden');
+                    }
+                    // -------------------------------------------------
+                    
                     resultsModal.classList.remove('hidden');
                     setTimeout(()=>resultsModal.classList.add('open'),10);
                 }
@@ -4714,7 +4755,6 @@
                 saveGarageToLocal();
             }
             populateDropdown();
-            renderGarageCar(0);
         }
 
         function saveGarageToLocal() {
@@ -4863,7 +4903,30 @@
         function openGarage() {
             // Recargar localStorage por si se modificó en otra pestaña
             garageCars = JSON.parse(localStorage.getItem('krono_garage_cars')) || [];
-            initGarage();
+            
+            if (garageCars.length === 0) {
+                initGarage();
+            } else {
+                populateDropdown();
+            }
+            
+            // Buscar cuál es el coche activo en la app principal
+            const activeCarName = document.getElementById('car-model-input').value;
+            let foundIndex = garageCars.findIndex(c => {
+                const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
+                return cName === activeCarName;
+            });
+            
+            if (foundIndex !== -1) {
+                currentGarageIndex = foundIndex;
+                carSelect.value = foundIndex;
+            } else {
+                currentGarageIndex = 0;
+                carSelect.value = 0;
+            }
+            
+            renderGarageCar(currentGarageIndex);
+            
             toggleGarageEdit(false);
             garageModal.classList.remove('hidden');
             setTimeout(() => garageModal.classList.add('open'), 10);
