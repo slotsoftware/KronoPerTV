@@ -4503,15 +4503,23 @@
                 });
             }
 
+            let valueChanged = false;
             // Seleccionar el guardado o el primero
             if (currentVal && Array.from(carSelect.options).some(o => o.value === currentVal)) {
                 carSelect.value = currentVal;
             } else if (carSelect.options.length > 0) {
                 carSelect.value = carSelect.options[0].value;
                 localStorage.setItem('krono_car_model', carSelect.value);
+                valueChanged = true;
             }
             
             updateConfigCarImage();
+
+            // Asegurar sincronización al móvil y TV si el coche cambia automáticamente (ej. al importar json por 1ra vez)
+            if (valueChanged && typeof broadcastState === 'function') {
+                broadcastState();
+                if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
+            }
         };
 
         window.updateConfigCarImage = function() {
@@ -4963,15 +4971,26 @@
                     
                     if (confirm(`Se han detectado ${parsedCars.length} coches en el archivo.\n\n¿Quieres REEMPLAZAR tu garaje actual con estos coches?\n\n- Dale a "Aceptar" para borrar los actuales y poner los nuevos.\n- Dale a "Cancelar" para añadirlos a los que ya tienes.`)) {
                         garageCars = parsedCars;
+                        // Al reemplazar el garaje, forzamos que seleccione el primer coche de la lista nueva
+                        localStorage.removeItem('krono_car_model');
                     } else {
+                        const wasEmpty = garageCars.length === 0;
                         garageCars = garageCars.concat(parsedCars);
+                        // Si el garaje estaba vacío y se añade, también forzamos la selección
+                        if (wasEmpty) localStorage.removeItem('krono_car_model');
                     }
                     
                     // Aseguramos primero la actualización de la interfaz UI en memoria
                     currentGarageIndex = 0;
                     populateDropdown();
                     renderGarageCar(currentGarageIndex);
-                    if (typeof updateConfigCarList === 'function') updateConfigCarList();
+                    
+                    if (typeof updateConfigCarList === 'function') {
+                        updateConfigCarList();
+                        // Forzamos un último broadcast por si no ha saltado, para que TV se actualice al instante
+                        if (typeof broadcastState === 'function') broadcastState();
+                        if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
+                    }
                     
                     // Ahora guardamos (la validación de tamaño se hace dentro automáticamente)
                     saveGarageToLocal();
