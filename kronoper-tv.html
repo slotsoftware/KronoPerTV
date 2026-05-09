@@ -1702,6 +1702,23 @@
                 </div>
             </div>
 
+            <!-- NUEVO: SECCIÓN DE RENDIMIENTO HISTÓRICO ACUMULADO (AQUÍ EN EL CENTRO) -->
+            <div id="modal-historical-section" class="mb-5 bg-slate-800 rounded-lg border border-slate-600 overflow-hidden shadow-md text-white hidden">
+                <div class="bg-slate-900 px-4 py-2 border-b border-slate-700 flex justify-between items-center">
+                    <h4 class="text-xs font-bold text-cyan-400 uppercase tracking-widest flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1.5 animate-pulse"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        Rendimiento Histórico
+                    </h4>
+                    <span class="text-[9px] font-bold bg-cyan-900/50 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/50 tracking-widest shadow-[0_0_8px_rgba(34,211,238,0.3)]">ACTUALIZADO</span>
+                </div>
+                <div class="grid grid-cols-4 gap-1 p-2 sm:p-3 text-center">
+                    <div class="flex flex-col"><span class="text-[8px] sm:text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Mejor V.</span><span id="modal-hist-best" class="font-black text-emerald-400 text-xs sm:text-sm truncate drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]"></span></div>
+                    <div class="flex flex-col border-l border-slate-700"><span class="text-[8px] sm:text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Distancia</span><span id="modal-hist-dist" class="font-black text-purple-400 text-xs sm:text-sm truncate drop-shadow-[0_0_5px_rgba(168,85,247,0.5)]"></span></div>
+                    <div class="flex flex-col border-l border-slate-700"><span class="text-[8px] sm:text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Vel. Media</span><span id="modal-hist-spd" class="font-black text-cyan-400 text-xs sm:text-sm truncate drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]"></span></div>
+                    <div class="flex flex-col border-l border-slate-700"><span class="text-[8px] sm:text-[9px] text-slate-400 uppercase font-bold tracking-wider mb-0.5">Constancia</span><span id="modal-hist-cons" class="font-black text-yellow-400 text-xs sm:text-sm truncate drop-shadow-[0_0_5px_rgba(250,204,21,0.5)]"></span></div>
+                </div>
+            </div>
+
             <div class="mb-6 bg-white rounded-lg border border-gray-300 overflow-hidden shadow-sm">
                 <div class="bg-gray-200 px-4 py-2 border-b border-gray-300">
                     <h4 class="text-sm font-bold text-gray-600 uppercase tracking-widest" data-i18n="lapDetail">Detalle de Vueltas</h4>
@@ -2749,23 +2766,28 @@
                     });
                     
                     // --- MOSTRAR RENDIMIENTO HISTÓRICO ACTUALIZADO ---
-                    const histSection = document.getElementById('modal-historical-section');
-                    const activeCarName = document.getElementById('car-model-input').value;
-                    const carIndex = garageCars.findIndex(c => {
-                        const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
-                        return cName === activeCarName;
-                    });
-                    
-                    if (carIndex !== -1) {
-                        const car = garageCars[carIndex];
-                        document.getElementById('modal-hist-best').textContent = car.bestLap || "-";
-                        document.getElementById('modal-hist-dist').textContent = car.totalDist || "-";
-                        document.getElementById('modal-hist-spd').textContent = car.avgSpd || "-";
-                        document.getElementById('modal-hist-cons').textContent = (car.consistency && parseFloat(car.consistency) > 0) ? `${car.consistency}%` : "-";
-                        histSection.classList.remove('hidden');
-                    } else {
-                        histSection.classList.add('hidden');
-                    }
+                    try {
+                        const histSection = document.getElementById('modal-historical-section');
+                        const activeCarName = document.getElementById('car-model-input').value;
+                        if (activeCarName) {
+                            // Buscar el coche usando la lógica exacta del selector
+                            const carIndex = garageCars.findIndex(c => {
+                                const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
+                                return cName === activeCarName;
+                            });
+                            
+                            if (carIndex !== -1) {
+                                const car = garageCars[carIndex];
+                                document.getElementById('modal-hist-best').textContent = car.bestLap || "-";
+                                document.getElementById('modal-hist-dist').textContent = car.totalDist || "-";
+                                document.getElementById('modal-hist-spd').textContent = car.avgSpd || "-";
+                                document.getElementById('modal-hist-cons').textContent = (car.consistency && parseFloat(car.consistency) > 0) ? `${car.consistency}%` : "-";
+                                histSection.classList.remove('hidden');
+                            } else {
+                                histSection.classList.add('hidden');
+                            }
+                        }
+                    } catch(e) { console.error("Error UI Histórico:", e); }
                     // -------------------------------------------------
                     
                     resultsModal.classList.remove('hidden');
@@ -4950,78 +4972,91 @@
         
         // --- AUTO-ACTUALIZAR GARAJE AL ACABAR CARRERA ---
         function updateGarageCarStatsAfterRace() {
-            if (!garageCars || garageCars.length === 0 || currentLap === 0) return;
-            const carName = document.getElementById('car-model-input').value;
-            const trackLen = parseFloat(document.getElementById('track-length-input').value) || 15;
-            
-            // Buscar el coche asegurando el formato del nombre para evitar fallos de coincidencia
-            let carIndex = garageCars.findIndex(c => {
-                const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
-                return cName === carName;
-            });
-            
-            if (carIndex === -1) return; // Salir si el coche no existe en el garaje con ese nombre
-            
-            let car = garageCars[carIndex];
-            
-            // 1. Mejor Vuelta Histórica
-            let currentBest = parseFloat(car.bestLap) || Infinity;
-            let raceBest = bestLapTime / 1000;
-            if (raceBest > 0 && raceBest < currentBest) {
-                car.bestLap = raceBest.toFixed(3) + "s";
-            }
-            
-            // 2. Tiempo Acumulado (soportando parseo de string robusto)
-            let rawTime = car._rawTotalTime || 0;
-            if (!car._rawTotalTime && car.totalTime && car.totalTime !== "0h 0m 0s" && car.totalTime !== "-") {
-                let match = car.totalTime.match(/(?:(\d+)h)?\s*(?:(\d+)m)?\s*(?:(\d+(?:\.\d+)?)s)?/);
-                if(match) {
-                    rawTime = (parseInt(match[1]||0)*3600000) + (parseInt(match[2]||0)*60000) + (parseFloat(match[3]||0)*1000);
+            try {
+                if (!garageCars || garageCars.length === 0 || currentLap === 0) return;
+                const activeCarName = document.getElementById('car-model-input').value;
+                if (!activeCarName) return;
+                
+                const trackLen = parseFloat(document.getElementById('track-length-input').value) || 15;
+                
+                // Buscar el coche asegurando el formato exacto del nombre generado en el selector
+                let carIndex = garageCars.findIndex(c => {
+                    const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
+                    return cName === activeCarName;
+                });
+                
+                if (carIndex === -1) {
+                    console.warn("Coche no encontrado para actualizar historial:", activeCarName);
+                    return; 
                 }
-            }
-            
-            // Sumar el tiempo de las vueltas de esta carrera
-            rawTime += totalLapTime; 
-            car._rawTotalTime = rawTime;
-            
-            let totalSecs = Math.floor(rawTime / 1000);
-            let h = Math.floor(totalSecs / 3600);
-            let m = Math.floor((totalSecs % 3600) / 60);
-            let s = totalSecs % 60;
-            car.totalTime = `${h}h ${m}m ${s}s`;
-            
-            // 3. Recorrido Acumulativo (Km)
-            let rawDist = car._rawTotalDist || 0;
-            if (!car._rawTotalDist && car.totalDist && car.totalDist !== "0.000 km" && car.totalDist !== "-") {
-                rawDist = parseFloat(car.totalDist) || 0;
-            }
-            let raceDistKm = (trackLen * currentLap) / 1000;
-            rawDist += raceDistKm;
-            car._rawTotalDist = rawDist;
-            car.totalDist = rawDist.toFixed(3) + " km";
-            
-            // 4. Velocidades Medias Históricas
-            if (rawTime > 0) {
-                let avgSpdMs = (rawDist * 1000) / (rawTime / 1000);
-                let avgSpdKmh = avgSpdMs * 3.6;
-                car.avgSpd = avgSpdKmh.toFixed(1) + " km/h";
-                car.avgSpd32 = (avgSpdKmh * 32).toFixed(1) + " km/h";
-            }
-            
-            // 5. Constancia (Promedio móvil histórico)
-            let currentCons = parseFloat(car.consistency) || 0;
-            if (consistency > 0 && isFinite(consistency)) {
-                if (currentCons === 0) {
-                    car.consistency = consistency.toFixed(1);
-                } else {
-                    car.consistency = ((currentCons + consistency) / 2).toFixed(1);
+                
+                let car = garageCars[carIndex];
+                
+                // 1. Mejor Vuelta Histórica
+                let currentBest = parseFloat(car.bestLap) || Infinity;
+                let raceBest = bestLapTime / 1000;
+                if (raceBest > 0 && raceBest < currentBest) {
+                    car.bestLap = raceBest.toFixed(3) + "s";
                 }
-            }
-            
-            saveGarageToLocal();
-            // Refrescar UI si el garaje está abierto y estamos viendo este coche
-            if (currentGarageIndex === carIndex && !garageModal.classList.contains('hidden')) {
-                renderGarageCar(carIndex);
+                
+                // 2. Tiempo Acumulado (soportando parseo de string robusto)
+                let rawTime = car._rawTotalTime || 0;
+                if (!car._rawTotalTime && car.totalTime && car.totalTime !== "0h 0m 0s" && car.totalTime !== "-") {
+                    let h = 0, m = 0, s = 0;
+                    let hMatch = car.totalTime.match(/(\d+)h/);
+                    let mMatch = car.totalTime.match(/(\d+)m/);
+                    let sMatch = car.totalTime.match(/(\d+(?:\.\d+)?)s/);
+                    if (hMatch) h = parseInt(hMatch[1]);
+                    if (mMatch) m = parseInt(mMatch[1]);
+                    if (sMatch) s = parseFloat(sMatch[1]);
+                    rawTime = (h * 3600000) + (m * 60000) + (s * 1000);
+                }
+                
+                // Sumar el tiempo de las vueltas de esta carrera
+                rawTime += totalLapTime; 
+                car._rawTotalTime = rawTime;
+                
+                let totalSecs = Math.floor(rawTime / 1000);
+                let h = Math.floor(totalSecs / 3600);
+                let m = Math.floor((totalSecs % 3600) / 60);
+                let s = totalSecs % 60;
+                car.totalTime = `${h}h ${m}m ${s}s`;
+                
+                // 3. Recorrido Acumulativo (Km)
+                let rawDist = car._rawTotalDist || 0;
+                if (!car._rawTotalDist && car.totalDist && car.totalDist !== "0.000 km" && car.totalDist !== "-") {
+                    rawDist = parseFloat(car.totalDist) || 0;
+                }
+                let raceDistKm = (trackLen * currentLap) / 1000;
+                rawDist += raceDistKm;
+                car._rawTotalDist = rawDist;
+                car.totalDist = rawDist.toFixed(3) + " km";
+                
+                // 4. Velocidades Medias Históricas
+                if (rawTime > 0) {
+                    let avgSpdMs = (rawDist * 1000) / (rawTime / 1000);
+                    let avgSpdKmh = avgSpdMs * 3.6;
+                    car.avgSpd = avgSpdKmh.toFixed(1) + " km/h";
+                    car.avgSpd32 = (avgSpdKmh * 32).toFixed(1) + " km/h";
+                }
+                
+                // 5. Constancia (Promedio móvil histórico)
+                let currentCons = parseFloat(car.consistency) || 0;
+                if (consistency > 0 && isFinite(consistency)) {
+                    if (currentCons === 0) {
+                        car.consistency = consistency.toFixed(1);
+                    } else {
+                        car.consistency = ((currentCons + consistency) / 2).toFixed(1);
+                    }
+                }
+                
+                saveGarageToLocal();
+                // Refrescar UI si el garaje está abierto y estamos viendo este coche
+                if (currentGarageIndex === carIndex && !garageModal.classList.contains('hidden')) {
+                    renderGarageCar(carIndex);
+                }
+            } catch (e) {
+                console.error("Error al actualizar estadísticas del garaje:", e);
             }
         }
 
