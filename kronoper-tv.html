@@ -1065,10 +1065,13 @@
                 <div class="resize-widget-handle absolute bottom-0 right-0 w-8 h-8 cursor-se-resize z-30 opacity-50 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-end justify-end p-2 text-slate-500 hover:text-cyan-400" title="Arrastra para escalar">
                     <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 21 21 21 21 15"></polyline><line x1="14" y1="14" x2="21" y2="21"></line></svg>
                 </div>
-                <div class="p-2 md:p-3 flex-1 flex flex-col items-center justify-center relative overflow-hidden h-full">
+                <div class="p-2 md:p-3 flex-1 flex flex-col items-center justify-center relative overflow-hidden h-full w-full">
                     <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                    <span class="text-slate-400 font-rajdhani font-semibold uppercase tracking-widest cq-title mb-1 z-10 pointer-events-none" data-i18n="pilotCar">Piloto / Coche</span>
-                    <span id="tv-pilot-car" class="cq-value font-bold text-white text-center z-10 leading-tight pointer-events-none">Cargando...</span>
+                    <span class="text-slate-400 font-rajdhani font-semibold uppercase tracking-widest cq-title mb-1 z-10 pointer-events-none shrink-0" data-i18n="pilotCar">Piloto / Coche</span>
+                    <div class="flex flex-col items-center justify-center w-full px-1 min-h-0 flex-1">
+                        <span id="tv-pilot-name" class="cq-value-sm font-bold text-white text-center leading-none truncate w-full pointer-events-none">Cargando...</span>
+                        <span id="tv-car-model" class="cq-title font-medium text-cyan-300 text-center leading-tight truncate w-full mt-1 pointer-events-none">Cargando...</span>
+                    </div>
                 </div>
             </div>
 
@@ -3773,7 +3776,8 @@
             if(cameraStream) cameraStream.getTracks().forEach(t=>t.stop());
             if(isProcessing) isProcessing = false;
 
-            const tvPilotCar = document.getElementById('tv-pilot-car');
+            const tvPilotName = document.getElementById('tv-pilot-name');
+            const tvCarModel = document.getElementById('tv-car-model');
             const tvStatus = document.getElementById('tv-status');
             const tvRaceTime = document.getElementById('tv-race-time');
             const tvLapCount = document.getElementById('tv-lap-count');
@@ -3803,37 +3807,15 @@
             const tvRemoteResetBtn = document.getElementById('tv-remote-reset-btn');
             const tvAiLayoutBtn = document.getElementById('tv-ai-layout-btn'); // NUEVO BOTÓN
 
-            function sendRemoteCommand(action) {
-                const now = Date.now();
-                // Si el usuario abrió el modo TV en la misma pestaña principal (botón Telemetría TV)
-                // Ejecutamos directamente y actualizamos lastProcessedCmdTs para evitar el "eco" de la nube
-                if (!isTVMode && typeof handleRemoteCommand === 'function') {
-                    lastProcessedCmdTs = now;
-                    handleRemoteCommand(action);
-                }
-
-                // Local (Para 2 pantallas en el mismo dispositivo)
-                kronoChannel.postMessage({ type: 'REMOTE_CMD', command: action, ts: now });
-                // Nube
-                if (cloudRoomCode && window.db && window.fs) {
-                    try {
-                        const cmdDocRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'tv_commands', cloudRoomCode);
-                        window.fs.setDoc(cmdDocRef, { action: action, ts: now });
-                    } catch (e) {
-                        console.error("Error enviando comando remoto:", e);
-                    }
-                }
-            }
-
             // Usamos .onclick en lugar de addEventListener para evitar duplicados si se entra y sale del modo TV
             if (tvRemoteStartBtn) {
-                tvRemoteStartBtn.onclick = () => sendRemoteCommand('START_RACE');
+                tvRemoteStartBtn.onclick = () => window.sendRemoteCommand('START_RACE');
             }
             if (tvRemotePauseBtn) {
-                tvRemotePauseBtn.onclick = () => sendRemoteCommand('PAUSE');
+                tvRemotePauseBtn.onclick = () => window.sendRemoteCommand('PAUSE');
             }
             if (tvRemoteResetBtn) {
-                tvRemoteResetBtn.onclick = () => sendRemoteCommand('NEW_RACE');
+                tvRemoteResetBtn.onclick = () => window.sendRemoteCommand('NEW_RACE');
             }
 
             // --- BOTÓN GARAJE EVENTO ---
@@ -4069,7 +4051,8 @@
                     }
                 }
 
-                tvPilotCar.textContent = `${tvData.pilot || 'Piloto'} / ${tvData.car || 'Coche'}`;
+                if (tvPilotName) tvPilotName.textContent = tvData.pilot || 'Piloto';
+                if (tvCarModel) tvCarModel.textContent = tvData.car || 'Coche';
                 
                 const maxLapsText = tvData.totalLaps === Infinity ? '∞' : tvData.totalLaps;
                 if (tvData.raceMode === 'time') {
@@ -4397,7 +4380,30 @@
 
         // --- SISTEMA RECEPTOR DE COMANDOS REMOTOS (DEL TV AL MÓVIL) ---
         let lastProcessedCmdTs = 0;
-        function handleRemoteCommand(action) {
+
+        window.sendRemoteCommand = function(action, data = null) {
+            const now = Date.now();
+            // Si el usuario abrió el modo TV en la misma pestaña principal (botón Telemetría TV)
+            // Ejecutamos directamente y actualizamos lastProcessedCmdTs para evitar el "eco" de la nube
+            if (!isTVMode && typeof handleRemoteCommand === 'function') {
+                lastProcessedCmdTs = now;
+                handleRemoteCommand(action, data);
+            }
+
+            // Local (Para 2 pantallas en el mismo dispositivo)
+            kronoChannel.postMessage({ type: 'REMOTE_CMD', command: action, data: data, ts: now });
+            // Nube
+            if (cloudRoomCode && window.db && window.fs) {
+                try {
+                    const cmdDocRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'tv_commands', cloudRoomCode);
+                    window.fs.setDoc(cmdDocRef, { action: action, data: data, ts: now });
+                } catch (e) {
+                    console.error("Error enviando comando remoto:", e);
+                }
+            }
+        };
+
+        function handleRemoteCommand(action, data = null) {
             if (action === 'PAUSE') {
                 if (isRaceActive) togglePause();
             } else if (action === 'RESET') {
@@ -4416,6 +4422,15 @@
                 if (!isRaceActive && !isCountdown) {
                     startTrafficLight();
                 }
+            } else if (action === 'CHANGE_CAR') {
+                const carInput = document.getElementById('car-model-input');
+                if (carInput && data) {
+                    carInput.value = data;
+                    localStorage.setItem('krono_car_model', data);
+                    if(typeof updateConfigCarImage === 'function') updateConfigCarImage();
+                    if(typeof broadcastState === 'function') broadcastState();
+                    if(typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
+                }
             }
         }
 
@@ -4428,7 +4443,7 @@
                     const cmdTs = event.data.ts || Date.now();
                     if (cmdTs > lastProcessedCmdTs) {
                         lastProcessedCmdTs = cmdTs;
-                        handleRemoteCommand(event.data.command);
+                        handleRemoteCommand(event.data.command, event.data.data);
                     }
                 }
             });
@@ -4443,7 +4458,7 @@
                             const cmd = docSnap.data();
                             if (cmd.ts > lastProcessedCmdTs) {
                                 lastProcessedCmdTs = cmd.ts;
-                                handleRemoteCommand(cmd.action);
+                                handleRemoteCommand(cmd.action, cmd.data);
                             }
                         }
                     }, (err) => {
@@ -4642,12 +4657,19 @@
                 valConsEl.textContent = consVal > 0 ? `${consVal.toFixed(1)}%` : "-";
             }
 
-            // Si cambiamos de coche, actualizamos el coche de la carrera actual (si no estamos en TV standalone)
+            // Si cambiamos de coche, actualizamos el coche de la carrera actual
             if (!isTVMode && car.name) {
                 const carInput = document.getElementById('car-model-input');
                 if(carInput) {
                     carInput.value = car.name;
+                    localStorage.setItem('krono_car_model', car.name);
                     if(typeof updateConfigCarImage === 'function') updateConfigCarImage();
+                    if(typeof broadcastState === 'function') broadcastState();
+                    if(typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
+                }
+            } else if (isTVMode && car.name) {
+                if (typeof window.sendRemoteCommand === 'function') {
+                    window.sendRemoteCommand('CHANGE_CAR', car.name);
                 }
             }
         }
@@ -4971,26 +4993,36 @@
                     
                     if (confirm(`Se han detectado ${parsedCars.length} coches en el archivo.\n\n¿Quieres REEMPLAZAR tu garaje actual con estos coches?\n\n- Dale a "Aceptar" para borrar los actuales y poner los nuevos.\n- Dale a "Cancelar" para añadirlos a los que ya tienes.`)) {
                         garageCars = parsedCars;
-                        // Al reemplazar el garaje, forzamos que seleccione el primer coche de la lista nueva
+                        // Forzar borrado completo en el DOM y LocalStorage para evitar lectura sucia
+                        document.getElementById('car-model-input').value = "";
                         localStorage.removeItem('krono_car_model');
                     } else {
                         const wasEmpty = garageCars.length === 0;
                         garageCars = garageCars.concat(parsedCars);
                         // Si el garaje estaba vacío y se añade, también forzamos la selección
-                        if (wasEmpty) localStorage.removeItem('krono_car_model');
+                        if (wasEmpty) {
+                            document.getElementById('car-model-input').value = "";
+                            localStorage.removeItem('krono_car_model');
+                        }
                     }
                     
-                    // Aseguramos primero la actualización de la interfaz UI en memoria
                     currentGarageIndex = 0;
+                    
+                    // ORDEN CRÍTICO: 1. Construir las opciones del menú principal para que existan
+                    if (typeof updateConfigCarList === 'function') {
+                        updateConfigCarList();
+                    }
+
+                    // 2. Poblar y renderizar el panel interno del garaje
                     populateDropdown();
                     renderGarageCar(currentGarageIndex);
                     
-                    if (typeof updateConfigCarList === 'function') {
-                        updateConfigCarList();
-                        // Forzamos un último broadcast por si no ha saltado, para que TV se actualice al instante
-                        if (typeof broadcastState === 'function') broadcastState();
-                        if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
-                    }
+                    // 3. Re-asegurar que el selector de config tiene el valor forzado y guardarlo
+                    localStorage.setItem('krono_car_model', document.getElementById('car-model-input').value);
+
+                    // 4. Disparar el broadcast a la TV ahora que todos los inputs son correctos
+                    if (typeof broadcastState === 'function') broadcastState();
+                    if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
                     
                     // Ahora guardamos (la validación de tamaño se hace dentro automáticamente)
                     saveGarageToLocal();
