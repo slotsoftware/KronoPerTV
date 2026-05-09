@@ -26,7 +26,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, setLogLevel, collection, addDoc, getDocs, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, setLogLevel, collection, addDoc, getDocs, doc, setDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const appId = "app_krono";
         const firebaseConfig = {
@@ -62,7 +62,7 @@
                 
                 window.db = db;
                 window.auth = auth;
-                window.fs = { collection, addDoc, getDocs, doc, setDoc, onSnapshot };
+                window.fs = { collection, addDoc, getDocs, doc, setDoc, onSnapshot, deleteDoc };
             } catch (error) {
                 console.error("Error initializing Firebase:", error);
             }
@@ -1730,7 +1730,13 @@
                     <h3 class="text-xl sm:text-2xl font-black font-rajdhani text-slate-100 tracking-[0.2em] opacity-90" data-i18n="globalRanking">RANKING GLOBAL</h3>
                     <span class="ml-3 text-[10px] font-bold text-blue-300 border border-blue-800/50 bg-blue-900/20 px-2 py-0.5 rounded-full uppercase tracking-widest hidden sm:block">Top 25</span>
                 </div>
-                <button id="close-ranking-btn" class="text-slate-500 hover:text-white font-black text-2xl transition-colors px-2">X</button>
+                <div class="flex items-center space-x-3 sm:space-x-4">
+                    <button id="reset-ranking-btn" class="text-red-500 hover:text-white font-bold text-[10px] uppercase tracking-widest px-3 py-1.5 border border-red-900/50 bg-red-900/20 rounded-lg hover:bg-red-600 transition-colors flex items-center shadow-md disabled:opacity-50" title="Borrar todo el ranking global">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sm:mr-1.5"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        <span class="hidden sm:inline" data-i18n="clearRanking">Borrar Ranking</span>
+                    </button>
+                    <button id="close-ranking-btn" class="text-slate-500 hover:text-white font-black text-2xl transition-colors px-2">X</button>
+                </div>
             </div>
             
             <!-- "Pista" Asfalto Desgastado -->
@@ -1797,7 +1803,7 @@
                 tvStatusYellowFlag: "BANDERA AMARILLA (PAUSA)", tvStatusFalseStart: "SALIDA NULA", tvStatusReady: "PREPARADOS...",
                 tvStatusRacing: "CARRERA EN CURSO", tvStatusFinished: "CARRERA FINALIZADA", tvStatusLinkActive: "ENLACE ACTIVO. ESPERANDO COCHE...",
                 tvStatusWaiting: "ESPERANDO...", tvStatusUplink: "ESTABLECIENDO UPLINK...", tvStatusSearching: "BUSCANDO SEÑAL DE TELEMETRÍA",
-                tvStatusRoomClosed: "SALA INACTIVA O CERRADA", tvStatusError: "ERROR DE CONEXIÓN"
+                tvStatusRoomClosed: "SALA INACTIVA O CERRADA", tvStatusError: "ERROR DE CONEXIÓN", clearRanking: "Borrar Ranking"
             },
             en: {
                 langLabel: "Language / Idioma", history: "History", tvMode: "TV", tvSetupTitle: "Connect TV Screen",
@@ -1826,7 +1832,7 @@
                 tvStatusYellowFlag: "YELLOW FLAG (PAUSED)", tvStatusFalseStart: "FALSE START", tvStatusReady: "GET READY...",
                 tvStatusRacing: "RACE IN PROGRESS", tvStatusFinished: "RACE FINISHED", tvStatusLinkActive: "LINK ACTIVE. WAITING FOR CAR...",
                 tvStatusWaiting: "WAITING...", tvStatusUplink: "ESTABLISHING UPLINK...", tvStatusSearching: "SEARCHING FOR TELEMETRY SIGNAL",
-                tvStatusRoomClosed: "INACTIVE OR CLOSED ROOM", tvStatusError: "CONNECTION ERROR"
+                tvStatusRoomClosed: "INACTIVE OR CLOSED ROOM", tvStatusError: "CONNECTION ERROR", clearRanking: "Clear Ranking"
             },
             fr: {
                 langLabel: "Langue / Language", history: "Historique", tvMode: "TV", tvSetupTitle: "Connecter Écran TV",
@@ -1855,7 +1861,7 @@
                 tvStatusYellowFlag: "DRAPEAU JAUNE (PAUSE)", tvStatusFalseStart: "FAUX DÉPART", tvStatusReady: "PRÊT...",
                 tvStatusRacing: "COURSE EN COURS", tvStatusFinished: "COURSE TERMINÉE", tvStatusLinkActive: "LIEN ACTIF. EN ATTENTE DE VOITURE...",
                 tvStatusWaiting: "EN ATTENTE...", tvStatusUplink: "ÉTABLISSEMENT DU LIEN...", tvStatusSearching: "RECHERCHE DU SIGNAL DE TÉLÉMÉTRIE",
-                tvStatusRoomClosed: "SALLE INACTIVE OU FERMÉE", tvStatusError: "ERREUR DE CONNEXION"
+                tvStatusRoomClosed: "SALLE INACTIVE OU FERMÉE", tvStatusError: "ERREUR DE CONNEXION", clearRanking: "Effacer Classement"
             }
         };
 
@@ -2655,13 +2661,17 @@
             if (raceIntervalId) clearInterval(raceIntervalId);
             if (lapIntervalId) clearInterval(lapIntervalId);
             
+            // Siempre actualizar rendimiento histórico si hay vueltas (incluso al abortar)
+            if (currentLap > 0) {
+                updateGarageCarStatsAfterRace();
+            }
+
             broadcastState(); 
             syncToCloud();    
 
             if (finished) {
                 saveRaceToHistory();
                 saveToLeaderboard(); 
-                updateGarageCarStatsAfterRace();
                 announceRaceFinish(pilotNameInput.value);
                 if(!isTVMode){
                     document.getElementById('modal-pilot-car').textContent = `${pilotNameInput.value} / ${carModelInput.value}`;
@@ -3090,6 +3100,45 @@
             
             rankingBtn.addEventListener('click', () => { loadLeaderboard(); rankingModal.classList.remove('hidden'); setTimeout(()=>rankingModal.classList.add('open'),10); });
             closeRankingBtn.addEventListener('click', () => { rankingModal.classList.remove('open'); setTimeout(()=>rankingModal.classList.add('hidden'),300); });
+            
+            const resetRankingBtn = document.getElementById('reset-ranking-btn');
+            if (resetRankingBtn) {
+                resetRankingBtn.addEventListener('click', async () => {
+                    if (!window.db || !window.auth || !window.auth.currentUser) {
+                        alert("Debes estar conectado a la red para borrar el ranking.");
+                        return;
+                    }
+                    if (confirm("⚠️ ¿Estás COMPLETAMENTE SEGURO de que quieres borrar TODOS los récords globales del ranking?\n\nEsta acción es irreversible y eliminará los tiempos de todos los jugadores de la nube.")) {
+                        try {
+                            const originalHtml = resetRankingBtn.innerHTML;
+                            resetRankingBtn.innerHTML = "BORRANDO...";
+                            resetRankingBtn.disabled = true;
+
+                            const appId = "app_krono";
+                            const colRef = window.fs.collection(window.db, 'artifacts', appId, 'public', 'data', 'leaderboard');
+                            const snapshot = await window.fs.getDocs(colRef);
+                            
+                            const deletePromises = [];
+                            snapshot.forEach(docSnap => {
+                                deletePromises.push(window.fs.deleteDoc(docSnap.ref));
+                            });
+                            
+                            await Promise.all(deletePromises);
+                            
+                            await loadLeaderboard(); // Recargar el ranking vacío
+                            
+                            resetRankingBtn.innerHTML = originalHtml;
+                            resetRankingBtn.disabled = false;
+                            
+                        } catch (e) {
+                            console.error("Error al borrar el ranking:", e);
+                            alert("Hubo un error al intentar borrar el ranking.");
+                            resetRankingBtn.innerHTML = '<span class="hidden sm:inline" data-i18n="clearRanking">Borrar Ranking</span>';
+                            resetRankingBtn.disabled = false;
+                        }
+                    }
+                });
+            }
             
             // --- NUEVA LÓGICA ABRIR TV (MODIFICADA PARA SPA Y AUTO-LINK DINÁMICO) ---
             function updateRoomCodeDisplay() {
@@ -4728,6 +4777,10 @@
                 if (inpEl) car[f] = inpEl.value;
             });
 
+            // Reseteamos las métricas RAW para que se recalculen desde el texto modificado en la próxima carrera
+            car._rawTotalTime = 0;
+            car._rawTotalDist = 0;
+
             saveGarageToLocal();
             populateDropdown();
             renderGarageCar(currentGarageIndex);
@@ -4736,6 +4789,8 @@
         }
 
         function openGarage() {
+            // Recargar localStorage por si se modificó en otra pestaña
+            garageCars = JSON.parse(localStorage.getItem('krono_garage_cars')) || [];
             initGarage();
             toggleGarageEdit(false);
             garageModal.classList.remove('hidden');
@@ -4760,7 +4815,7 @@
         
         // --- AUTO-ACTUALIZAR GARAJE AL ACABAR CARRERA ---
         function updateGarageCarStatsAfterRace() {
-            if (!garageCars || garageCars.length === 0) return;
+            if (!garageCars || garageCars.length === 0 || currentLap === 0) return;
             const carName = document.getElementById('car-model-input').value;
             const trackLen = parseFloat(document.getElementById('track-length-input').value) || 15;
             
@@ -4776,33 +4831,51 @@
                 car.bestLap = raceBest.toFixed(3) + "s";
             }
             
-            // 2. Tiempo Acumulado (usamos variable oculta para no perder precisión)
-            car._rawTotalTime = (car._rawTotalTime || 0) + finalRaceTimeMs;
-            let totalSecs = Math.floor(car._rawTotalTime / 1000);
+            // 2. Tiempo Acumulado (soportando parseo de string si _raw falta)
+            let rawTime = car._rawTotalTime || 0;
+            if (!car._rawTotalTime && car.totalTime && car.totalTime !== "0h 0m 0s") {
+                let match = car.totalTime.match(/(?:(\d+)h)?\s*(?:(\d+)m)?\s*(?:(\d+(?:\.\d+)?)s)?/);
+                if(match) {
+                    rawTime = (parseInt(match[1]||0)*3600000) + (parseInt(match[2]||0)*60000) + (parseFloat(match[3]||0)*1000);
+                }
+            }
+            
+            // Sumar solo el tiempo de las vueltas completadas (válido incluso si se aborta la carrera)
+            rawTime += totalLapTime; 
+            car._rawTotalTime = rawTime;
+            
+            let totalSecs = Math.floor(rawTime / 1000);
             let h = Math.floor(totalSecs / 3600);
             let m = Math.floor((totalSecs % 3600) / 60);
             let s = totalSecs % 60;
             car.totalTime = `${h}h ${m}m ${s}s`;
             
             // 3. Recorrido Acumulativo (Km)
+            let rawDist = car._rawTotalDist || 0;
+            if (!car._rawTotalDist && car.totalDist && car.totalDist !== "0.000 km") {
+                rawDist = parseFloat(car.totalDist) || 0;
+            }
             let raceDistKm = (trackLen * currentLap) / 1000;
-            car._rawTotalDist = (car._rawTotalDist || 0) + raceDistKm;
-            car.totalDist = car._rawTotalDist.toFixed(3) + " km";
+            rawDist += raceDistKm;
+            car._rawTotalDist = rawDist;
+            car.totalDist = rawDist.toFixed(3) + " km";
             
-            // 4. Velocidades (calculada con totales acumulados)
-            if (car._rawTotalTime > 0) {
-                let avgSpdMs = (car._rawTotalDist * 1000) / (car._rawTotalTime / 1000);
+            // 4. Velocidades Medias Históricas
+            if (rawTime > 0) {
+                let avgSpdMs = (rawDist * 1000) / (rawTime / 1000);
                 let avgSpdKmh = avgSpdMs * 3.6;
                 car.avgSpd = avgSpdKmh.toFixed(1) + " km/h";
                 car.avgSpd32 = (avgSpdKmh * 32).toFixed(1) + " km/h";
             }
             
-            // 5. Constancia (Promediamos la histórica con la de esta carrera)
+            // 5. Constancia (Promedio móvil)
             let currentCons = parseFloat(car.consistency) || 0;
-            if (currentCons === 0) {
-                car.consistency = consistency.toFixed(1);
-            } else {
-                car.consistency = ((currentCons + consistency) / 2).toFixed(1);
+            if (consistency > 0) {
+                if (currentCons === 0) {
+                    car.consistency = consistency.toFixed(1);
+                } else {
+                    car.consistency = ((currentCons + consistency) / 2).toFixed(1);
+                }
             }
             
             saveGarageToLocal();
