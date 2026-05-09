@@ -4424,9 +4424,23 @@
                 }
             } else if (action === 'CHANGE_CAR') {
                 const carInput = document.getElementById('car-model-input');
-                if (carInput && data) {
-                    carInput.value = data;
-                    localStorage.setItem('krono_car_model', data);
+                
+                // Extraer nombre del coche (soporta objeto o string antiguo)
+                let carName = typeof data === 'string' ? data : (data && data.car ? data.car : null);
+
+                if (carInput && carName) {
+                    // Asegurar que el coche existe en el select del móvil (supera el bloqueo por localStorage distinto)
+                    let exists = Array.from(carInput.options).some(opt => opt.value === carName);
+                    if (!exists) {
+                        const newOpt = document.createElement('option');
+                        newOpt.value = carName;
+                        newOpt.textContent = carName;
+                        carInput.appendChild(newOpt);
+                    }
+                    
+                    carInput.value = carName;
+                    localStorage.setItem('krono_car_model', carName);
+
                     if(typeof updateConfigCarImage === 'function') updateConfigCarImage();
                     if(typeof broadcastState === 'function') broadcastState();
                     if(typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
@@ -4661,15 +4675,25 @@
             if (!isTVMode && car.name) {
                 const carInput = document.getElementById('car-model-input');
                 if(carInput) {
+                    // Asegurar que exista la opción
+                    let exists = Array.from(carInput.options).some(opt => opt.value === car.name);
+                    if (!exists) {
+                        const newOpt = document.createElement('option');
+                        newOpt.value = car.name;
+                        newOpt.textContent = car.name;
+                        carInput.appendChild(newOpt);
+                    }
+                    
                     carInput.value = car.name;
                     localStorage.setItem('krono_car_model', car.name);
+
                     if(typeof updateConfigCarImage === 'function') updateConfigCarImage();
                     if(typeof broadcastState === 'function') broadcastState();
                     if(typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
                 }
             } else if (isTVMode && car.name) {
                 if (typeof window.sendRemoteCommand === 'function') {
-                    window.sendRemoteCommand('CHANGE_CAR', car.name);
+                    window.sendRemoteCommand('CHANGE_CAR', { car: car.name });
                 }
             }
         }
