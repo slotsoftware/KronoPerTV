@@ -4753,6 +4753,43 @@
                 // Re-enviar el garaje para cualquier otra pantalla conectada
                 if (typeof broadcastState === 'function') broadcastState();
                 if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
+            } else if (action === 'SYNC_FULL_GARAGE') {
+                // NUEVO: Recibir importaciones o borrados masivos desde la TV
+                const incomingGarage = data;
+                if (Array.isArray(incomingGarage)) {
+                    let newGarageList = incomingGarage.map(incomingCar => {
+                        let localMatch = garageCars.find(c => c.id === incomingCar.id);
+                        return {
+                            ...incomingCar,
+                            image: localMatch ? localMatch.image : (incomingCar.image || "")
+                        };
+                    });
+                    
+                    garageCars = newGarageList;
+                    localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
+                    
+                    if (typeof updateConfigCarList === 'function') updateConfigCarList();
+                    
+                    const garageMod = document.getElementById('garageModal');
+                    if (garageMod && !garageMod.classList.contains('hidden')) {
+                        let savedId = garageCars[currentGarageIndex] ? garageCars[currentGarageIndex].id : null;
+                        populateDropdown();
+                        if (savedId) {
+                            let newIdx = garageCars.findIndex(c => c.id === savedId);
+                            if (newIdx !== -1) {
+                                currentGarageIndex = newIdx;
+                                document.getElementById('garage-car-select').value = newIdx;
+                            } else {
+                                currentGarageIndex = 0;
+                            }
+                        }
+                        renderGarageCar(currentGarageIndex);
+                    }
+
+                    // Re-enviar el garaje actualizado al resto del ecosistema
+                    if (typeof broadcastState === 'function') broadcastState();
+                    if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
+                }
             }
         }
 
@@ -4832,6 +4869,23 @@
 
         let currentGarageIndex = 0;
         let isGarageEditing = false;
+        
+        // --- FUNCIÓN MAESTRA DE SINCRONIZACIÓN DE GARAJE ---
+        function forceEcosystemSync() {
+            if (isTVMode) {
+                if (typeof window.sendRemoteCommand === 'function') {
+                    const strippedGarage = garageCars.map(c => {
+                        let cp = { ...c };
+                        delete cp.image; // Evitar saturar red en transferencias masivas
+                        return cp;
+                    });
+                    window.sendRemoteCommand('SYNC_FULL_GARAGE', strippedGarage);
+                }
+            } else {
+                if (typeof broadcastState === 'function') broadcastState();
+                if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
+            }
+        }
         
         // --- ACTUALIZAR SELECTOR DE COCHE EN PANEL CONFIG ---
         window.updateConfigCarList = function() {
@@ -5243,8 +5297,7 @@
             toggleGarageEdit(true);
 
             // Sincronizar nuevo coche globalmente de inmediato
-            if (typeof broadcastState === 'function') broadcastState();
-            if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
+            forceEcosystemSync();
         });
 
         deleteBtn.addEventListener('click', () => {
@@ -5268,8 +5321,7 @@
                 toggleGarageEdit(false);
 
                 // Notificar eliminación al instante
-                if (typeof broadcastState === 'function') broadcastState();
-                if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
+                forceEcosystemSync();
             }
         });
 
@@ -5469,9 +5521,8 @@
                     // 3. Re-asegurar que el selector de config tiene el valor forzado y guardarlo
                     localStorage.setItem('krono_car_model', document.getElementById('car-model-input').value);
 
-                    // 4. Disparar el broadcast a la TV ahora que todos los inputs son correctos
-                    if (typeof broadcastState === 'function') broadcastState();
-                    if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
+                    // 4. Disparar el broadcast a la TV o al Móvil ahora que todos los inputs son correctos
+                    forceEcosystemSync();
                     
                     // Ahora guardamos (la validación de tamaño se hace dentro automáticamente)
                     saveGarageToLocal();
