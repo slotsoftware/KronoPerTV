@@ -783,12 +783,6 @@
                         <span class="text-[10px] font-bold uppercase tracking-wider" data-i18n="leaderboard">Ranking</span>
                     </button>
 
-                    <!-- NUEVO BOTÓN: GARAJE MÓVIL -->
-                    <button id="mobile-garage-btn" class="shrink-0 flex items-center text-red-800 hover:text-red-900 transition-colors px-3 py-1.5 rounded-lg bg-red-100/90 hover:bg-red-100 border border-red-400 shadow-md" title="Garaje Personal">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
-                        <span class="text-[10px] font-bold uppercase tracking-wider">Garaje</span>
-                    </button>
-
                     <button id="direct-tv-btn" class="shrink-0 flex items-center text-blue-800 hover:text-blue-900 transition-colors px-3 py-1.5 rounded-lg bg-blue-100/90 hover:bg-blue-100 border border-blue-400 shadow-md" title="Cambiar a Dashboard TV">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1">
                             <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
@@ -1039,15 +1033,6 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:animate-pulse"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
                     </button>
 
-                    <!-- NUEVO: SEMÁFORO TV (MODO OSCURO) -->
-                    <div id="tv-traffic-light" class="flex items-center space-x-1.5 px-4 py-2.5 rounded-xl bg-slate-800/80 border border-slate-600 shadow-lg hidden sm:flex">
-                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
-                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
-                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
-                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
-                        <div class="tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"></div>
-                    </div>
-
                     <div id="tv-status" class="text-xl lg:text-2xl font-rajdhani font-bold uppercase tracking-widest px-6 py-2 rounded-xl bg-slate-800/80 border border-slate-600 text-slate-400 shadow-lg" data-i18n="tvStatusWaiting">
                         ESPERANDO...
                     </div>
@@ -1057,6 +1042,17 @@
                         <svg id="tv-fs-exit" class="hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- NUEVO: SEMÁFORO TV CENTRADO (MODO OSCURO) -->
+        <div id="tv-traffic-light-container" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 transition-opacity duration-500 opacity-0 pointer-events-none hidden flex-col items-center">
+            <div id="tv-traffic-light" class="flex items-center space-x-3 sm:space-x-6 px-6 py-4 sm:px-10 sm:py-6 rounded-3xl bg-slate-900/90 border-2 border-slate-700 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-xl">
+                <div class="tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-4 border-slate-600 transition-all duration-200 shadow-inner"></div>
+                <div class="tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-4 border-slate-600 transition-all duration-200 shadow-inner"></div>
+                <div class="tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-4 border-slate-600 transition-all duration-200 shadow-inner"></div>
+                <div class="tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-4 border-slate-600 transition-all duration-200 shadow-inner"></div>
+                <div class="tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-4 border-slate-600 transition-all duration-200 shadow-inner"></div>
             </div>
         </div>
         
@@ -1658,17 +1654,28 @@
             </datalist>
 
             <!-- Pie de Exportación (Oculto o compacto al final) -->
-            <div class="flex justify-end items-center mt-2 pt-2 border-t border-red-900/50 shrink-0 gap-2">
-                <button id="garage-import-btn" class="bg-[#111] border border-gray-700 hover:bg-blue-900/40 text-gray-400 hover:text-blue-400 px-3 py-1 rounded text-xs font-bold uppercase transition flex items-center shadow-[0_0_10px_rgba(59,130,246,0.1)]">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 14 12 9 7 14"/><line x1="12" y1="9" x2="12" y2="21"/></svg>
-                    Importar JSON
-                </button>
-                <input type="file" id="garage-import-input" accept=".json" class="hidden">
-                <div class="w-px h-4 bg-gray-700 mx-1"></div>
-                <button id="garage-export-btn" class="bg-[#111] border border-gray-700 hover:bg-gray-800 text-gray-400 hover:text-white px-3 py-1 rounded text-xs font-bold uppercase transition flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    Exportar JSON
-                </button>
+            <div class="flex flex-col md:flex-row justify-between items-center mt-2 pt-2 border-t border-red-900/50 shrink-0 gap-3 md:gap-2">
+                
+                <!-- NUEVO: SISTEMA CLOUD SYNC AUTOMÁTICO -->
+                <div class="flex items-center space-x-2 bg-blue-950/40 border border-blue-500/50 px-3 py-1.5 rounded-lg shadow-[0_0_15px_rgba(59,130,246,0.2)] w-full md:w-auto justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-pulse shrink-0"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+                    <span class="text-blue-300 text-[10px] sm:text-xs uppercase font-bold tracking-widest shrink-0">ID Nube:</span>
+                    <input type="text" id="garage-cloud-id" class="bg-black/80 border border-blue-400/50 text-white text-xs sm:text-sm font-black text-center w-24 sm:w-28 py-1 rounded outline-none uppercase focus:border-blue-400 focus:shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all tracking-widest" maxlength="6" title="Código para sincronizar tu garaje entre dispositivos">
+                    <button id="garage-cloud-sync-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-xs font-bold uppercase transition shadow-[0_0_10px_rgba(37,99,235,0.4)] hover:shadow-[0_0_15px_rgba(37,99,235,0.8)] shrink-0">Vincular</button>
+                </div>
+
+                <!-- Botones Backup Antiguos (Más discretos) -->
+                <div class="flex space-x-2 shrink-0">
+                    <button id="garage-import-btn" class="bg-[#111] border border-gray-700 hover:bg-gray-800 text-gray-500 hover:text-gray-300 px-2 py-1 rounded text-[10px] font-bold uppercase transition flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 14 12 9 7 14"/><line x1="12" y1="9" x2="12" y2="21"/></svg>
+                        Importar Local
+                    </button>
+                    <input type="file" id="garage-import-input" accept=".json" class="hidden">
+                    <button id="garage-export-btn" class="bg-[#111] border border-gray-700 hover:bg-gray-800 text-gray-500 hover:text-gray-300 px-2 py-1 rounded text-[10px] font-bold uppercase transition flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Backup
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -2007,9 +2014,6 @@
         const closeRankingBtn = document.getElementById('close-ranking-btn');
         const rankingBody = document.getElementById('ranking-body');
         
-        // --- BOTÓN GARAJE MÓVIL ---
-        const mobileGarageBtn = document.getElementById('mobile-garage-btn');
-
         // --- TV SETUP MODAL ---
         const tvSetupModal = document.getElementById('tvSetupModal');
         const closeTvSetupBtn = document.getElementById('close-tv-setup-btn');
@@ -2763,15 +2767,10 @@
                         const activeCarName = document.getElementById('car-model-input').value;
                         if (activeCarName) {
                             // Buscar el coche usando la lógica exacta del selector
-                            let carIndex = garageCars.findIndex(c => {
+                            const carIndex = garageCars.findIndex(c => {
                                 const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
                                 return cName === activeCarName;
                             });
-                            
-                            // FALLBACK SEGURO: Si no hace match exacto, usar el primer coche para no perder los datos
-                            if (carIndex === -1 && garageCars.length > 0) {
-                                carIndex = 0;
-                            }
                             
                             if (carIndex !== -1) {
                                 const car = garageCars[carIndex];
@@ -3163,11 +3162,6 @@
                 });
             }
             
-            // CONECTAR GARAJE MÓVIL
-            if (mobileGarageBtn) {
-                mobileGarageBtn.addEventListener('click', openGarage);
-            }
-
             modalRestartBtn.addEventListener('click', () => { 
                 resultsModal.classList.remove('open'); 
                 setTimeout(()=>resultsModal.classList.add('hidden'),300); 
@@ -3382,17 +3376,7 @@
         // MÓDULO COMUNICACIÓN TV <-> APP
         // =========================================================================
 
-        window.lastSyncedCarData = null; // NUEVO: Para auto-sincronizar garaje
-        window.lastAppliedCarDataTs = 0; // NUEVO: Control de versiones TV
-
         function getPayload() {
-            // Preparar el garaje completo sin imágenes para enviarlo
-            const strippedGarage = garageCars.map(c => {
-                let cp = { ...c };
-                delete cp.image;
-                return cp;
-            });
-
             return {
                 pilot: pilotNameInput.value || 'Piloto',
                 car: carModelInput.value || 'Coche',
@@ -3417,8 +3401,6 @@
                     soundIndex: selectedSoundIndex,
                     voiceEnabled: voiceToggle.checked
                 },
-                fullGarageData: strippedGarage,
-                syncedCarData: window.lastSyncedCarData || null, // Inyectar datos del coche en vivo
                 timestamp: Date.now()
             };
         }
@@ -3455,15 +3437,7 @@
         let lastReceivedLocalTime = Date.now(); // NUEVO: Para sincronizar relojes relativos
         
         window.startTVMode = function(roomCode) {
-            // FIX: Determinar si somos el Móvil (Local/SPA) o una TV Remota
-            const isLocalRoom = (roomCode === window.myRoomCode);
-            isSpaMode = isLocalRoom; 
-            
-            // Si nos conectamos a otra sala, pasamos a ser ESTRICTAMENTE un cliente TV
-            if (!isLocalRoom) {
-                isTVMode = true; 
-            }
-            
+            isSpaMode = !isTVMode; // Si NO estamos en Standalone TV, estamos en SPA Mode.
             cloudRoomCode = roomCode;
 
             // Tracking de estado para activar Audios en el TV Mode
@@ -4134,82 +4108,6 @@
             window.updateTVUI = function() {
                 if(!tvData) return;
 
-                // --- NUEVO: AUTO-SINCRONIZACIÓN DE GARAJE COMPLETO (MAGIA V2) ---
-                try {
-                    if (tvData.fullGarageData && Array.isArray(tvData.fullGarageData)) {
-                        let newGarageList = tvData.fullGarageData.map(incomingCar => {
-                            let localMatch = garageCars.find(c => c.id === incomingCar.id);
-                            return {
-                                ...incomingCar,
-                                image: localMatch ? localMatch.image : "" // Preservar imagen local si existe
-                            };
-                        });
-
-                        // Comparar si hay cambios reales (ignorando imágenes y timestamps)
-                        const stripForCompare = (list) => JSON.stringify(list.map(c => { 
-                            let cp = {...c}; 
-                            delete cp.image; 
-                            delete cp.syncTs; 
-                            return cp; 
-                        }));
-
-                        const strOld = stripForCompare(garageCars);
-                        const strNew = stripForCompare(newGarageList);
-
-                        if (strOld !== strNew) {
-                            garageCars = newGarageList;
-                            localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
-                            
-                            // Refrescar UI si el garaje está abierto
-                            const garageMod = document.getElementById('garageModal');
-                            if (garageMod && !garageMod.classList.contains('hidden')) {
-                                let savedId = garageCars[currentGarageIndex] ? garageCars[currentGarageIndex].id : null;
-                                populateDropdown();
-                                if (savedId) {
-                                    let newIdx = garageCars.findIndex(c => c.id === savedId);
-                                    if (newIdx !== -1) {
-                                        currentGarageIndex = newIdx;
-                                        document.getElementById('garage-car-select').value = newIdx;
-                                    } else {
-                                        currentGarageIndex = 0;
-                                    }
-                                }
-                                renderGarageCar(currentGarageIndex);
-                            }
-                        }
-                    } else if (tvData.syncedCarData && tvData.syncedCarData.syncTs > (window.lastAppliedCarDataTs || 0)) {
-                        // Fallback de retrocompatibilidad
-                        window.lastAppliedCarDataTs = tvData.syncedCarData.syncTs;
-                        
-                        let idx = garageCars.findIndex(c => c.id === tvData.syncedCarData.id);
-                        if (idx !== -1) {
-                            const existingImage = garageCars[idx].image; // Preservar imagen HD de la TV
-                            garageCars[idx] = { ...tvData.syncedCarData, image: existingImage };
-                        } else {
-                            garageCars.push({ ...tvData.syncedCarData, image: "" });
-                        }
-                        localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
-                        
-                        // Refrescar UI si el garaje está abierto
-                        const garageMod = document.getElementById('garageModal');
-                        if (garageMod && !garageMod.classList.contains('hidden')) {
-                            let savedId = garageCars[currentGarageIndex] ? garageCars[currentGarageIndex].id : null;
-                            populateDropdown();
-                            if (savedId) {
-                                let newIdx = garageCars.findIndex(c => c.id === savedId);
-                                if (newIdx !== -1) {
-                                    currentGarageIndex = newIdx;
-                                    document.getElementById('garage-car-select').value = newIdx;
-                                }
-                            }
-                            renderGarageCar(currentGarageIndex);
-                        }
-                    }
-                } catch(e) {
-                    console.error("Error en sincronización del garaje UI", e);
-                }
-                // ----------------------------------------------------
-
                 // Aplicar traducción remota si cambió el idioma
                 if (tvData.currentLang && tvData.currentLang !== currentLang) {
                     currentLang = tvData.currentLang;
@@ -4253,10 +4151,15 @@
                     if(tvCountdownInterval) clearInterval(tvCountdownInterval);
                     
                     tvLights.forEach(l => {
-                        l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-red-600 border border-red-400 shadow-[0_0_15px_#dc2626] animate-pulse";
+                        l.className = "tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-red-600 border-4 border-red-400 shadow-[0_0_30px_#dc2626] animate-pulse";
                     });
                     setTimeout(() => {
-                        tvLights.forEach(l => { l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"; });
+                        tvLights.forEach(l => { l.className = "tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-4 border-slate-600 transition-all duration-200 shadow-inner"; });
+                        const tvContainer = document.getElementById('tv-traffic-light-container');
+                        if(tvContainer) {
+                            tvContainer.classList.add('opacity-0');
+                            setTimeout(() => tvContainer.classList.add('hidden'), 500);
+                        }
                     }, 3000);
                 }
                 
@@ -4264,11 +4167,16 @@
                 if (tvData.isRaceActive && !tvPrevState.isRaceActive && !tvData.raceAborted && !tvPrevState.isPaused) {
                     polySynth.triggerAttackRelease(["C5", "E5", "G5"], "0.5");
                     tvLights.forEach(l => {
-                        l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-emerald-500 border border-emerald-400 shadow-[0_0_15px_#10b981] transition-all duration-200";
+                        l.className = "tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-emerald-500 border-4 border-emerald-400 shadow-[0_0_40px_#10b981] transition-all duration-200";
                     });
                     setTimeout(() => {
-                        tvLights.forEach(l => { l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"; });
-                    }, 3000);
+                        const tvContainer = document.getElementById('tv-traffic-light-container');
+                        if(tvContainer) {
+                            tvContainer.classList.add('opacity-0');
+                            setTimeout(() => tvContainer.classList.add('hidden'), 500);
+                        }
+                        tvLights.forEach(l => { l.className = "tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-4 border-slate-600 transition-all duration-200 shadow-inner"; });
+                    }, 2000);
                 }
                 
                 // 3. Nueva Vuelta
@@ -4300,7 +4208,13 @@
                 // 5. Inicio Cuenta Atrás (Semáforos Rojos)
                 if (tvData.isCountdown && !tvPrevState.isCountdown) {
                     let count = 0;
-                    tvLights.forEach(l => { l.className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-slate-700 border border-slate-500 transition-all duration-200"; });
+                    tvLights.forEach(l => { l.className = "tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-slate-800 border-4 border-slate-600 transition-all duration-200 shadow-inner"; });
+
+                    const tvContainer = document.getElementById('tv-traffic-light-container');
+                    if(tvContainer) {
+                        tvContainer.classList.remove('hidden');
+                        setTimeout(() => tvContainer.classList.remove('opacity-0'), 10);
+                    }
 
                     if(tvCountdownInterval) clearInterval(tvCountdownInterval);
                     tvCountdownInterval = setInterval(() => {
@@ -4309,11 +4223,20 @@
                             return;
                         }
                         synth.triggerAttackRelease("C4", "8n");
-                        tvLights[count].className = "tv-light w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-red-500 border border-red-400 shadow-[0_0_10px_#ef4444] transition-all duration-200";
+                        tvLights[count].className = "tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-red-500 border-4 border-red-400 shadow-[0_0_30px_#ef4444] transition-all duration-200";
                         count++;
                     }, 1000);
                 }
                 
+                // 6. Reset completo / Idle
+                if (!tvData.isRaceActive && !tvData.isCountdown && !tvData.raceAborted) {
+                    const tvContainer = document.getElementById('tv-traffic-light-container');
+                    if(tvContainer && !tvContainer.classList.contains('hidden')) {
+                        tvContainer.classList.add('opacity-0');
+                        setTimeout(() => tvContainer.classList.add('hidden'), 500);
+                    }
+                }
+
                 // Actualizar estado previo
                     tvPrevState.lapCount = tvData.currentLap || 0;
                     tvPrevState.isRaceActive = tvData.isRaceActive || false;
@@ -4665,18 +4588,17 @@
 
         window.sendRemoteCommand = function(action, data = null) {
             const now = Date.now();
-            
-            // FIX: Solo ejecutamos localmente si somos el Host mostrando el modo TV (SPA Mode)
-            if (isSpaMode && typeof handleRemoteCommand === 'function') {
+            // Si el usuario abrió el modo TV en la misma pestaña principal (botón Telemetría TV)
+            // Ejecutamos directamente y actualizamos lastProcessedCmdTs para evitar el "eco" de la nube
+            if (!isTVMode && typeof handleRemoteCommand === 'function') {
                 lastProcessedCmdTs = now;
                 handleRemoteCommand(action, data);
             }
 
             // Local (Para 2 pantallas en el mismo dispositivo)
             kronoChannel.postMessage({ type: 'REMOTE_CMD', command: action, data: data, ts: now });
-            
             // Nube
-            if (cloudRoomCode && window.db && window.fs && window.auth && window.auth.currentUser) {
+            if (cloudRoomCode && window.db && window.fs) {
                 try {
                     const cmdDocRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'tv_commands', cloudRoomCode);
                     window.fs.setDoc(cmdDocRef, { action: action, data: data, ts: now });
@@ -4728,68 +4650,6 @@
                     if(typeof broadcastState === 'function') broadcastState();
                     if(typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
                 }
-            } else if (action === 'SYNC_GARAGE_CAR') {
-                // NUEVO: Recibir ediciones hechas en la TV hacia el Móvil
-                const incomingCar = data;
-                if (!incomingCar || !incomingCar.id) return;
-                
-                let idx = garageCars.findIndex(c => c.id === incomingCar.id);
-                if (idx !== -1) {
-                    const existingImg = garageCars[idx].image;
-                    garageCars[idx] = { ...incomingCar, image: existingImg };
-                } else {
-                    garageCars.push({ ...incomingCar, image: "" });
-                }
-                localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
-                
-                if (typeof updateConfigCarList === 'function') updateConfigCarList();
-                
-                const garageMod = document.getElementById('garageModal');
-                if (garageMod && !garageMod.classList.contains('hidden')) {
-                    populateDropdown();
-                    renderGarageCar(currentGarageIndex);
-                }
-
-                // Re-enviar el garaje para cualquier otra pantalla conectada
-                if (typeof broadcastState === 'function') broadcastState();
-                if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
-            } else if (action === 'SYNC_FULL_GARAGE') {
-                // NUEVO: Recibir importaciones o borrados masivos desde la TV
-                const incomingGarage = data;
-                if (Array.isArray(incomingGarage)) {
-                    let newGarageList = incomingGarage.map(incomingCar => {
-                        let localMatch = garageCars.find(c => c.id === incomingCar.id);
-                        return {
-                            ...incomingCar,
-                            image: localMatch ? localMatch.image : (incomingCar.image || "")
-                        };
-                    });
-                    
-                    garageCars = newGarageList;
-                    localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
-                    
-                    if (typeof updateConfigCarList === 'function') updateConfigCarList();
-                    
-                    const garageMod = document.getElementById('garageModal');
-                    if (garageMod && !garageMod.classList.contains('hidden')) {
-                        let savedId = garageCars[currentGarageIndex] ? garageCars[currentGarageIndex].id : null;
-                        populateDropdown();
-                        if (savedId) {
-                            let newIdx = garageCars.findIndex(c => c.id === savedId);
-                            if (newIdx !== -1) {
-                                currentGarageIndex = newIdx;
-                                document.getElementById('garage-car-select').value = newIdx;
-                            } else {
-                                currentGarageIndex = 0;
-                            }
-                        }
-                        renderGarageCar(currentGarageIndex);
-                    }
-
-                    // Re-enviar el garaje actualizado al resto del ecosistema
-                    if (typeof broadcastState === 'function') broadcastState();
-                    if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
-                }
             }
         }
 
@@ -4809,8 +4669,7 @@
 
             // Receptor Nube (Firebase)
             const initCloudRemoteListener = setInterval(() => {
-                // FIX CRÍTICO: Asegurar que 'window.auth.currentUser' exista para evitar crash de permisos en Firebase
-                if (window.db && window.auth && window.auth.currentUser && window.myRoomCode && window.fs) {
+                if (window.db && window.auth && window.myRoomCode && window.fs) {
                     clearInterval(initCloudRemoteListener);
                     const cmdDocRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'tv_commands', window.myRoomCode);
                     window.fs.onSnapshot(cmdDocRef, (docSnap) => {
@@ -4850,43 +4709,115 @@
         const importInput = document.getElementById('garage-import-input');
 
         let garageCars = JSON.parse(localStorage.getItem('krono_garage_cars')) || [];
-        
-        // FIX: Asegurar que el garaje nunca esté vacío desde el principio para que el rendimiento siempre se guarde
-        if (garageCars.length === 0) {
-            garageCars.push({
-                id: "ID0187", name: "Seat 850 E - Rally Arrabassada 1972", image: "",
-                marca: "Scalextric", ref: "U10613S300", year: "1972", cat: "Rally", pilot: "Anton Guasch", copilot: "Sin Nombre", sys: "Analógico C. Advance",
-                motor: "Scalextric FR45", posicion: "In Line", pinon: "Scalextric Original Bronce 9z", corona: "Scalextric Original Plástico Blanco 27z",
-                relacion: "9:27", chasis: "Scalextric Original", guia: "Scalextric Original Presión suspensión...", trencillas: "Dobles",
-                cableado: "Lámina de cobre", ejeDelantero: "Semieje", llantaDelantera: "Scalextric Original Plástico Negra 15 x 6.5 mm",
-                neumaticoDelantero: "15 x 8 mm", ejeTrasero: "Scalextric Original 45 mm", llantaTrasera: "Scalextric Original Plástico Negra 15 x 6.5 mm",
-                neumaticoTrasero: "15 x 8 mm", longitud: "106 mm", anchura: "45 mm", altura: "44 mm", distEjes: "63 mm", batalla: "69 mm", peso: "60", luces: "Leds Serie",
-                caja: "Urna", estado: "Nuevo", precio: "55.44 €", compradoEn: "Amazon", fecha: "16/04/2026", coleccion: "SCX",
-                bestLap: "-", totalTime: "0h 0m 0s", totalDist: "0.000 km", avgSpd: "0.0 km/h", avgSpd32: "0.0 km/h", consistency: "0"
-            });
-            try { localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars)); } catch(e){}
-        }
-
         let currentGarageIndex = 0;
         let isGarageEditing = false;
         
-        // --- FUNCIÓN MAESTRA DE SINCRONIZACIÓN DE GARAJE ---
-        function forceEcosystemSync() {
-            if (isTVMode) {
-                if (typeof window.sendRemoteCommand === 'function') {
-                    const strippedGarage = garageCars.map(c => {
-                        let cp = { ...c };
-                        delete cp.image; // Evitar saturar red en transferencias masivas
-                        return cp;
-                    });
-                    window.sendRemoteCommand('SYNC_FULL_GARAGE', strippedGarage);
+        // --- VARIABLES SISTEMA NUBE ---
+        let cloudGarageId = localStorage.getItem('krono_cloud_id');
+        if (!cloudGarageId) {
+            cloudGarageId = Math.random().toString(36).substring(2, 8).toUpperCase();
+            localStorage.setItem('krono_cloud_id', cloudGarageId);
+        }
+        let unsubGarageCloud = null;
+        let isSyncingFromCloud = false;
+
+        // --- FUNCIONES SISTEMA NUBE ---
+        async function saveGarageToCloud() {
+            if (!window.db || !window.fs || isSyncingFromCloud) return;
+            try {
+                const docRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'cloud_garages', cloudGarageId);
+                let payload = { cars: garageCars, updatedAt: Date.now() };
+                let jsonStr = JSON.stringify(payload);
+                
+                // Evitar error de cuota si hay demasiadas fotos (Límite Firestore: 1MB por documento)
+                if (jsonStr.length > 900000) { 
+                    const lightCars = garageCars.map(c => ({...c, image: ""}));
+                    payload = { cars: lightCars, updatedAt: Date.now(), warning: "fotos_omitidas" };
                 }
-            } else {
-                if (typeof broadcastState === 'function') broadcastState();
-                if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
+                await window.fs.setDoc(docRef, payload);
+            } catch(e) {
+                console.error("Error sincronizando garaje a la nube:", e);
             }
         }
-        
+
+        function listenToCloudGarage() {
+            if (!window.db || !window.fs) return;
+            if (unsubGarageCloud) unsubGarageCloud(); // Matar escucha anterior
+            
+            const docRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'cloud_garages', cloudGarageId);
+            unsubGarageCloud = window.fs.onSnapshot(docRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    // Bloqueamos la subida temporalmente para que la descarga no se re-suba en bucle
+                    isSyncingFromCloud = true;
+                    garageCars = data.cars || [];
+                    
+                    // Guardar silenciosamente en local
+                    localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
+                    
+                    // Si el garaje está abierto, refrescar la interfaz en vivo
+                    if (!document.getElementById('garageModal').classList.contains('hidden')) {
+                        populateDropdown();
+                        if(currentGarageIndex >= garageCars.length) currentGarageIndex = 0;
+                        renderGarageCar(currentGarageIndex);
+                    }
+                    if (typeof updateConfigCarList === 'function') updateConfigCarList();
+                    
+                    // Notificar visualmente si se forzó la vinculación
+                    const syncBtn = document.getElementById('garage-cloud-sync-btn');
+                    if(syncBtn && syncBtn.textContent === "CONECTANDO...") {
+                        syncBtn.textContent = "¡VINCULADO!";
+                        syncBtn.classList.add('bg-green-600', 'shadow-[0_0_15px_#16a34a]');
+                        setTimeout(() => {
+                            syncBtn.textContent = "VINCULAR";
+                            syncBtn.classList.remove('bg-green-600', 'shadow-[0_0_15px_#16a34a]');
+                        }, 3000);
+                    }
+                    
+                    setTimeout(() => { isSyncingFromCloud = false; }, 500);
+                }
+            }, (error) => {
+                console.error("Error escuchando cambios de la nube:", error);
+            });
+        }
+
+        // --- INICIALIZADOR UI DE LA NUBE ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const cloudIdInput = document.getElementById('garage-cloud-id');
+            const cloudSyncBtn = document.getElementById('garage-cloud-sync-btn');
+            
+            if (cloudIdInput) cloudIdInput.value = cloudGarageId;
+            
+            if (cloudSyncBtn) {
+                cloudSyncBtn.addEventListener('click', () => {
+                    const newId = cloudIdInput.value.trim().toUpperCase();
+                    if (newId.length > 0 && newId !== cloudGarageId) {
+                        if (confirm(`Vas a vincular tu garaje al código de la nube [ ${newId} ].\n\n- Si la cuenta existe, descargarás esos coches aquí.\n- Si es una cuenta nueva, tus coches actuales se subirán a ella.\n\n¿Deseas continuar?`)) {
+                            cloudGarageId = newId;
+                            localStorage.setItem('krono_cloud_id', cloudGarageId);
+                            cloudSyncBtn.textContent = "CONECTANDO...";
+                            
+                            listenToCloudGarage();
+                            
+                            // Forzamos un guardado inmediato por si es una cuenta nueva virgen
+                            setTimeout(() => { saveGarageToCloud(); }, 1000);
+                        }
+                    }
+                });
+            }
+            
+            // Iniciar conexión automática al abrir la app
+            const initGarageCloudInterval = setInterval(() => {
+                if (window.db && window.auth && window.auth.currentUser) {
+                    clearInterval(initGarageCloudInterval);
+                    listenToCloudGarage();
+                    // Si el usuario ya tenía coches antes de esta actualización, subirlos
+                    if(garageCars.length > 0) saveGarageToCloud();
+                }
+            }, 1000);
+        });
+
         // --- ACTUALIZAR SELECTOR DE COCHE EN PANEL CONFIG ---
         window.updateConfigCarList = function() {
             const carSelect = document.getElementById('car-model-input');
@@ -4957,6 +4888,24 @@
             'bestLap', 'totalTime', 'totalDist', 'avgSpd', 'avgSpd32', 'consistency'
         ];
 
+        function initGarage() {
+            if (garageCars.length === 0) {
+                garageCars.push({
+                    id: "ID0187", name: "Seat 850 E - Rally Arrabassada 1972", image: "",
+                    marca: "Scalextric", ref: "U10613S300", year: "1972", cat: "Rally", pilot: "Anton Guasch", copilot: "Sin Nombre", sys: "Analógico C. Advance",
+                    motor: "Scalextric FR45", posicion: "In Line", pinon: "Scalextric Original Bronce 9z", corona: "Scalextric Original Plástico Blanco 27z",
+                    relacion: "9:27", chasis: "Scalextric Original", guia: "Scalextric Original Presión suspensión...", trencillas: "Dobles",
+                    cableado: "Lámina de cobre", ejeDelantero: "Semieje", llantaDelantera: "Scalextric Original Plástico Negra 15 x 6.5 mm",
+                    neumaticoDelantero: "15 x 8 mm", ejeTrasero: "Scalextric Original 45 mm", llantaTrasera: "Scalextric Original Plástico Negra 15 x 6.5 mm",
+                    neumaticoTrasero: "15 x 8 mm", longitud: "106 mm", anchura: "45 mm", altura: "44 mm", distEjes: "63 mm", batalla: "69 mm", peso: "60", luces: "Leds Serie",
+                    caja: "Urna", estado: "Nuevo", precio: "55.44 €", compradoEn: "Amazon", fecha: "16/04/2026", coleccion: "SCX",
+                    bestLap: "-", totalTime: "0h 0m 0s", totalDist: "0.000 km", avgSpd: "0.0 km/h", avgSpd32: "0.0 km/h", consistency: "0"
+                });
+                saveGarageToLocal();
+            }
+            populateDropdown();
+        }
+
         function saveGarageToLocal() {
             try {
                 let jsonStr = JSON.stringify(garageCars);
@@ -4974,6 +4923,10 @@
                 }
                 
                 localStorage.setItem('krono_garage_cars', jsonStr);
+                
+                // --- DISPARAR GUARDADO EN LA NUBE AUTOMÁTICAMENTE ---
+                saveGarageToCloud();
+                
             } catch (e) {
                 console.error("Error saving garage:", e);
                 // Si falla por CUALQUIER otro error de cuota o límite en móviles
@@ -4982,6 +4935,7 @@
                 garageCars.forEach(car => car.image = "");
                 try {
                     localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
+                    saveGarageToCloud(); // <-- Intentar nube sin fotos
                     if (typeof updateConfigCarList === 'function') updateConfigCarList();
                     renderGarageCar(currentGarageIndex);
                 } catch (e2) {
@@ -5098,19 +5052,6 @@
             renderGarageCar(currentGarageIndex);
             if (typeof updateConfigCarList === 'function') updateConfigCarList();
             toggleGarageEdit(false);
-
-            // NUEVO: Auto-Sincronización Bidireccional
-            let carForSync = JSON.parse(JSON.stringify(garageCars[currentGarageIndex]));
-            delete carForSync.image; // Evitar cuotas altas
-            carForSync.syncTs = Date.now();
-            
-            if (isTVMode) {
-                if (typeof window.sendRemoteCommand === 'function') window.sendRemoteCommand('SYNC_GARAGE_CAR', carForSync);
-            } else {
-                window.lastSyncedCarData = carForSync;
-                if (typeof broadcastState === 'function') broadcastState(); // <-- AÑADIDO: Fuerza refresco al momento
-                if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
-            }
         }
 
         function openGarage() {
@@ -5118,15 +5059,10 @@
             garageCars = JSON.parse(localStorage.getItem('krono_garage_cars')) || [];
             
             if (garageCars.length === 0) {
-                // Fallback de seguridad en caso de que se borre todo manual
-                garageCars.push({
-                    id: "ID001", name: "Coche por Defecto", image: "",
-                    bestLap: "-", totalTime: "0h 0m 0s", totalDist: "0.000 km", avgSpd: "0.0 km/h", avgSpd32: "0.0 km/h", consistency: "0"
-                });
-                try { localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars)); } catch(e){}
+                initGarage();
+            } else {
+                populateDropdown();
             }
-            
-            populateDropdown();
             
             // Buscar cuál es el coche activo en la app principal
             const activeCarName = document.getElementById('car-model-input').value;
@@ -5169,12 +5105,6 @@
         // --- AUTO-ACTUALIZAR GARAJE AL ACABAR CARRERA ---
         function updateGarageCarStatsAfterRace() {
             try {
-                // Sincronización extra: asegurar que cogemos la versión más reciente del local storage
-                const latestGarage = JSON.parse(localStorage.getItem('krono_garage_cars'));
-                if (latestGarage && latestGarage.length > 0) {
-                    garageCars = latestGarage;
-                }
-
                 if (!garageCars || garageCars.length === 0 || currentLap === 0) return;
                 const activeCarName = document.getElementById('car-model-input').value;
                 if (!activeCarName) return;
@@ -5187,19 +5117,15 @@
                     return cName === activeCarName;
                 });
                 
-                // FALLBACK SEGURO: Si por algún motivo el nombre no coincide, forzar el guardado en el primer coche
                 if (carIndex === -1) {
-                    console.warn("Coche exacto no encontrado en garaje, guardando stats en el coche principal.");
-                    carIndex = 0; 
+                    console.warn("Coche no encontrado para actualizar historial:", activeCarName);
+                    return; 
                 }
                 
                 let car = garageCars[carIndex];
                 
-                // 1. Mejor Vuelta Histórica (Robust Parsing limpiando 's' y espacios)
-                let currentBestStr = car.bestLap ? car.bestLap.toString().replace('s', '').trim() : "";
-                let currentBest = parseFloat(currentBestStr);
-                if (isNaN(currentBest)) currentBest = Infinity;
-                
+                // 1. Mejor Vuelta Histórica
+                let currentBest = parseFloat(car.bestLap) || Infinity;
                 let raceBest = bestLapTime / 1000;
                 if (raceBest > 0 && raceBest < currentBest) {
                     car.bestLap = raceBest.toFixed(3) + "s";
@@ -5228,11 +5154,10 @@
                 let s = totalSecs % 60;
                 car.totalTime = `${h}h ${m}m ${s}s`;
                 
-                // 3. Recorrido Acumulativo (Km) (Robust Parsing limpiando 'km' y espacios)
+                // 3. Recorrido Acumulativo (Km)
                 let rawDist = car._rawTotalDist || 0;
                 if (!car._rawTotalDist && car.totalDist && car.totalDist !== "0.000 km" && car.totalDist !== "-") {
-                    let distStr = car.totalDist.toString().replace('km', '').trim();
-                    rawDist = parseFloat(distStr) || 0;
+                    rawDist = parseFloat(car.totalDist) || 0;
                 }
                 let raceDistKm = (trackLen * currentLap) / 1000;
                 rawDist += raceDistKm;
@@ -5247,10 +5172,8 @@
                     car.avgSpd32 = (avgSpdKmh * 32).toFixed(1) + " km/h";
                 }
                 
-                // 5. Constancia (Promedio móvil histórico limpiando '%')
-                let currentConsStr = car.consistency ? car.consistency.toString().replace('%', '').trim() : "0";
-                let currentCons = parseFloat(currentConsStr) || 0;
-                
+                // 5. Constancia (Promedio móvil histórico)
+                let currentCons = parseFloat(car.consistency) || 0;
                 if (consistency > 0 && isFinite(consistency)) {
                     if (currentCons === 0) {
                         car.consistency = consistency.toFixed(1);
@@ -5260,23 +5183,9 @@
                 }
                 
                 saveGarageToLocal();
-                // FORZAR GUARDADO DIRECTO EXTRA PARA ASEGURAR SINCRONIZACIÓN
-                localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
-                
-                // NUEVO: Auto-Sincronización hacia la TV al terminar la carrera
-                let carForSync = JSON.parse(JSON.stringify(car));
-                delete carForSync.image; // Evitar saturar Firebase
-                carForSync.syncTs = Date.now();
-                window.lastSyncedCarData = carForSync;
-                if (!isTVMode) {
-                    if (typeof broadcastState === 'function') broadcastState(); // <-- AÑADIDO: Notificar tras acabar vuelta/carrera
-                    if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
-                }
-
                 // Refrescar UI si el garaje está abierto y estamos viendo este coche
-                const garageMod = document.getElementById('garageModal');
-                if (currentGarageIndex === carIndex && garageMod && !garageMod.classList.contains('hidden')) {
-                    if (typeof renderGarageCar === 'function') renderGarageCar(carIndex);
+                if (currentGarageIndex === carIndex && !garageModal.classList.contains('hidden')) {
+                    renderGarageCar(carIndex);
                 }
             } catch (e) {
                 console.error("Error al actualizar estadísticas del garaje:", e);
@@ -5295,9 +5204,6 @@
             renderGarageCar(currentGarageIndex);
             if (typeof updateConfigCarList === 'function') updateConfigCarList();
             toggleGarageEdit(true);
-
-            // Sincronizar nuevo coche globalmente de inmediato
-            forceEcosystemSync();
         });
 
         deleteBtn.addEventListener('click', () => {
@@ -5319,9 +5225,6 @@
                 }
                 if (typeof updateConfigCarList === 'function') updateConfigCarList();
                 toggleGarageEdit(false);
-
-                // Notificar eliminación al instante
-                forceEcosystemSync();
             }
         });
 
@@ -5397,111 +5300,65 @@
 
         // --- SISTEMA DE IMPORTACIÓN INTELIGENTE ---
         function parseImportedCars(importedData) {
-            return importedData.map((car, idx) => {
-                // Caso A: Formato KRONO Nativo (exportado previamente desde esta app)
-                if (car.marca !== undefined || car.name !== undefined || car.bestLap !== undefined) {
-                    if (!car.name) car.name = `${car.marca || 'Coche'} ${car.ref || ''}`.trim() || `Coche ${idx+1}`;
-                    if (!car.id) car.id = `ID${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
-                    
-                    // Asegurar inicialización de métricas por si vienen de versiones antiguas
-                    if (car.bestLap === undefined) car.bestLap = "-";
-                    if (car.totalTime === undefined) car.totalTime = "0h 0m 0s";
-                    if (car.totalDist === undefined) car.totalDist = "0.000 km";
-                    if (car.avgSpd === undefined) car.avgSpd = "0.0 km/h";
-                    if (car.avgSpd32 === undefined) car.avgSpd32 = "0.0 km/h";
-                    if (car.consistency === undefined) car.consistency = "0";
+            return importedData.map(car => {
+                // Si el coche ya viene en el formato plano de la app (exportado previamente desde aquí)
+                if (car.marca !== undefined && car.metadata === undefined) {
+                    // Garantizar que tenga nombre y un ID por si viene de una versión antigua
+                    if (!car.name) car.name = `${car.marca || 'Coche'} ${car.ref || ''}`.trim() || 'Coche Importado';
+                    if (!car.id) car.id = `ID${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
                     return car; 
                 }
 
-                // Caso B: Formato RT SLOT Antiguo (Propiedades planas en Mayúscula o Title Case)
-                if (car.MARCA !== undefined || car['Referencia'] !== undefined) {
-                    return {
-                        id: `ID${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
-                        name: `${car.MARCA || 'Coche'} ${car['Referencia'] || ''}`.trim() || `Coche Importado ${idx+1}`,
-                        image: car.image || car.imagen || car.foto || "",
-                        marca: car['MARCA'] || "",
-                        ref: car['Referencia'] || "",
-                        year: car['Año I/F'] || "",
-                        cat: car['Categoría'] || "",
-                        pilot: car['Piloto'] || "",
-                        copilot: car['Copiloto'] || "",
-                        sys: car['Analógico / Digital'] || "",
-                        motor: car['Motor'] || car['MOTOR-MARCA'] || "",
-                        posicion: car['MOTOR-POSICIÓN'] || "",
-                        pinon: car['Piñón'] || "",
-                        corona: car['Corona'] || "",
-                        relacion: car['RELACIÓN'] || "",
-                        chasis: car['CHASIS'] || "",
-                        guia: car['GUÍA-TIPO'] || "",
-                        trencillas: car['GUÍA-TRENCILLAS'] || "",
-                        cableado: car['GUÍA-CABLEADO'] || "",
-                        ejeDelantero: car['Eje Delantero'] || "",
-                        llantaDelantera: car['LLANTA DEL-TIPO'] || "",
-                        neumaticoDelantero: car['Neumático Delantero'] || "",
-                        ejeTrasero: car['Eje Trasero'] || "",
-                        llantaTrasera: car['LLANTA TRAS-TIPO'] || "",
-                        neumaticoTrasero: car['Neumático Trasero'] || "",
-                        longitud: car['LONGITUD'] || "",
-                        anchura: car['ANCHURA'] || "",
-                        altura: car['ALTURA'] || "",
-                        distEjes: car['DIST. EJES'] || "",
-                        batalla: car['BATALLA'] || "",
-                        peso: car['Peso Total'] || car['Peso Carrocería'] || "",
-                        luces: car['Luces'] || "",
-                        caja: car['Caja'] || "",
-                        estado: car['ESTADO'] || "",
-                        precio: car['Precio'] || "",
-                        compradoEn: car['Comprado en'] || "",
-                        fecha: car['Fecha'] || "",
-                        coleccion: car['Colección'] || "",
-                        bestLap: "-", totalTime: "0h 0m 0s", totalDist: "0.000 km", avgSpd: "0.0 km/h", avgSpd32: "0.0 km/h", consistency: "0",
-                        _rawTotalTime: 0, _rawTotalDist: 0
-                    };
-                }
-
-                // Caso C: Formato Externo Envuelto en "metadata"
+                // Si viene del formato externo con sub-objeto "metadata"
                 const meta = car.metadata || {};
                 return {
-                    id: car.id || `ID${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
-                    name: car.name || `${meta['MARCA'] || 'Coche'} ${meta['Referencia'] || ''}`.trim() || `Coche Importado ${idx+1}`,
+                    id: car.id || `ID${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+                    name: car.name || "Coche Importado",
                     image: car.image || "",
-                    marca: meta['MARCA'] || meta['marca'] || "",
-                    ref: meta['Referencia'] || meta['ref'] || "",
-                    year: meta['Año I/F'] || meta['year'] || "",
-                    cat: meta['Categoría'] || meta['cat'] || "",
-                    pilot: meta['Piloto'] || meta['pilot'] || "",
-                    copilot: meta['Copiloto'] || meta['copilot'] || "",
-                    sys: meta['Analógico / Digital'] || meta['sys'] || "",
-                    motor: meta['Motor'] || meta['MOTOR-MARCA'] || meta['motor'] || "",
-                    posicion: meta['MOTOR-POSICIÓN'] || meta['posicion'] || "",
-                    pinon: meta['Piñón'] || meta['pinon'] || "",
-                    corona: meta['Corona'] || meta['corona'] || "",
-                    relacion: meta['RELACIÓN'] || meta['relacion'] || "",
-                    chasis: meta['CHASIS'] || meta['chasis'] || "",
-                    guia: meta['GUÍA-TIPO'] || meta['guia'] || "",
-                    trencillas: meta['GUÍA-TRENCILLAS'] || meta['trencillas'] || "",
-                    cableado: meta['GUÍA-CABLEADO'] || meta['cableado'] || "",
-                    ejeDelantero: meta['Eje Delantero'] || meta['ejeDelantero'] || "",
-                    llantaDelantera: meta['LLANTA DEL-TIPO'] || meta['llantaDelantera'] || "",
-                    neumaticoDelantero: meta['Neumático Delantero'] || meta['neumaticoDelantero'] || "",
-                    ejeTrasero: meta['Eje Trasero'] || meta['ejeTrasero'] || "",
-                    llantaTrasera: meta['LLANTA TRAS-TIPO'] || meta['llantaTrasera'] || "",
-                    neumaticoTrasero: meta['Neumático Trasero'] || meta['neumaticoTrasero'] || "",
-                    longitud: meta['LONGITUD'] || meta['longitud'] || "",
-                    anchura: meta['ANCHURA'] || meta['anchura'] || "",
-                    altura: meta['ALTURA'] || meta['altura'] || "",
-                    distEjes: meta['DIST. EJES'] || meta['distEjes'] || "",
-                    batalla: meta['BATALLA'] || meta['batalla'] || "",
-                    peso: meta['Peso Total'] || meta['Peso Carrocería'] || meta['peso'] || "",
-                    luces: meta['Luces'] || meta['luces'] || "",
-                    caja: meta['Caja'] || meta['caja'] || "",
-                    estado: meta['ESTADO'] || meta['estado'] || "",
-                    precio: meta['Precio'] || meta['precio'] || "",
-                    compradoEn: meta['Comprado en'] || meta['compradoEn'] || "",
-                    fecha: meta['Fecha'] || meta['fecha'] || "",
-                    coleccion: meta['Colección'] || meta['coleccion'] || "",
-                    bestLap: "-", totalTime: "0h 0m 0s", totalDist: "0.000 km", avgSpd: "0.0 km/h", avgSpd32: "0.0 km/h", consistency: "0",
-                    _rawTotalTime: 0, _rawTotalDist: 0
+                    marca: meta['MARCA'] || "",
+                    ref: meta['Referencia'] || "",
+                    year: meta['Año I/F'] || "",
+                    cat: meta['Categoría'] || "",
+                    pilot: meta['Piloto'] || "",
+                    copilot: meta['Copiloto'] || "",
+                    sys: meta['Analógico / Digital'] || "",
+                    motor: meta['Motor'] || meta['MOTOR-MARCA'] || "",
+                    posicion: meta['MOTOR-POSICIÓN'] || "",
+                    pinon: meta['Piñón'] || "",
+                    corona: meta['Corona'] || "",
+                    relacion: meta['RELACIÓN'] || "",
+                    chasis: meta['CHASIS'] || "",
+                    guia: meta['GUÍA-TIPO'] || "",
+                    trencillas: meta['GUÍA-TRENCILLAS'] || "",
+                    cableado: meta['GUÍA-CABLEADO'] || "",
+                    ejeDelantero: meta['Eje Delantero'] || "",
+                    llantaDelantera: meta['LLANTA DEL-TIPO'] || "",
+                    neumaticoDelantero: meta['Neumático Delantero'] || "",
+                    ejeTrasero: meta['Eje Trasero'] || "",
+                    llantaTrasera: meta['LLANTA TRAS-TIPO'] || "",
+                    neumaticoTrasero: meta['Neumático Trasero'] || "",
+                    longitud: meta['LONGITUD'] || "",
+                    anchura: meta['ANCHURA'] || "",
+                    altura: meta['ALTURA'] || "",
+                    distEjes: meta['DIST. EJES'] || "",
+                    batalla: meta['BATALLA'] || "",
+                    peso: meta['Peso Total'] || meta['Peso Carrocería'] || "",
+                    luces: meta['Luces'] || "",
+                    caja: meta['Caja'] || "",
+                    estado: meta['ESTADO'] || "",
+                    precio: meta['Precio'] || "",
+                    compradoEn: meta['Comprado en'] || "",
+                    fecha: meta['Fecha'] || "",
+                    coleccion: meta['Colección'] || "",
+                    // Inicializar métricas a 0 para el nuevo panel de rendimiento
+                    bestLap: "-",
+                    totalTime: "0h 0m 0s",
+                    totalDist: "0.000 km",
+                    avgSpd: "0.0 km/h",
+                    avgSpd32: "0.0 km/h",
+                    consistency: "0",
+                    _rawTotalTime: 0,
+                    _rawTotalDist: 0
                 };
             });
         }
@@ -5519,46 +5376,34 @@
                 try {
                     let importedData = JSON.parse(event.target.result);
                     
-                    // --- EXTRACCIÓN RECURSIVA INTELIGENTE (IA BOT) ---
-                    // Este algoritmo navega por cualquier estructura JSON, sin importar lo anidada que esté,
-                    // y extrae únicamente los objetos que parezcan ser coches.
-                    let rawCarsList = [];
-                    let visited = new Set();
-                    
-                    function extractCars(node) {
-                        if (!node || typeof node !== 'object') return;
-                        if (visited.has(node)) return; // Evitar bucles infinitos
-                        visited.add(node);
-
-                        // Criterios de "es un coche" (Soporta múltiples versiones)
-                        const isKronoCar = ('marca' in node) || ('name' in node && 'id' in node);
-                        const isRTSlotCar = ('MARCA' in node) || ('Referencia' in node);
-                        const isMetaCar = ('metadata' in node) && ('MARCA' in node.metadata || 'marca' in node.metadata);
-
-                        if (isKronoCar || isRTSlotCar || isMetaCar) {
-                            rawCarsList.push(node);
+                    // Flexibilidad en el formato del JSON: forzar conversión a Array si viene como Objeto
+                    if (!Array.isArray(importedData)) {
+                        if (typeof importedData === 'object' && importedData !== null) {
+                            // Caso A: { "cars": [...] }
+                            const keys = Object.keys(importedData);
+                            if (keys.length === 1 && Array.isArray(importedData[keys[0]])) {
+                                importedData = importedData[keys[0]];
+                            } 
+                            // Caso B: { "1": {...}, "2": {...} }
+                            else {
+                                importedData = Object.values(importedData);
+                            }
                         } else {
-                            // Si no es un coche, seguimos escarbando dentro
-                            Object.values(node).forEach(child => extractCars(child));
+                            throw new Error("El archivo JSON debe contener una lista de coches.");
                         }
                     }
                     
-                    extractCars(importedData);
+                    const parsedCars = parseImportedCars(importedData);
                     
-                    if (rawCarsList.length === 0) {
-                        throw new Error("No se detectó ningún coche en el archivo. Verifica el formato.");
-                    }
-                    
-                    const parsedCars = parseImportedCars(rawCarsList);
-                    // ------------------------------------------------
-
-                    if (confirm(`Se han detectado ${parsedCars.length} coches listos para importar.\n\n¿Quieres REEMPLAZAR tu garaje actual con estos coches?\n\n- Dale a "Aceptar" para borrar los actuales y poner los nuevos.\n- Dale a "Cancelar" para añadirlos a los que ya tienes.`)) {
+                    if (confirm(`Se han detectado ${parsedCars.length} coches en el archivo.\n\n¿Quieres REEMPLAZAR tu garaje actual con estos coches?\n\n- Dale a "Aceptar" para borrar los actuales y poner los nuevos.\n- Dale a "Cancelar" para añadirlos a los que ya tienes.`)) {
                         garageCars = parsedCars;
+                        // Forzar borrado completo en el DOM y LocalStorage para evitar lectura sucia
                         document.getElementById('car-model-input').value = "";
                         localStorage.removeItem('krono_car_model');
                     } else {
                         const wasEmpty = garageCars.length === 0;
                         garageCars = garageCars.concat(parsedCars);
+                        // Si el garaje estaba vacío y se añade, también forzamos la selección
                         if (wasEmpty) {
                             document.getElementById('car-model-input').value = "";
                             localStorage.removeItem('krono_car_model');
@@ -5567,20 +5412,26 @@
                     
                     currentGarageIndex = 0;
                     
+                    // ORDEN CRÍTICO: 1. Construir las opciones del menú principal para que existan
                     if (typeof updateConfigCarList === 'function') {
                         updateConfigCarList();
                     }
 
+                    // 2. Poblar y renderizar el panel interno del garaje
                     populateDropdown();
                     renderGarageCar(currentGarageIndex);
                     
+                    // 3. Re-asegurar que el selector de config tiene el valor forzado y guardarlo
                     localStorage.setItem('krono_car_model', document.getElementById('car-model-input').value);
 
-                    // Disparar sincronización masiva al resto de pantallas (TV)
-                    forceEcosystemSync();
+                    // 4. Disparar el broadcast a la TV ahora que todos los inputs son correctos
+                    if (typeof broadcastState === 'function') broadcastState();
+                    if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
                     
+                    // Ahora guardamos (la validación de tamaño se hace dentro automáticamente)
                     saveGarageToLocal();
                     
+                    // Notificación visual de éxito en el propio botón
                     const originalText = importBtn.innerHTML;
                     importBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><polyline points="20 6 9 17 4 12"></polyline></svg> <span class="text-green-500">¡Importado!</span>`;
                     setTimeout(() => { importBtn.innerHTML = originalText; }, 3000);
@@ -5588,7 +5439,7 @@
                 } catch (error) {
                     alert("Error al importar el archivo: " + error.message);
                 }
-                importInput.value = ''; // Reset para poder importar otra vez
+                importInput.value = ''; // Reset para permitir volver a importar el mismo archivo si se desea
             };
             reader.readAsText(file);
         });
