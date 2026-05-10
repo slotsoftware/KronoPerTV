@@ -2754,10 +2754,15 @@
                         const activeCarName = document.getElementById('car-model-input').value;
                         if (activeCarName) {
                             // Buscar el coche usando la lógica exacta del selector
-                            const carIndex = garageCars.findIndex(c => {
+                            let carIndex = garageCars.findIndex(c => {
                                 const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
                                 return cName === activeCarName;
                             });
+                            
+                            // FALLBACK SEGURO: Si no hace match exacto, usar el primer coche para no perder los datos
+                            if (carIndex === -1 && garageCars.length > 0) {
+                                carIndex = 0;
+                            }
                             
                             if (carIndex !== -1) {
                                 const car = garageCars[carIndex];
@@ -4671,6 +4676,23 @@
         const importInput = document.getElementById('garage-import-input');
 
         let garageCars = JSON.parse(localStorage.getItem('krono_garage_cars')) || [];
+        
+        // FIX: Asegurar que el garaje nunca esté vacío desde el principio para que el rendimiento siempre se guarde
+        if (garageCars.length === 0) {
+            garageCars.push({
+                id: "ID0187", name: "Seat 850 E - Rally Arrabassada 1972", image: "",
+                marca: "Scalextric", ref: "U10613S300", year: "1972", cat: "Rally", pilot: "Anton Guasch", copilot: "Sin Nombre", sys: "Analógico C. Advance",
+                motor: "Scalextric FR45", posicion: "In Line", pinon: "Scalextric Original Bronce 9z", corona: "Scalextric Original Plástico Blanco 27z",
+                relacion: "9:27", chasis: "Scalextric Original", guia: "Scalextric Original Presión suspensión...", trencillas: "Dobles",
+                cableado: "Lámina de cobre", ejeDelantero: "Semieje", llantaDelantera: "Scalextric Original Plástico Negra 15 x 6.5 mm",
+                neumaticoDelantero: "15 x 8 mm", ejeTrasero: "Scalextric Original 45 mm", llantaTrasera: "Scalextric Original Plástico Negra 15 x 6.5 mm",
+                neumaticoTrasero: "15 x 8 mm", longitud: "106 mm", anchura: "45 mm", altura: "44 mm", distEjes: "63 mm", batalla: "69 mm", peso: "60", luces: "Leds Serie",
+                caja: "Urna", estado: "Nuevo", precio: "55.44 €", compradoEn: "Amazon", fecha: "16/04/2026", coleccion: "SCX",
+                bestLap: "-", totalTime: "0h 0m 0s", totalDist: "0.000 km", avgSpd: "0.0 km/h", avgSpd32: "0.0 km/h", consistency: "0"
+            });
+            try { localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars)); } catch(e){}
+        }
+
         let currentGarageIndex = 0;
         let isGarageEditing = false;
         
@@ -4743,24 +4765,6 @@
             'caja', 'estado', 'precio', 'compradoEn', 'fecha', 'coleccion',
             'bestLap', 'totalTime', 'totalDist', 'avgSpd', 'avgSpd32', 'consistency'
         ];
-
-        function initGarage() {
-            if (garageCars.length === 0) {
-                garageCars.push({
-                    id: "ID0187", name: "Seat 850 E - Rally Arrabassada 1972", image: "",
-                    marca: "Scalextric", ref: "U10613S300", year: "1972", cat: "Rally", pilot: "Anton Guasch", copilot: "Sin Nombre", sys: "Analógico C. Advance",
-                    motor: "Scalextric FR45", posicion: "In Line", pinon: "Scalextric Original Bronce 9z", corona: "Scalextric Original Plástico Blanco 27z",
-                    relacion: "9:27", chasis: "Scalextric Original", guia: "Scalextric Original Presión suspensión...", trencillas: "Dobles",
-                    cableado: "Lámina de cobre", ejeDelantero: "Semieje", llantaDelantera: "Scalextric Original Plástico Negra 15 x 6.5 mm",
-                    neumaticoDelantero: "15 x 8 mm", ejeTrasero: "Scalextric Original 45 mm", llantaTrasera: "Scalextric Original Plástico Negra 15 x 6.5 mm",
-                    neumaticoTrasero: "15 x 8 mm", longitud: "106 mm", anchura: "45 mm", altura: "44 mm", distEjes: "63 mm", batalla: "69 mm", peso: "60", luces: "Leds Serie",
-                    caja: "Urna", estado: "Nuevo", precio: "55.44 €", compradoEn: "Amazon", fecha: "16/04/2026", coleccion: "SCX",
-                    bestLap: "-", totalTime: "0h 0m 0s", totalDist: "0.000 km", avgSpd: "0.0 km/h", avgSpd32: "0.0 km/h", consistency: "0"
-                });
-                saveGarageToLocal();
-            }
-            populateDropdown();
-        }
 
         function saveGarageToLocal() {
             try {
@@ -4910,10 +4914,15 @@
             garageCars = JSON.parse(localStorage.getItem('krono_garage_cars')) || [];
             
             if (garageCars.length === 0) {
-                initGarage();
-            } else {
-                populateDropdown();
+                // Fallback de seguridad en caso de que se borre todo manual
+                garageCars.push({
+                    id: "ID001", name: "Coche por Defecto", image: "",
+                    bestLap: "-", totalTime: "0h 0m 0s", totalDist: "0.000 km", avgSpd: "0.0 km/h", avgSpd32: "0.0 km/h", consistency: "0"
+                });
+                try { localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars)); } catch(e){}
             }
+            
+            populateDropdown();
             
             // Buscar cuál es el coche activo en la app principal
             const activeCarName = document.getElementById('car-model-input').value;
@@ -4956,6 +4965,12 @@
         // --- AUTO-ACTUALIZAR GARAJE AL ACABAR CARRERA ---
         function updateGarageCarStatsAfterRace() {
             try {
+                // Sincronización extra: asegurar que cogemos la versión más reciente del local storage
+                const latestGarage = JSON.parse(localStorage.getItem('krono_garage_cars'));
+                if (latestGarage && latestGarage.length > 0) {
+                    garageCars = latestGarage;
+                }
+
                 if (!garageCars || garageCars.length === 0 || currentLap === 0) return;
                 const activeCarName = document.getElementById('car-model-input').value;
                 if (!activeCarName) return;
@@ -4968,15 +4983,19 @@
                     return cName === activeCarName;
                 });
                 
+                // FALLBACK SEGURO: Si por algún motivo el nombre no coincide, forzar el guardado en el primer coche
                 if (carIndex === -1) {
-                    console.warn("Coche no encontrado para actualizar historial:", activeCarName);
-                    return; 
+                    console.warn("Coche exacto no encontrado en garaje, guardando stats en el coche principal.");
+                    carIndex = 0; 
                 }
                 
                 let car = garageCars[carIndex];
                 
-                // 1. Mejor Vuelta Histórica
-                let currentBest = parseFloat(car.bestLap) || Infinity;
+                // 1. Mejor Vuelta Histórica (Robust Parsing limpiando 's' y espacios)
+                let currentBestStr = car.bestLap ? car.bestLap.toString().replace('s', '').trim() : "";
+                let currentBest = parseFloat(currentBestStr);
+                if (isNaN(currentBest)) currentBest = Infinity;
+                
                 let raceBest = bestLapTime / 1000;
                 if (raceBest > 0 && raceBest < currentBest) {
                     car.bestLap = raceBest.toFixed(3) + "s";
@@ -5005,10 +5024,11 @@
                 let s = totalSecs % 60;
                 car.totalTime = `${h}h ${m}m ${s}s`;
                 
-                // 3. Recorrido Acumulativo (Km)
+                // 3. Recorrido Acumulativo (Km) (Robust Parsing limpiando 'km' y espacios)
                 let rawDist = car._rawTotalDist || 0;
                 if (!car._rawTotalDist && car.totalDist && car.totalDist !== "0.000 km" && car.totalDist !== "-") {
-                    rawDist = parseFloat(car.totalDist) || 0;
+                    let distStr = car.totalDist.toString().replace('km', '').trim();
+                    rawDist = parseFloat(distStr) || 0;
                 }
                 let raceDistKm = (trackLen * currentLap) / 1000;
                 rawDist += raceDistKm;
@@ -5023,8 +5043,10 @@
                     car.avgSpd32 = (avgSpdKmh * 32).toFixed(1) + " km/h";
                 }
                 
-                // 5. Constancia (Promedio móvil histórico)
-                let currentCons = parseFloat(car.consistency) || 0;
+                // 5. Constancia (Promedio móvil histórico limpiando '%')
+                let currentConsStr = car.consistency ? car.consistency.toString().replace('%', '').trim() : "0";
+                let currentCons = parseFloat(currentConsStr) || 0;
+                
                 if (consistency > 0 && isFinite(consistency)) {
                     if (currentCons === 0) {
                         car.consistency = consistency.toFixed(1);
@@ -5034,9 +5056,11 @@
                 }
                 
                 saveGarageToLocal();
+                
                 // Refrescar UI si el garaje está abierto y estamos viendo este coche
-                if (currentGarageIndex === carIndex && !garageModal.classList.contains('hidden')) {
-                    renderGarageCar(carIndex);
+                const garageMod = document.getElementById('garageModal');
+                if (currentGarageIndex === carIndex && garageMod && !garageMod.classList.contains('hidden')) {
+                    if (typeof renderGarageCar === 'function') renderGarageCar(carIndex);
                 }
             } catch (e) {
                 console.error("Error al actualizar estadísticas del garaje:", e);
