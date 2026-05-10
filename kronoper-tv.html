@@ -1662,6 +1662,8 @@
                     <span class="text-blue-300 text-[10px] sm:text-xs uppercase font-bold tracking-widest shrink-0">ID Nube:</span>
                     <input type="text" id="garage-cloud-id" class="bg-black/80 border border-blue-400/50 text-white text-xs sm:text-sm font-black text-center w-24 sm:w-28 py-1 rounded outline-none uppercase focus:border-blue-400 focus:shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all tracking-widest" maxlength="6" title="Código para sincronizar tu garaje entre dispositivos">
                     <button id="garage-cloud-sync-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-xs font-bold uppercase transition shadow-[0_0_10px_rgba(37,99,235,0.4)] hover:shadow-[0_0_15px_rgba(37,99,235,0.8)] shrink-0">Vincular</button>
+                    <div class="w-px h-4 bg-blue-500/50 mx-1"></div>
+                    <button id="garage-bottom-close-btn" class="bg-red-900/60 hover:bg-red-600 border border-red-500/50 text-white px-3 py-1 rounded text-xs font-bold uppercase transition shadow-[0_0_10px_rgba(239,68,68,0.3)] hover:shadow-[0_0_15px_rgba(239,68,68,0.8)] shrink-0">Salir</button>
                 </div>
 
                 <!-- Botones Backup Antiguos (Más discretos) -->
@@ -5094,6 +5096,19 @@
             garageModal.classList.remove('open');
             setTimeout(() => garageModal.classList.add('hidden'), 300);
         });
+
+        // Evento para el nuevo botón Salir en la barra inferior
+        const bottomCloseGarageBtn = document.getElementById('garage-bottom-close-btn');
+        if (bottomCloseGarageBtn) {
+            bottomCloseGarageBtn.addEventListener('click', () => {
+                if (isGarageEditing) {
+                    if (!confirm("Tienes cambios sin guardar. ¿Cerrar de todos modos?")) return;
+                }
+                toggleGarageEdit(false);
+                garageModal.classList.remove('open');
+                setTimeout(() => garageModal.classList.add('hidden'), 300);
+            });
+        }
 
         carSelect.addEventListener('change', (e) => {
             renderGarageCar(parseInt(e.target.value));
