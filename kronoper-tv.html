@@ -3454,17 +3454,25 @@
         window.startTVMode = function(roomCode) {
             isSpaMode = !isTVMode; // Si NO estamos en Standalone TV, estamos en SPA Mode.
             cloudRoomCode = roomCode;
+            
+            // Limpieza de listeners previos para evitar duplicados si se entra y sale del TV Mode
+            if (window._unsubTvCloud) {
+                window._unsubTvCloud();
+                window._unsubTvCloud = null;
+            }
+            if (window.tvCountdownInterval) {
+                clearInterval(window.tvCountdownInterval);
+                window.tvCountdownInterval = null;
+            }
 
             // Tracking de estado para activar Audios en el TV Mode
             let tvPrevState = {
-                lapCount: 0,
+                lapCount: -1,
                 isRaceActive: false,
                 raceAborted: false,
                 isCountdown: false,
                 isPaused: false
             };
-            let isFirstPayload = true;
-            let tvCountdownInterval = null;
 
             // UI Switch
             document.getElementById('main-app-container').style.display = 'none';
@@ -4116,6 +4124,7 @@
                         document.title = "KRONO V.4.0 - TrueColor AI";
                         isSpaMode = false;
                         if (tvIntervalId) clearInterval(tvIntervalId);
+                        if (window._unsubTvCloud) window._unsubTvCloud();
                     };
                 }
             }
@@ -4129,9 +4138,9 @@
                     updateTexts();
                 }
 
-                // ANTI-GHOST RACES: Si los datos de Firebase son de hace más de 2 horas, caducamos la sesión
-                const STALE_TIME_MS = 2 * 60 * 60 * 1000; 
-                if (tvData.timestamp && (Date.now() - tvData.timestamp > STALE_TIME_MS)) {
+                // ANTI-GHOST RACES: Si los datos de Firebase son viejos (Usamos 24h absolutas para tolerar relojes desincronizados en Smart TVs)
+                const STALE_TIME_MS = 24 * 60 * 60 * 1000; 
+                if (tvData.timestamp && (Math.abs(Date.now() - tvData.timestamp) > STALE_TIME_MS)) {
                     tvData.isRaceActive = false;
                     tvData.isCountdown = false;
                     tvData.isPaused = false;
@@ -4146,14 +4155,6 @@
                 }
 
                 // === TV AUDIO STATE MACHINE ===
-                if (isFirstPayload) {
-                    tvPrevState.lapCount = tvData.currentLap || 0;
-                    tvPrevState.isRaceActive = tvData.isRaceActive || false;
-                    tvPrevState.raceAborted = tvData.raceAborted || false;
-                    tvPrevState.isCountdown = tvData.isCountdown || false;
-                    tvPrevState.isPaused = tvData.isPaused || false;
-                isFirstPayload = false;
-            } else {
                 if (Tone.context.state !== 'running') Tone.context.resume();
                 
                 const targetLang = tvData.currentLang || currentLang;
@@ -4163,7 +4164,7 @@
                 if (tvData.raceAborted && !tvPrevState.raceAborted) {
                     polySynth.triggerAttackRelease(["C2", "F#2"], "1");
                     speak(translations[targetLang].voiceFalseStart);
-                    if(tvCountdownInterval) clearInterval(tvCountdownInterval);
+                    if(window.tvCountdownInterval) clearInterval(window.tvCountdownInterval);
                     
                     tvLights.forEach(l => {
                         l.className = "tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-red-600 border-4 border-red-400 shadow-[0_0_30px_#dc2626] animate-pulse";
@@ -4181,11 +4182,17 @@
                 // 2. Semáforo Verde (Inicio Carrera)
                 if (tvData.isRaceActive && !tvPrevState.isRaceActive && !tvData.raceAborted && !tvPrevState.isPaused) {
                     polySynth.triggerAttackRelease(["C5", "E5", "G5"], "0.5");
+                    
+                    const tvContainer = document.getElementById('tv-traffic-light-container');
+                    if(tvContainer) {
+                        tvContainer.classList.remove('hidden');
+                        tvContainer.classList.remove('opacity-0');
+                    }
+
                     tvLights.forEach(l => {
                         l.className = "tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-emerald-500 border-4 border-emerald-400 shadow-[0_0_40px_#10b981] transition-all duration-200";
                     });
                     setTimeout(() => {
-                        const tvContainer = document.getElementById('tv-traffic-light-container');
                         if(tvContainer) {
                             tvContainer.classList.add('opacity-0');
                             setTimeout(() => tvContainer.classList.add('hidden'), 500);
@@ -4231,11 +4238,11 @@
                         setTimeout(() => tvContainer.classList.remove('opacity-0'), 10);
                     }
 
-                    if(tvCountdownInterval) clearInterval(tvCountdownInterval);
+                    if(window.tvCountdownInterval) clearInterval(window.tvCountdownInterval);
                     
                     const tickLight = () => {
                         if (!tvData.isCountdown || tvData.raceAborted || count >= 5) {
-                            if(tvCountdownInterval) clearInterval(tvCountdownInterval);
+                            if(window.tvCountdownInterval) clearInterval(window.tvCountdownInterval);
                             return;
                         }
                         if(Tone.context.state === 'running') synth.triggerAttackRelease("C4", "8n");
@@ -4246,7 +4253,7 @@
                     };
                     
                     tickLight(); // Primera luz encendida inmediatamente
-                    tvCountdownInterval = setInterval(tickLight, 1000);
+                    window.tvCountdownInterval = setInterval(tickLight, 1000);
                 }
                 
                 // 6. Reset completo / Idle
@@ -4259,12 +4266,11 @@
                 }
 
                 // Actualizar estado previo
-                    tvPrevState.lapCount = tvData.currentLap || 0;
-                    tvPrevState.isRaceActive = tvData.isRaceActive || false;
-                    tvPrevState.raceAborted = tvData.raceAborted || false;
-                    tvPrevState.isCountdown = tvData.isCountdown || false;
-                    tvPrevState.isPaused = tvData.isPaused || false;
-                }
+                tvPrevState.lapCount = tvData.currentLap || 0;
+                tvPrevState.isRaceActive = tvData.isRaceActive || false;
+                tvPrevState.raceAborted = tvData.raceAborted || false;
+                tvPrevState.isCountdown = tvData.isCountdown || false;
+                tvPrevState.isPaused = tvData.isPaused || false;
                 // === FIN TV AUDIO STATE MACHINE ===
 
                 // Cambiar el icono de pausa en TV según el estado
@@ -4411,7 +4417,7 @@
                         const appId = "app_krono";
                         const docRef = window.fs.doc(window.db, 'artifacts', appId, 'public', 'data', 'tv_sessions', cloudRoomCode);
                         
-                        window.fs.onSnapshot(docRef, (docSnap) => {
+                        window._unsubTvCloud = window.fs.onSnapshot(docRef, (docSnap) => {
                             if (docSnap.exists()) {
                                 tvData = docSnap.data();
                                 lastReceivedLocalTime = Date.now(); // Sincronizar tiempo local
