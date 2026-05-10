@@ -783,6 +783,12 @@
                         <span class="text-[10px] font-bold uppercase tracking-wider" data-i18n="leaderboard">Ranking</span>
                     </button>
 
+                    <!-- NUEVO BOTÓN: GARAJE MÓVIL -->
+                    <button id="mobile-garage-btn" class="shrink-0 flex items-center text-red-800 hover:text-red-900 transition-colors px-3 py-1.5 rounded-lg bg-red-100/90 hover:bg-red-100 border border-red-400 shadow-md" title="Garaje Personal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+                        <span class="text-[10px] font-bold uppercase tracking-wider">Garaje</span>
+                    </button>
+
                     <button id="direct-tv-btn" class="shrink-0 flex items-center text-blue-800 hover:text-blue-900 transition-colors px-3 py-1.5 rounded-lg bg-blue-100/90 hover:bg-blue-100 border border-blue-400 shadow-md" title="Cambiar a Dashboard TV">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1">
                             <path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
@@ -2001,6 +2007,9 @@
         const closeRankingBtn = document.getElementById('close-ranking-btn');
         const rankingBody = document.getElementById('ranking-body');
         
+        // --- BOTÓN GARAJE MÓVIL ---
+        const mobileGarageBtn = document.getElementById('mobile-garage-btn');
+
         // --- TV SETUP MODAL ---
         const tvSetupModal = document.getElementById('tvSetupModal');
         const closeTvSetupBtn = document.getElementById('close-tv-setup-btn');
@@ -3154,6 +3163,11 @@
                 });
             }
             
+            // CONECTAR GARAJE MÓVIL
+            if (mobileGarageBtn) {
+                mobileGarageBtn.addEventListener('click', openGarage);
+            }
+
             modalRestartBtn.addEventListener('click', () => { 
                 resultsModal.classList.remove('open'); 
                 setTimeout(()=>resultsModal.classList.add('hidden'),300); 
@@ -3368,6 +3382,9 @@
         // MÓDULO COMUNICACIÓN TV <-> APP
         // =========================================================================
 
+        window.lastSyncedCarData = null; // NUEVO: Para auto-sincronizar garaje
+        window.lastAppliedCarDataTs = 0; // NUEVO: Control de versiones TV
+
         function getPayload() {
             return {
                 pilot: pilotNameInput.value || 'Piloto',
@@ -3393,6 +3410,7 @@
                     soundIndex: selectedSoundIndex,
                     voiceEnabled: voiceToggle.checked
                 },
+                syncedCarData: window.lastSyncedCarData || null, // Inyectar datos del coche en vivo
                 timestamp: Date.now()
             };
         }
@@ -4100,6 +4118,36 @@
             window.updateTVUI = function() {
                 if(!tvData) return;
 
+                // --- NUEVO: AUTO-SINCRONIZACIÓN DE GARAJE (MAGIA) ---
+                if (tvData.syncedCarData && tvData.syncedCarData.syncTs > (window.lastAppliedCarDataTs || 0)) {
+                    window.lastAppliedCarDataTs = tvData.syncedCarData.syncTs;
+                    
+                    let idx = garageCars.findIndex(c => c.id === tvData.syncedCarData.id);
+                    if (idx !== -1) {
+                        const existingImage = garageCars[idx].image; // Preservar imagen HD de la TV
+                        garageCars[idx] = { ...tvData.syncedCarData, image: existingImage };
+                    } else {
+                        garageCars.push({ ...tvData.syncedCarData, image: "" });
+                    }
+                    localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
+                    
+                    // Refrescar UI si el garaje está abierto
+                    const garageMod = document.getElementById('garageModal');
+                    if (garageMod && !garageMod.classList.contains('hidden')) {
+                        let savedId = garageCars[currentGarageIndex] ? garageCars[currentGarageIndex].id : null;
+                        populateDropdown();
+                        if (savedId) {
+                            let newIdx = garageCars.findIndex(c => c.id === savedId);
+                            if (newIdx !== -1) {
+                                currentGarageIndex = newIdx;
+                                document.getElementById('garage-car-select').value = newIdx;
+                            }
+                        }
+                        renderGarageCar(currentGarageIndex);
+                    }
+                }
+                // ----------------------------------------------------
+
                 // Aplicar traducción remota si cambió el idioma
                 if (tvData.currentLang && tvData.currentLang !== currentLang) {
                     currentLang = tvData.currentLang;
@@ -4617,6 +4665,27 @@
                     if(typeof broadcastState === 'function') broadcastState();
                     if(typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
                 }
+            } else if (action === 'SYNC_GARAGE_CAR') {
+                // NUEVO: Recibir ediciones hechas en la TV hacia el Móvil
+                const incomingCar = data;
+                if (!incomingCar || !incomingCar.id) return;
+                
+                let idx = garageCars.findIndex(c => c.id === incomingCar.id);
+                if (idx !== -1) {
+                    const existingImg = garageCars[idx].image;
+                    garageCars[idx] = { ...incomingCar, image: existingImg };
+                } else {
+                    garageCars.push({ ...incomingCar, image: "" });
+                }
+                localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
+                
+                if (typeof updateConfigCarList === 'function') updateConfigCarList();
+                
+                const garageMod = document.getElementById('garageModal');
+                if (garageMod && !garageMod.classList.contains('hidden')) {
+                    populateDropdown();
+                    renderGarageCar(currentGarageIndex);
+                }
             }
         }
 
@@ -4907,6 +4976,18 @@
             renderGarageCar(currentGarageIndex);
             if (typeof updateConfigCarList === 'function') updateConfigCarList();
             toggleGarageEdit(false);
+
+            // NUEVO: Auto-Sincronización Bidireccional
+            let carForSync = JSON.parse(JSON.stringify(garageCars[currentGarageIndex]));
+            delete carForSync.image; // Evitar cuotas altas
+            carForSync.syncTs = Date.now();
+            
+            if (isTVMode) {
+                if (typeof window.sendRemoteCommand === 'function') window.sendRemoteCommand('SYNC_GARAGE_CAR', carForSync);
+            } else {
+                window.lastSyncedCarData = carForSync;
+                if (typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
+            }
         }
 
         function openGarage() {
@@ -5056,7 +5137,18 @@
                 }
                 
                 saveGarageToLocal();
+                // FORZAR GUARDADO DIRECTO EXTRA PARA ASEGURAR SINCRONIZACIÓN
+                localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
                 
+                // NUEVO: Auto-Sincronización hacia la TV al terminar la carrera
+                let carForSync = JSON.parse(JSON.stringify(car));
+                delete carForSync.image; // Evitar saturar Firebase
+                carForSync.syncTs = Date.now();
+                window.lastSyncedCarData = carForSync;
+                if (!isTVMode && typeof triggerDebouncedCloudSync === 'function') {
+                    triggerDebouncedCloudSync();
+                }
+
                 // Refrescar UI si el garaje está abierto y estamos viendo este coche
                 const garageMod = document.getElementById('garageModal');
                 if (currentGarageIndex === carIndex && garageMod && !garageMod.classList.contains('hidden')) {
