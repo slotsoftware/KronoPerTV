@@ -802,7 +802,7 @@
             <div class="w-full bg-black/30 backdrop-blur-sm border border-white/20 rounded-xl p-3 sm:p-4 flex flex-col items-center shadow-lg">
                 
                 <!-- Semáforo Centrado y Más Grande -->
-                <div id="traffic-light-wrapper" class="w-full flex justify-center transition-all duration-500 ease-in-out overflow-hidden max-h-[100px] opacity-100">
+                <div id="traffic-light-wrapper" class="w-full flex justify-center transition-all duration-500 ease-in-out overflow-hidden max-h-[100px] opacity-100 relative">
                     <div id="traffic-light-module" class="traffic-light-container five-lights transform scale-[1.1] sm:scale-[1.3] origin-center mt-1 mb-0 sm:mt-3 sm:mb-2">
                         <div id="light-1" class="light"></div>
                         <div id="light-2" class="light"></div>
@@ -810,6 +810,12 @@
                         <div id="light-4" class="light"></div>
                         <div id="light-5" class="light"></div>
                     </div>
+
+                    <!-- Botón Garaje Móvil (Absoluto a la derecha) -->
+                    <button id="mobile-garage-btn" class="absolute right-0 sm:right-2 top-1/2 -translate-y-1/2 flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-600/80 text-blue-400 hover:text-white hover:border-blue-500 transition-colors shadow-lg z-10 group" title="Personal Cars (Garaje)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-1 group-hover:-translate-y-0.5 transition-transform"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+                        <span class="text-[9px] font-black uppercase tracking-widest leading-none font-rajdhani">GARAJE</span>
+                    </button>
                 </div>
 
                 <!-- Tiempos -->
@@ -3233,6 +3239,13 @@
             
             rankingBtn.addEventListener('click', () => { loadLeaderboard(); rankingModal.classList.remove('hidden'); setTimeout(()=>rankingModal.classList.add('open'),10); });
             closeRankingBtn.addEventListener('click', () => { rankingModal.classList.remove('open'); setTimeout(()=>rankingModal.classList.add('hidden'),300); });
+            
+            const mobileGarageBtn = document.getElementById('mobile-garage-btn');
+            if (mobileGarageBtn) {
+                mobileGarageBtn.addEventListener('click', () => {
+                    openGarage();
+                });
+            }
             
             const resetRankingBtn = document.getElementById('reset-ranking-btn');
             if (resetRankingBtn) {
