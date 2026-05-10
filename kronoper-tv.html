@@ -4219,15 +4219,21 @@
                     }
 
                     if(tvCountdownInterval) clearInterval(tvCountdownInterval);
-                    tvCountdownInterval = setInterval(() => {
+                    
+                    const tickLight = () => {
                         if (!tvData.isCountdown || tvData.raceAborted || count >= 5) {
-                            clearInterval(tvCountdownInterval);
+                            if(tvCountdownInterval) clearInterval(tvCountdownInterval);
                             return;
                         }
-                        synth.triggerAttackRelease("C4", "8n");
-                        tvLights[count].className = "tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-red-500 border-4 border-red-400 shadow-[0_0_30px_#ef4444] transition-all duration-200";
+                        if(Tone.context.state === 'running') synth.triggerAttackRelease("C4", "8n");
+                        if(tvLights[count]) {
+                            tvLights[count].className = "tv-light w-8 h-8 sm:w-16 sm:h-16 rounded-full bg-red-500 border-4 border-red-400 shadow-[0_0_30px_#ef4444] transition-all duration-200";
+                        }
                         count++;
-                    }, 1000);
+                    };
+                    
+                    tickLight(); // Primera luz encendida inmediatamente
+                    tvCountdownInterval = setInterval(tickLight, 1000);
                 }
                 
                 // 6. Reset completo / Idle
