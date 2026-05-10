@@ -3455,7 +3455,15 @@
         let lastReceivedLocalTime = Date.now(); // NUEVO: Para sincronizar relojes relativos
         
         window.startTVMode = function(roomCode) {
-            isSpaMode = !isTVMode; // Si NO estamos en Standalone TV, estamos en SPA Mode.
+            // FIX: Determinar si somos el Móvil (Local/SPA) o una TV Remota
+            const isLocalRoom = (roomCode === window.myRoomCode);
+            isSpaMode = isLocalRoom; 
+            
+            // Si nos conectamos a otra sala, pasamos a ser ESTRICTAMENTE un cliente TV
+            if (!isLocalRoom) {
+                isTVMode = true; 
+            }
+            
             cloudRoomCode = roomCode;
 
             // Tracking de estado para activar Audios en el TV Mode
@@ -4127,28 +4135,59 @@
                 if(!tvData) return;
 
                 // --- NUEVO: AUTO-SINCRONIZACIÓN DE GARAJE COMPLETO (MAGIA V2) ---
-                if (tvData.fullGarageData && Array.isArray(tvData.fullGarageData)) {
-                    let newGarageList = tvData.fullGarageData.map(incomingCar => {
-                        let localMatch = garageCars.find(c => c.id === incomingCar.id);
-                        return {
-                            ...incomingCar,
-                            image: localMatch ? localMatch.image : "" // Preservar imagen local si existe
-                        };
-                    });
+                try {
+                    if (tvData.fullGarageData && Array.isArray(tvData.fullGarageData)) {
+                        let newGarageList = tvData.fullGarageData.map(incomingCar => {
+                            let localMatch = garageCars.find(c => c.id === incomingCar.id);
+                            return {
+                                ...incomingCar,
+                                image: localMatch ? localMatch.image : "" // Preservar imagen local si existe
+                            };
+                        });
 
-                    // Comparar si hay cambios reales (ignorando imágenes y timestamps)
-                    const stripForCompare = (list) => JSON.stringify(list.map(c => { 
-                        let cp = {...c}; 
-                        delete cp.image; 
-                        delete cp.syncTs; 
-                        return cp; 
-                    }));
+                        // Comparar si hay cambios reales (ignorando imágenes y timestamps)
+                        const stripForCompare = (list) => JSON.stringify(list.map(c => { 
+                            let cp = {...c}; 
+                            delete cp.image; 
+                            delete cp.syncTs; 
+                            return cp; 
+                        }));
 
-                    const strOld = stripForCompare(garageCars);
-                    const strNew = stripForCompare(newGarageList);
+                        const strOld = stripForCompare(garageCars);
+                        const strNew = stripForCompare(newGarageList);
 
-                    if (strOld !== strNew) {
-                        garageCars = newGarageList;
+                        if (strOld !== strNew) {
+                            garageCars = newGarageList;
+                            localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
+                            
+                            // Refrescar UI si el garaje está abierto
+                            const garageMod = document.getElementById('garageModal');
+                            if (garageMod && !garageMod.classList.contains('hidden')) {
+                                let savedId = garageCars[currentGarageIndex] ? garageCars[currentGarageIndex].id : null;
+                                populateDropdown();
+                                if (savedId) {
+                                    let newIdx = garageCars.findIndex(c => c.id === savedId);
+                                    if (newIdx !== -1) {
+                                        currentGarageIndex = newIdx;
+                                        document.getElementById('garage-car-select').value = newIdx;
+                                    } else {
+                                        currentGarageIndex = 0;
+                                    }
+                                }
+                                renderGarageCar(currentGarageIndex);
+                            }
+                        }
+                    } else if (tvData.syncedCarData && tvData.syncedCarData.syncTs > (window.lastAppliedCarDataTs || 0)) {
+                        // Fallback de retrocompatibilidad
+                        window.lastAppliedCarDataTs = tvData.syncedCarData.syncTs;
+                        
+                        let idx = garageCars.findIndex(c => c.id === tvData.syncedCarData.id);
+                        if (idx !== -1) {
+                            const existingImage = garageCars[idx].image; // Preservar imagen HD de la TV
+                            garageCars[idx] = { ...tvData.syncedCarData, image: existingImage };
+                        } else {
+                            garageCars.push({ ...tvData.syncedCarData, image: "" });
+                        }
                         localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
                         
                         // Refrescar UI si el garaje está abierto
@@ -4161,40 +4200,13 @@
                                 if (newIdx !== -1) {
                                     currentGarageIndex = newIdx;
                                     document.getElementById('garage-car-select').value = newIdx;
-                                } else {
-                                    currentGarageIndex = 0;
                                 }
                             }
                             renderGarageCar(currentGarageIndex);
                         }
                     }
-                } else if (tvData.syncedCarData && tvData.syncedCarData.syncTs > (window.lastAppliedCarDataTs || 0)) {
-                    // Fallback de retrocompatibilidad
-                    window.lastAppliedCarDataTs = tvData.syncedCarData.syncTs;
-                    
-                    let idx = garageCars.findIndex(c => c.id === tvData.syncedCarData.id);
-                    if (idx !== -1) {
-                        const existingImage = garageCars[idx].image; // Preservar imagen HD de la TV
-                        garageCars[idx] = { ...tvData.syncedCarData, image: existingImage };
-                    } else {
-                        garageCars.push({ ...tvData.syncedCarData, image: "" });
-                    }
-                    localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
-                    
-                    // Refrescar UI si el garaje está abierto
-                    const garageMod = document.getElementById('garageModal');
-                    if (garageMod && !garageMod.classList.contains('hidden')) {
-                        let savedId = garageCars[currentGarageIndex] ? garageCars[currentGarageIndex].id : null;
-                        populateDropdown();
-                        if (savedId) {
-                            let newIdx = garageCars.findIndex(c => c.id === savedId);
-                            if (newIdx !== -1) {
-                                currentGarageIndex = newIdx;
-                                document.getElementById('garage-car-select').value = newIdx;
-                            }
-                        }
-                        renderGarageCar(currentGarageIndex);
-                    }
+                } catch(e) {
+                    console.error("Error en sincronización del garaje UI", e);
                 }
                 // ----------------------------------------------------
 
@@ -4653,17 +4665,18 @@
 
         window.sendRemoteCommand = function(action, data = null) {
             const now = Date.now();
-            // Si el usuario abrió el modo TV en la misma pestaña principal (botón Telemetría TV)
-            // Ejecutamos directamente y actualizamos lastProcessedCmdTs para evitar el "eco" de la nube
-            if (!isTVMode && typeof handleRemoteCommand === 'function') {
+            
+            // FIX: Solo ejecutamos localmente si somos el Host mostrando el modo TV (SPA Mode)
+            if (isSpaMode && typeof handleRemoteCommand === 'function') {
                 lastProcessedCmdTs = now;
                 handleRemoteCommand(action, data);
             }
 
             // Local (Para 2 pantallas en el mismo dispositivo)
             kronoChannel.postMessage({ type: 'REMOTE_CMD', command: action, data: data, ts: now });
+            
             // Nube
-            if (cloudRoomCode && window.db && window.fs) {
+            if (cloudRoomCode && window.db && window.fs && window.auth && window.auth.currentUser) {
                 try {
                     const cmdDocRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'tv_commands', cloudRoomCode);
                     window.fs.setDoc(cmdDocRef, { action: action, data: data, ts: now });
@@ -4759,7 +4772,8 @@
 
             // Receptor Nube (Firebase)
             const initCloudRemoteListener = setInterval(() => {
-                if (window.db && window.auth && window.myRoomCode && window.fs) {
+                // FIX CRÍTICO: Asegurar que 'window.auth.currentUser' exista para evitar crash de permisos en Firebase
+                if (window.db && window.auth && window.auth.currentUser && window.myRoomCode && window.fs) {
                     clearInterval(initCloudRemoteListener);
                     const cmdDocRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'tv_commands', window.myRoomCode);
                     window.fs.onSnapshot(cmdDocRef, (docSnap) => {
