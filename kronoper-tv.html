@@ -5397,65 +5397,111 @@
 
         // --- SISTEMA DE IMPORTACIÓN INTELIGENTE ---
         function parseImportedCars(importedData) {
-            return importedData.map(car => {
-                // Si el coche ya viene en el formato plano de la app (exportado previamente desde aquí)
-                if (car.marca !== undefined && car.metadata === undefined) {
-                    // Garantizar que tenga nombre y un ID por si viene de una versión antigua
-                    if (!car.name) car.name = `${car.marca || 'Coche'} ${car.ref || ''}`.trim() || 'Coche Importado';
-                    if (!car.id) car.id = `ID${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
+            return importedData.map((car, idx) => {
+                // Caso A: Formato KRONO Nativo (exportado previamente desde esta app)
+                if (car.marca !== undefined || car.name !== undefined || car.bestLap !== undefined) {
+                    if (!car.name) car.name = `${car.marca || 'Coche'} ${car.ref || ''}`.trim() || `Coche ${idx+1}`;
+                    if (!car.id) car.id = `ID${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+                    
+                    // Asegurar inicialización de métricas por si vienen de versiones antiguas
+                    if (car.bestLap === undefined) car.bestLap = "-";
+                    if (car.totalTime === undefined) car.totalTime = "0h 0m 0s";
+                    if (car.totalDist === undefined) car.totalDist = "0.000 km";
+                    if (car.avgSpd === undefined) car.avgSpd = "0.0 km/h";
+                    if (car.avgSpd32 === undefined) car.avgSpd32 = "0.0 km/h";
+                    if (car.consistency === undefined) car.consistency = "0";
                     return car; 
                 }
 
-                // Si viene del formato externo con sub-objeto "metadata"
+                // Caso B: Formato RT SLOT Antiguo (Propiedades planas en Mayúscula o Title Case)
+                if (car.MARCA !== undefined || car['Referencia'] !== undefined) {
+                    return {
+                        id: `ID${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
+                        name: `${car.MARCA || 'Coche'} ${car['Referencia'] || ''}`.trim() || `Coche Importado ${idx+1}`,
+                        image: car.image || car.imagen || car.foto || "",
+                        marca: car['MARCA'] || "",
+                        ref: car['Referencia'] || "",
+                        year: car['Año I/F'] || "",
+                        cat: car['Categoría'] || "",
+                        pilot: car['Piloto'] || "",
+                        copilot: car['Copiloto'] || "",
+                        sys: car['Analógico / Digital'] || "",
+                        motor: car['Motor'] || car['MOTOR-MARCA'] || "",
+                        posicion: car['MOTOR-POSICIÓN'] || "",
+                        pinon: car['Piñón'] || "",
+                        corona: car['Corona'] || "",
+                        relacion: car['RELACIÓN'] || "",
+                        chasis: car['CHASIS'] || "",
+                        guia: car['GUÍA-TIPO'] || "",
+                        trencillas: car['GUÍA-TRENCILLAS'] || "",
+                        cableado: car['GUÍA-CABLEADO'] || "",
+                        ejeDelantero: car['Eje Delantero'] || "",
+                        llantaDelantera: car['LLANTA DEL-TIPO'] || "",
+                        neumaticoDelantero: car['Neumático Delantero'] || "",
+                        ejeTrasero: car['Eje Trasero'] || "",
+                        llantaTrasera: car['LLANTA TRAS-TIPO'] || "",
+                        neumaticoTrasero: car['Neumático Trasero'] || "",
+                        longitud: car['LONGITUD'] || "",
+                        anchura: car['ANCHURA'] || "",
+                        altura: car['ALTURA'] || "",
+                        distEjes: car['DIST. EJES'] || "",
+                        batalla: car['BATALLA'] || "",
+                        peso: car['Peso Total'] || car['Peso Carrocería'] || "",
+                        luces: car['Luces'] || "",
+                        caja: car['Caja'] || "",
+                        estado: car['ESTADO'] || "",
+                        precio: car['Precio'] || "",
+                        compradoEn: car['Comprado en'] || "",
+                        fecha: car['Fecha'] || "",
+                        coleccion: car['Colección'] || "",
+                        bestLap: "-", totalTime: "0h 0m 0s", totalDist: "0.000 km", avgSpd: "0.0 km/h", avgSpd32: "0.0 km/h", consistency: "0",
+                        _rawTotalTime: 0, _rawTotalDist: 0
+                    };
+                }
+
+                // Caso C: Formato Externo Envuelto en "metadata"
                 const meta = car.metadata || {};
                 return {
-                    id: car.id || `ID${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
-                    name: car.name || "Coche Importado",
+                    id: car.id || `ID${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`,
+                    name: car.name || `${meta['MARCA'] || 'Coche'} ${meta['Referencia'] || ''}`.trim() || `Coche Importado ${idx+1}`,
                     image: car.image || "",
-                    marca: meta['MARCA'] || "",
-                    ref: meta['Referencia'] || "",
-                    year: meta['Año I/F'] || "",
-                    cat: meta['Categoría'] || "",
-                    pilot: meta['Piloto'] || "",
-                    copilot: meta['Copiloto'] || "",
-                    sys: meta['Analógico / Digital'] || "",
-                    motor: meta['Motor'] || meta['MOTOR-MARCA'] || "",
-                    posicion: meta['MOTOR-POSICIÓN'] || "",
-                    pinon: meta['Piñón'] || "",
-                    corona: meta['Corona'] || "",
-                    relacion: meta['RELACIÓN'] || "",
-                    chasis: meta['CHASIS'] || "",
-                    guia: meta['GUÍA-TIPO'] || "",
-                    trencillas: meta['GUÍA-TRENCILLAS'] || "",
-                    cableado: meta['GUÍA-CABLEADO'] || "",
-                    ejeDelantero: meta['Eje Delantero'] || "",
-                    llantaDelantera: meta['LLANTA DEL-TIPO'] || "",
-                    neumaticoDelantero: meta['Neumático Delantero'] || "",
-                    ejeTrasero: meta['Eje Trasero'] || "",
-                    llantaTrasera: meta['LLANTA TRAS-TIPO'] || "",
-                    neumaticoTrasero: meta['Neumático Trasero'] || "",
-                    longitud: meta['LONGITUD'] || "",
-                    anchura: meta['ANCHURA'] || "",
-                    altura: meta['ALTURA'] || "",
-                    distEjes: meta['DIST. EJES'] || "",
-                    batalla: meta['BATALLA'] || "",
-                    peso: meta['Peso Total'] || meta['Peso Carrocería'] || "",
-                    luces: meta['Luces'] || "",
-                    caja: meta['Caja'] || "",
-                    estado: meta['ESTADO'] || "",
-                    precio: meta['Precio'] || "",
-                    compradoEn: meta['Comprado en'] || "",
-                    fecha: meta['Fecha'] || "",
-                    coleccion: meta['Colección'] || "",
-                    // Inicializar métricas a 0 para el nuevo panel de rendimiento
-                    bestLap: "-",
-                    totalTime: "0h 0m 0s",
-                    totalDist: "0.000 km",
-                    avgSpd: "0.0 km/h",
-                    avgSpd32: "0.0 km/h",
-                    consistency: "0",
-                    _rawTotalTime: 0,
-                    _rawTotalDist: 0
+                    marca: meta['MARCA'] || meta['marca'] || "",
+                    ref: meta['Referencia'] || meta['ref'] || "",
+                    year: meta['Año I/F'] || meta['year'] || "",
+                    cat: meta['Categoría'] || meta['cat'] || "",
+                    pilot: meta['Piloto'] || meta['pilot'] || "",
+                    copilot: meta['Copiloto'] || meta['copilot'] || "",
+                    sys: meta['Analógico / Digital'] || meta['sys'] || "",
+                    motor: meta['Motor'] || meta['MOTOR-MARCA'] || meta['motor'] || "",
+                    posicion: meta['MOTOR-POSICIÓN'] || meta['posicion'] || "",
+                    pinon: meta['Piñón'] || meta['pinon'] || "",
+                    corona: meta['Corona'] || meta['corona'] || "",
+                    relacion: meta['RELACIÓN'] || meta['relacion'] || "",
+                    chasis: meta['CHASIS'] || meta['chasis'] || "",
+                    guia: meta['GUÍA-TIPO'] || meta['guia'] || "",
+                    trencillas: meta['GUÍA-TRENCILLAS'] || meta['trencillas'] || "",
+                    cableado: meta['GUÍA-CABLEADO'] || meta['cableado'] || "",
+                    ejeDelantero: meta['Eje Delantero'] || meta['ejeDelantero'] || "",
+                    llantaDelantera: meta['LLANTA DEL-TIPO'] || meta['llantaDelantera'] || "",
+                    neumaticoDelantero: meta['Neumático Delantero'] || meta['neumaticoDelantero'] || "",
+                    ejeTrasero: meta['Eje Trasero'] || meta['ejeTrasero'] || "",
+                    llantaTrasera: meta['LLANTA TRAS-TIPO'] || meta['llantaTrasera'] || "",
+                    neumaticoTrasero: meta['Neumático Trasero'] || meta['neumaticoTrasero'] || "",
+                    longitud: meta['LONGITUD'] || meta['longitud'] || "",
+                    anchura: meta['ANCHURA'] || meta['anchura'] || "",
+                    altura: meta['ALTURA'] || meta['altura'] || "",
+                    distEjes: meta['DIST. EJES'] || meta['distEjes'] || "",
+                    batalla: meta['BATALLA'] || meta['batalla'] || "",
+                    peso: meta['Peso Total'] || meta['Peso Carrocería'] || meta['peso'] || "",
+                    luces: meta['Luces'] || meta['luces'] || "",
+                    caja: meta['Caja'] || meta['caja'] || "",
+                    estado: meta['ESTADO'] || meta['estado'] || "",
+                    precio: meta['Precio'] || meta['precio'] || "",
+                    compradoEn: meta['Comprado en'] || meta['compradoEn'] || "",
+                    fecha: meta['Fecha'] || meta['fecha'] || "",
+                    coleccion: meta['Colección'] || meta['coleccion'] || "",
+                    bestLap: "-", totalTime: "0h 0m 0s", totalDist: "0.000 km", avgSpd: "0.0 km/h", avgSpd32: "0.0 km/h", consistency: "0",
+                    _rawTotalTime: 0, _rawTotalDist: 0
                 };
             });
         }
@@ -5473,34 +5519,46 @@
                 try {
                     let importedData = JSON.parse(event.target.result);
                     
-                    // Flexibilidad en el formato del JSON: forzar conversión a Array si viene como Objeto
-                    if (!Array.isArray(importedData)) {
-                        if (typeof importedData === 'object' && importedData !== null) {
-                            // Caso A: { "cars": [...] }
-                            const keys = Object.keys(importedData);
-                            if (keys.length === 1 && Array.isArray(importedData[keys[0]])) {
-                                importedData = importedData[keys[0]];
-                            } 
-                            // Caso B: { "1": {...}, "2": {...} }
-                            else {
-                                importedData = Object.values(importedData);
-                            }
+                    // --- EXTRACCIÓN RECURSIVA INTELIGENTE (IA BOT) ---
+                    // Este algoritmo navega por cualquier estructura JSON, sin importar lo anidada que esté,
+                    // y extrae únicamente los objetos que parezcan ser coches.
+                    let rawCarsList = [];
+                    let visited = new Set();
+                    
+                    function extractCars(node) {
+                        if (!node || typeof node !== 'object') return;
+                        if (visited.has(node)) return; // Evitar bucles infinitos
+                        visited.add(node);
+
+                        // Criterios de "es un coche" (Soporta múltiples versiones)
+                        const isKronoCar = ('marca' in node) || ('name' in node && 'id' in node);
+                        const isRTSlotCar = ('MARCA' in node) || ('Referencia' in node);
+                        const isMetaCar = ('metadata' in node) && ('MARCA' in node.metadata || 'marca' in node.metadata);
+
+                        if (isKronoCar || isRTSlotCar || isMetaCar) {
+                            rawCarsList.push(node);
                         } else {
-                            throw new Error("El archivo JSON debe contener una lista de coches.");
+                            // Si no es un coche, seguimos escarbando dentro
+                            Object.values(node).forEach(child => extractCars(child));
                         }
                     }
                     
-                    const parsedCars = parseImportedCars(importedData);
+                    extractCars(importedData);
                     
-                    if (confirm(`Se han detectado ${parsedCars.length} coches en el archivo.\n\n¿Quieres REEMPLAZAR tu garaje actual con estos coches?\n\n- Dale a "Aceptar" para borrar los actuales y poner los nuevos.\n- Dale a "Cancelar" para añadirlos a los que ya tienes.`)) {
+                    if (rawCarsList.length === 0) {
+                        throw new Error("No se detectó ningún coche en el archivo. Verifica el formato.");
+                    }
+                    
+                    const parsedCars = parseImportedCars(rawCarsList);
+                    // ------------------------------------------------
+
+                    if (confirm(`Se han detectado ${parsedCars.length} coches listos para importar.\n\n¿Quieres REEMPLAZAR tu garaje actual con estos coches?\n\n- Dale a "Aceptar" para borrar los actuales y poner los nuevos.\n- Dale a "Cancelar" para añadirlos a los que ya tienes.`)) {
                         garageCars = parsedCars;
-                        // Forzar borrado completo en el DOM y LocalStorage para evitar lectura sucia
                         document.getElementById('car-model-input').value = "";
                         localStorage.removeItem('krono_car_model');
                     } else {
                         const wasEmpty = garageCars.length === 0;
                         garageCars = garageCars.concat(parsedCars);
-                        // Si el garaje estaba vacío y se añade, también forzamos la selección
                         if (wasEmpty) {
                             document.getElementById('car-model-input').value = "";
                             localStorage.removeItem('krono_car_model');
@@ -5509,25 +5567,20 @@
                     
                     currentGarageIndex = 0;
                     
-                    // ORDEN CRÍTICO: 1. Construir las opciones del menú principal para que existan
                     if (typeof updateConfigCarList === 'function') {
                         updateConfigCarList();
                     }
 
-                    // 2. Poblar y renderizar el panel interno del garaje
                     populateDropdown();
                     renderGarageCar(currentGarageIndex);
                     
-                    // 3. Re-asegurar que el selector de config tiene el valor forzado y guardarlo
                     localStorage.setItem('krono_car_model', document.getElementById('car-model-input').value);
 
-                    // 4. Disparar el broadcast a la TV o al Móvil ahora que todos los inputs son correctos
+                    // Disparar sincronización masiva al resto de pantallas (TV)
                     forceEcosystemSync();
                     
-                    // Ahora guardamos (la validación de tamaño se hace dentro automáticamente)
                     saveGarageToLocal();
                     
-                    // Notificación visual de éxito en el propio botón
                     const originalText = importBtn.innerHTML;
                     importBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><polyline points="20 6 9 17 4 12"></polyline></svg> <span class="text-green-500">¡Importado!</span>`;
                     setTimeout(() => { importBtn.innerHTML = originalText; }, 3000);
@@ -5535,7 +5588,7 @@
                 } catch (error) {
                     alert("Error al importar el archivo: " + error.message);
                 }
-                importInput.value = ''; // Reset para permitir volver a importar el mismo archivo si se desea
+                importInput.value = ''; // Reset para poder importar otra vez
             };
             reader.readAsText(file);
         });
