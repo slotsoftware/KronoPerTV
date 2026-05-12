@@ -3549,15 +3549,15 @@
                 pilot: pilotNameInput.value || 'Piloto',
                 car: carModelInput.value || 'Coche',
                 raceMode: raceMode,
-                totalLaps: totalLaps,
+                totalLaps: totalLaps === Infinity ? -1 : totalLaps,
                 currentLap: currentLap,
                 raceTimeLimit: raceTimeLimit,
                 lapHistory: lapHistory,
-                bestLapTime: bestLapTime,
+                bestLapTime: bestLapTime === Infinity ? null : bestLapTime,
                 lastCompletedLapTime: lastCompletedLapTime,
-                avgSpeed: avgSpeed,
-                maxSpeed: maxSpeed,
-                consistency: consistency,
+                avgSpeed: isFinite(avgSpeed) ? avgSpeed : 0,
+                maxSpeed: isFinite(maxSpeed) ? maxSpeed : 0,
+                consistency: isFinite(consistency) ? consistency : 0,
                 isRaceActive: isRaceActive,
                 isCountdown: isCountdown,
                 isPaused: isPaused,
@@ -4433,7 +4433,7 @@
                 if (tvPilotName) tvPilotName.textContent = tvData.pilot || 'Piloto';
                 if (tvCarModel) tvCarModel.textContent = tvData.car || 'Coche';
                 
-                const maxLapsText = tvData.totalLaps === Infinity ? '∞' : tvData.totalLaps;
+                const maxLapsText = (tvData.totalLaps === Infinity || tvData.totalLaps === -1) ? '∞' : tvData.totalLaps;
                 if (tvData.raceMode === 'time') {
                     tvLapCount.textContent = tvData.currentLap || 0;
                     tvModeTarget.textContent = `TARGET: ${(tvData.raceTimeLimit || 0) / 60000} MIN`;
