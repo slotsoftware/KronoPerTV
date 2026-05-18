@@ -3143,8 +3143,8 @@
 
             let records = [];
             
-            // USAR garageCars DIRECTAMENTE PARA EVITAR PROBLEMAS DE LOCALSTORAGE (Memoria Viva)
-            // Esto asegura que las referencias a las fotos "img_..." estén siempre presentes.
+            // Usamos la memoria viva (garageCars) IGUAL que en el panel de configuración, 
+            // no leemos de localStorage para evitar que las fotos se hayan limpiado por límite de peso
             garageCars.forEach(car => {
                 if (car.bestLap && car.bestLap !== "-" && car.bestLap !== "") {
                     const timeStr = typeof car.bestLap === 'string' ? car.bestLap.replace('s', '') : car.bestLap;
@@ -3170,15 +3170,13 @@
 
             const leaderLap = records[0].bestLapMs;
 
-            // Al usar 'await' dentro del bucle, obligamos a IndexedDB a servir las imágenes una a una 
-            // evitando que colapse al pedir todas las fotos simultáneamente.
             for (let idx = 0; idx < records.length; idx++) {
                 const r = records[idx];
                 const deltaMs = r.bestLapMs - leaderLap;
                 const deltaStr = idx === 0 ? "LÍDER" : `+${(deltaMs / 1000).toFixed(3)}s`;
 
-                let posColor = 'text-slate-400';
                 let borderColor = 'border-slate-700 hover:border-slate-400';
+                let posColor = 'text-slate-400 drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]';
                 let highlightColor = 'text-slate-300';
                 let glowClass = 'shadow-xl';
                 
@@ -3200,22 +3198,17 @@
                 }
 
                 const carDisplayName = r.name || `${r.marca} ${r.ref}`.trim() || 'Coche Desconocido';
-                
-                // Generamos un ID super único para que JavaScript jamás se confunda de etiqueta
-                const imgId = `personal-rank-img-${r.id}-${idx}-${Date.now()}`;
+                const imgId = `personal-rank-img-${r.id}-${idx}`;
 
                 let div = document.createElement('div');
                 div.className = `w-full relative rounded-2xl overflow-hidden bg-slate-900 border-2 ${borderColor} transition-all duration-500 group h-36 sm:h-48 flex items-end ${glowClass} mb-5`;
                 
                 div.innerHTML = `
-                    <!-- Z-index 0 para la foto, opacidad más alta para que luzca espectacular -->
                     <img id="${imgId}" src="" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-80 group-hover:opacity-100 z-0">
                     
-                    <!-- Degradados oscurecidos suavizados para no tapar la foto -->
                     <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent pointer-events-none z-10"></div>
                     <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/40 to-transparent pointer-events-none z-10"></div>
 
-                    <!-- Textos Z-index 20 -->
                     <div class="absolute top-2 right-4 font-rajdhani font-black text-5xl sm:text-7xl italic ${posColor} z-20 opacity-80 group-hover:scale-110 transition-transform duration-300">
                         P${idx + 1}
                     </div>
@@ -3253,14 +3246,29 @@
                 `;
                 personalRankingBody.appendChild(div);
 
-                // Esperamos a que la etiqueta exista en el DOM real para pasarle la referencia a la IA
+                // Extracción manual e idéntica a la que usa el menú de configuración (para asegurar que 100% de las veces funciona)
                 const imgElement = document.getElementById(imgId);
-                if (window.loadCarImageUI && imgElement) {
-                    try {
-                        // Obligamos a esperar (await) a que IndexedDB cargue antes de pasar al siguiente
-                        await window.loadCarImageUI(r, imgElement);
-                    } catch (e) {
-                        console.error("Fallo al cargar imagen del IndexedDB en ranking:", e);
+                const imageId = r.image;
+                
+                if (imageId) {
+                    if (imageId.startsWith('data:image')) {
+                        imgElement.src = imageId;
+                    } else if (imageId.startsWith('img_')) {
+                        const localB64 = await window.getImageFromIDB(imageId);
+                        if (localB64) {
+                            imgElement.src = localB64;
+                        } else if (window.db && window.fs) {
+                            try {
+                                const appId = "app_krono";
+                                const docRef = window.fs.doc(window.db, 'artifacts', appId, 'public', 'data', 'cloud_garages_images', imageId);
+                                const docSnap = await window.fs.getDoc(docRef);
+                                if (docSnap.exists()) {
+                                    const cloudB64 = docSnap.data().data;
+                                    imgElement.src = cloudB64;
+                                    await window.saveImageToIDB(imageId, cloudB64);
+                                }
+                            } catch(e) { console.error("Error descargando foto del ranking personal:", e); }
+                        }
                     }
                 }
             }
