@@ -602,6 +602,16 @@
             box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
             position: relative;
         }
+        .personal-track-bg::before {
+            /* Línea central discontinua estilo parrilla */
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            background: repeating-linear-gradient(to bottom, rgba(168, 85, 247, 0.2) 0, rgba(168, 85, 247, 0.2) 40px, transparent 40px, transparent 80px);
+            z-index: 0;
+        }
         .personal-start-line {
             width: 80%;
             margin: 0 auto;
@@ -1910,31 +1920,6 @@
         
         window.myRoomCode = getPortalRoomCode() || Math.random().toString(36).substring(2, 6).toUpperCase();
 
-        window.updateGlobalRoomCodeDisplay = function() {
-            const display = document.getElementById('room-code-display');
-            if (display) display.textContent = getPortalRoomCode() ? "AUTO-LINK" : window.myRoomCode;
-            
-            const tvDisplaySpan = document.querySelector('#tv-cloud-code-display span');
-            if (tvDisplaySpan) tvDisplaySpan.textContent = getPortalRoomCode() ? "AUTO-LINK" : window.myRoomCode;
-        };
-
-        // Observador inteligente GLOBAL: Detecta si Krono inyecta el código con retraso en cualquier modo
-        setInterval(() => {
-            const pCode = getPortalRoomCode();
-            if (pCode && pCode !== window.myRoomCode) {
-                window.myRoomCode = pCode;
-                window.updateGlobalRoomCodeDisplay();
-                
-                if (isTVMode) {
-                    cloudRoomCode = pCode;
-                    if (typeof listenToCloudRoom === 'function') listenToCloudRoom();
-                } else {
-                    if (typeof broadcastState === 'function') broadcastState();
-                    if (typeof syncToCloud === 'function') syncToCloud();
-                }
-            }
-        }, 1000);
-
         window.startTVMode = function(code) {
             isTVMode = true;
             isSpaMode = true;
@@ -1949,7 +1934,7 @@
                 const cloudCodeDisplay = document.getElementById('tv-cloud-code-display');
                 if (cloudCodeDisplay) {
                     const spanEl = cloudCodeDisplay.querySelector('span');
-                    if (spanEl) spanEl.textContent = getPortalRoomCode() ? "AUTO-LINK" : code;
+                    if (spanEl) spanEl.textContent = code;
                     cloudCodeDisplay.classList.remove('hidden');
                     cloudCodeDisplay.classList.add('flex');
                 }
@@ -2240,16 +2225,13 @@
         // --- FUNCIONES DE SINCRONIZACIÓN ESTADO (NUBE/LOCAL) ---
         window.broadcastState = function() {
             if (isTVMode) return;
-            const now = Date.now();
-            const elapsedRace = isRaceActive ? (isPaused ? finalRaceTimeMs : now - raceStartTime) : finalRaceTimeMs;
-            const elapsedLap = isRaceActive ? (isPaused ? (pauseStartTime - lapStartTimestamp) : now - lapStartTimestamp) : 0;
-
             const state = {
                 isRaceActive, isCountdown, countdownStep, isPaused, currentLap, totalLaps,
                 raceMode, bestLapTime, avgSpeed, maxSpeed, consistency, lastDelta,
                 lapHistory, pilot: pilotNameInput.value, car: carModelInput.value,
                 timeLimit: raceTimeLimit, raceTimeMs: finalRaceTimeMs,
-                raceStartTime, lapStartTimestamp, elapsedRace, elapsedLap, timestamp: now
+                raceStartTime, lapStartTimestamp, pauseStartTime,
+                timestamp: Date.now()
             };
             try { kronoChannel.postMessage({ type: 'STATE_UPDATE', state }); } catch(e) { console.warn("BroadcastChannel error:", e); }
         };
@@ -2257,31 +2239,16 @@
         window.syncToCloud = function() {
             if (isTVMode || !window.db || !window.fs || !window.myRoomCode) return;
             try {
-                const now = Date.now();
-                const elapsedRace = isRaceActive ? (isPaused ? finalRaceTimeMs : now - raceStartTime) : finalRaceTimeMs;
-                const elapsedLap = isRaceActive ? (isPaused ? (pauseStartTime - lapStartTimestamp) : now - lapStartTimestamp) : 0;
-
-                let imageId = "";
-                const activeCarName = carModelInput.value;
-                if (garageCars && garageCars.length > 0) {
-                    const car = garageCars.find(c => {
-                        const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
-                        return cName === activeCarName;
-                    });
-                    if (car && car.image) imageId = car.image;
-                }
-
                 const docRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'rooms', window.myRoomCode);
                 const state = {
                     isRaceActive, isCountdown, countdownStep, isPaused, currentLap, totalLaps,
                     raceMode, bestLapTime, avgSpeed, maxSpeed, consistency, lastDelta,
-                    lapHistory, pilot: pilotNameInput.value, car: activeCarName, imageId: imageId,
+                    lapHistory, pilot: pilotNameInput.value, car: carModelInput.value,
                     timeLimit: raceTimeLimit, raceTimeMs: finalRaceTimeMs,
-                    raceStartTime, lapStartTimestamp, elapsedRace, elapsedLap, timestamp: now
+                    raceStartTime, lapStartTimestamp, pauseStartTime,
+                    timestamp: Date.now()
                 };
-                window.fs.setDoc(docRef, { state }, { merge: true }).catch(e => {
-                    // Prevenir UNHANDLEDREJECTION si el cliente se queda sin conexión
-                });
+                window.fs.setDoc(docRef, { state }, { merge: true });
             } catch(e) { console.warn("Error syncing state to cloud:", e); }
         };
 
@@ -3137,18 +3104,7 @@
         
         function saveRaceToHistory() {
             if(isTVMode) return;
-            
-            let imageId = "";
-            const activeCarName = carModelInput.value;
-            if (garageCars && garageCars.length > 0) {
-                const car = garageCars.find(c => {
-                    const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
-                    return cName === activeCarName;
-                });
-                if (car && car.image) imageId = car.image;
-            }
-            
-            const rec = { date: new Date().toLocaleString(), pilot: pilotNameInput.value, car: activeCarName, imageId: imageId, bestLap: formatTime(bestLapTime,false), avgSpeed: avgSpeed.toFixed(1) };
+            const rec = { date: new Date().toLocaleString(), pilot: pilotNameInput.value, car: carModelInput.value, bestLap: formatTime(bestLapTime,false), avgSpeed: avgSpeed.toFixed(1) };
             let h = JSON.parse(localStorage.getItem('scx_history')||'[]'); h.unshift(rec); if(h.length>50) h.pop();
             localStorage.setItem('scx_history', JSON.stringify(h));
         }
@@ -3159,33 +3115,10 @@
             if(!h.length) noHistoryMsg.classList.remove('hidden');
             else {
                 noHistoryMsg.classList.add('hidden');
-                h.forEach((r, idx) => {
+                h.forEach(r => {
                     const tr = document.createElement('tr');
-                    tr.className = "border-b border-gray-200 hover:bg-gray-50 transition-colors";
-                    const imgIdStr = `hist-img-${idx}`;
-                    
-                    tr.innerHTML = `
-                        <td class="p-2 text-xs text-gray-500 whitespace-nowrap">${r.date}</td>
-                        <td class="p-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-md bg-gray-200 border border-gray-300 overflow-hidden flex-shrink-0 flex items-center justify-center">
-                                    <img id="${imgIdStr}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e5e7eb'/%3E%3Cpath d='M30 60 L40 40 L60 40 L70 60 Z' fill='%239ca3af'/%3E%3C/svg%3E" class="w-full h-full object-cover">
-                                </div>
-                                <div class="flex flex-col min-w-0">
-                                    <span class="font-bold text-gray-800 leading-tight truncate">${r.pilot}</span>
-                                    <span class="text-[10px] font-normal text-gray-500 uppercase tracking-wider truncate">${r.car}</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="p-2 text-green-700 font-bold font-arial">${r.bestLap}</td>
-                        <td class="p-2 text-gray-700 font-arial">${r.avgSpeed}</td>
-                    `;
+                    tr.innerHTML = `<td class="p-2 text-xs">${r.date}</td><td class="p-2 font-bold">${r.pilot}<br><span class="text-xs font-normal">${r.car}</span></td><td class="p-2 text-green-700">${r.bestLap}</td><td class="p-2">${r.avgSpeed}</td>`;
                     fullHistoryBody.appendChild(tr);
-
-                    if (r.imageId) {
-                        const imgEl = document.getElementById(imgIdStr);
-                        if(imgEl) loadCarImageUI({image: r.imageId}, imgEl);
-                    }
                 });
             }
         }
@@ -3356,11 +3289,6 @@
                         </div>
                      `;
                      rankingBody.appendChild(div);
-
-                     if (r.imageId) {
-                         const imgEl = document.getElementById(imgIdStr);
-                         if(imgEl) loadCarImageUI({image: r.imageId}, imgEl);
-                     }
                  });
             }
         }
@@ -3430,31 +3358,51 @@
                 const carName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
                 const category = c.cat || 'Categoría S/C';
                 
+                // --- CARGAR IMAGEN ---
+                let imgSrc = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231f1b2e'/%3E%3Cpath d='M30 60 L40 40 L60 40 L70 60 Z' fill='%233b3259'/%3E%3Ccircle cx='40' cy='65' r='10' fill='%23110e1a'/%3E%3Ccircle cx='60' cy='65' r='10' fill='%23110e1a'/%3E%3C/svg%3E";
+                
+                if (c.image) {
+                    if (c.image.startsWith('data:image')) {
+                        imgSrc = c.image;
+                    } else if (c.image.startsWith('img_')) {
+                        const localB64 = await getImageFromIDB(c.image);
+                        if (localB64) {
+                            imgSrc = localB64;
+                        } else if (window.db && window.fs) {
+                            try {
+                                const appId = "app_krono";
+                                const docRef = window.fs.doc(window.db, 'artifacts', appId, 'public', 'data', 'cloud_garages_images', c.image);
+                                const docSnap = await window.fs.getDoc(docRef);
+                                if (docSnap.exists()) {
+                                    imgSrc = docSnap.data().data;
+                                    // Backup local en background
+                                    saveImageToIDB(c.image, imgSrc).catch(e=>console.warn(e));
+                                }
+                            } catch(e) { console.error("Error cargando imagen ranking personal", e); }
+                        }
+                    }
+                }
+                
                 // Determinar alineación alternada
                 const isLeft = index % 2 === 0;
 
                 let div = document.createElement('div');
-                div.className = `w-full md:w-[65%] ${isLeft ? 'self-start md:ml-4' : 'self-end md:mr-4'} relative backdrop-blur-md border border-l-4 ${borderGlow} ${accentBorder} rounded-xl p-3 sm:p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(168,85,247,0.3)] hover:border-purple-400/60 group overflow-hidden`;
+                div.className = `w-[90%] md:w-[45%] ${isLeft ? 'self-start md:-mr-[5%]' : 'self-end md:-ml-[5%]'} relative backdrop-blur-md border border-l-4 ${borderGlow} ${accentBorder} rounded-r-xl rounded-l-md p-3 sm:p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(168,85,247,0.3)] hover:border-purple-400/60 group`;
                 
-                const imgIdStr = `pr-img-${index}`;
-
                 div.innerHTML = `
-                    <div class="absolute -top-3 -right-3 w-32 h-32 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-2xl pointer-events-none group-hover:from-purple-400/20 transition-colors"></div>
+                    <!-- Etiqueta Posición Flotante (Como en el Ranking Global) -->
+                    <div class="absolute -top-3 sm:-top-4 ${isLeft ? '-left-2 sm:-left-4' : '-right-2 sm:-right-4'} font-rajdhani font-black text-3xl sm:text-4xl italic ${posColor} z-20 transition-transform duration-300 group-hover:scale-110">
+                        P${index + 1}
+                    </div>
+                    
+                    <div class="absolute -top-3 -right-3 w-32 h-32 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-2xl pointer-events-none group-hover:from-purple-400/20 transition-colors z-0"></div>
                     
                     <div class="flex items-center gap-3 sm:gap-4 relative z-10">
                         
-                        <!-- Posición -->
-                        <div class="flex-shrink-0 w-12 sm:w-16 text-center border-r border-slate-700/50 pr-2">
-                            <span class="block text-[9px] sm:text-[10px] uppercase font-bold text-slate-500 tracking-widest mb-1">Rank</span>
-                            <span class="block font-rajdhani font-black text-3xl sm:text-4xl italic ${posColor} leading-none group-hover:scale-110 transition-transform origin-center">
-                                ${index + 1}
-                            </span>
-                        </div>
-                        
                         <!-- Foto Coche -->
                         <div class="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 ${index < 3 ? 'border-purple-500/40' : 'border-slate-700'} overflow-hidden shadow-inner bg-black flex items-center justify-center relative group-hover:border-purple-400/80 transition-colors">
-                             <img id="${imgIdStr}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231f1b2e'/%3E%3Cpath d='M30 60 L40 40 L60 40 L70 60 Z' fill='%233b3259'/%3E%3Ccircle cx='40' cy='65' r='10' fill='%23110e1a'/%3E%3Ccircle cx='60' cy='65' r='10' fill='%23110e1a'/%3E%3C/svg%3E" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Coche">
-                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
+                             <img src="${imgSrc}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Coche">
+                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                         </div>
                         
                         <!-- Info Coche y Tiempos -->
@@ -3468,7 +3416,7 @@
                                 </span>
                             </div>
                             
-                            <div class="flex justify-between items-end mt-2">
+                            <div class="flex justify-between items-end mt-2 pt-2 border-t border-purple-900/30">
                                 <div class="flex flex-col">
                                     <span class="text-slate-400 text-[9px] uppercase font-bold tracking-widest mb-0.5">Dif: <span class="${highlightColor}">${deltaStr}</span></span>
                                     <span class="text-slate-500 text-[9px] font-bold tracking-widest flex items-center gap-1" title="Velocidad Media Real">
@@ -3488,11 +3436,6 @@
                     </div>
                 `;
                 personalRankingBody.appendChild(div);
-
-                if (c.image) {
-                    const imgEl = document.getElementById(imgIdStr);
-                    if(imgEl) loadCarImageUI(c, imgEl);
-                }
             }
         }
 
@@ -3698,10 +3641,29 @@
             }
             
             // --- NUEVA LÓGICA ABRIR TV (MODIFICADA PARA SPA Y AUTO-LINK DINÁMICO) ---
-            window.updateGlobalRoomCodeDisplay();
+            function updateRoomCodeDisplay() {
+                const display = document.getElementById('room-code-display');
+                if (display) {
+                    display.textContent = getPortalRoomCode() ? "AUTO-LINK" : window.myRoomCode;
+                }
+            }
+            updateRoomCodeDisplay();
+
+            // Observador inteligente: Si Krono inyecta el código con retraso, lo detectamos en vivo sin necesidad de salir.
+            setInterval(() => {
+                const pCode = getPortalRoomCode();
+                if (pCode && pCode !== window.myRoomCode) {
+                    window.myRoomCode = pCode;
+                    updateRoomCodeDisplay();
+                    if (!isTVMode) {
+                        broadcastState();
+                        syncToCloud();
+                    }
+                }
+            }, 1000);
 
             openTvBtn.addEventListener('click', () => {
-                window.updateGlobalRoomCodeDisplay();
+                updateRoomCodeDisplay();
                 tvSetupModal.classList.remove('hidden');
                 setTimeout(() => tvSetupModal.classList.add('open'), 10);
                 syncToCloud(); 
@@ -3752,9 +3714,7 @@
             if (window.db && window.fs && window.myRoomCode) {
                 try {
                     const docRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'rooms', window.myRoomCode);
-                    window.fs.setDoc(docRef, { lastCommand: { command, payload, ts: Date.now() } }, { merge: true }).catch(e => {
-                        // Ignorar fallo si no hay conexión
-                    });
+                    window.fs.setDoc(docRef, { lastCommand: { command, payload, ts: Date.now() } }, { merge: true });
                 } catch(e) { console.error("Error enviando comando remoto:", e); }
             }
         };
@@ -3860,26 +3820,40 @@
 
             drawTvGraphs(lapHist);
 
-            // LOGICA DE CRONÓMETROS EN VIVO PARA TV
-            if (tvIntervalId) { clearInterval(tvIntervalId); tvIntervalId = null; }
+            // --- TICKING TIMERS FOR TV ---
+            if (tvIntervalId) {
+                clearInterval(tvIntervalId);
+                tvIntervalId = null;
+            }
 
-            setText('tv-race-time', formatTime(state.elapsedRace || state.raceTimeMs || 0, true));
-            setText('tv-current-lap-time', formatTime(state.elapsedLap || 0, false));
+            const receiverReceiveTime = Date.now();
 
-            if (state.isRaceActive && !state.isPaused && !state.isCountdown) {
-                const localNow = Date.now();
-                const serverNow = state.timestamp || localNow;
-                const offset = localNow - serverNow;
-                
-                const adjustedRaceStart = (state.raceStartTime || (localNow - (state.elapsedRace || 0))) + offset;
-                const adjustedLapStart = (state.lapStartTimestamp || (localNow - (state.elapsedLap || 0))) + offset;
-
+            if (state.isRaceActive && !state.isPaused) {
                 tvIntervalId = setInterval(() => {
-                    const currentRace = Date.now() - adjustedRaceStart;
-                    const currentLap = Date.now() - adjustedLapStart;
-                    setText('tv-race-time', formatTime(currentRace, true));
-                    setText('tv-current-lap-time', formatTime(currentLap, false));
-                }, 47);
+                    const elapsedSinceReceive = Date.now() - receiverReceiveTime;
+                    const senderNow = (state.timestamp || Date.now()) + elapsedSinceReceive;
+                    
+                    let currentRaceTime = state.raceTimeMs || 0;
+                    if (state.raceStartTime) {
+                        currentRaceTime = senderNow - state.raceStartTime;
+                    }
+                    setText('tv-race-time', formatTime(currentRaceTime, true));
+
+                    let currentLapTime = 0;
+                    if (state.lapStartTimestamp) {
+                        currentLapTime = senderNow - state.lapStartTimestamp;
+                    }
+                    setText('tv-current-lap-time', formatTime(currentLapTime, false));
+                }, 50);
+            } else {
+                setText('tv-race-time', formatTime(state.raceTimeMs || 0, true));
+                
+                if (state.isPaused && state.lapStartTimestamp && state.pauseStartTime) {
+                    let frozenLapTime = state.pauseStartTime - state.lapStartTimestamp;
+                    setText('tv-current-lap-time', formatTime(frozenLapTime, false));
+                } else if (!state.isRaceActive) {
+                    setText('tv-current-lap-time', "00.000");
+                }
             }
         }
 
@@ -4008,8 +3982,6 @@
                                     window.executeRemoteCommand(data.lastCommand.command, data.lastCommand.payload);
                                 }
                             }
-                        }).catch(e => {
-                            // Ignorar error si el dispositivo está offline y evitar UNHANDLEDREJECTION masivo
                         });
                     } catch(e) {}
                 }
