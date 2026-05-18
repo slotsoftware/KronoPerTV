@@ -1941,6 +1941,9 @@
                 if (typeof listenToCloudRoom === 'function') listenToCloudRoom();
             }
             if (typeof updateTvStatus === 'function') updateTvStatus("ESPERANDO CONEXIÓN...", 'cyan');
+            
+            // Solicitar estado inmediatamente si estamos en red local
+            try { kronoChannel.postMessage({ type: 'REQUEST_STATE' }); } catch(e){}
         };
 
         window.exitTVMode = function() {
@@ -2230,8 +2233,7 @@
                 raceMode, bestLapTime, avgSpeed, maxSpeed, consistency, lastDelta,
                 lapHistory, pilot: pilotNameInput.value, car: carModelInput.value,
                 timeLimit: raceTimeLimit, raceTimeMs: finalRaceTimeMs,
-                raceStartTime, lapStartTimestamp, pauseStartTime,
-                timestamp: Date.now()
+                raceStartTime, lapStartTimestamp, pauseStartTime, timestamp: Date.now()
             };
             try { kronoChannel.postMessage({ type: 'STATE_UPDATE', state }); } catch(e) { console.warn("BroadcastChannel error:", e); }
         };
@@ -2245,8 +2247,7 @@
                     raceMode, bestLapTime, avgSpeed, maxSpeed, consistency, lastDelta,
                     lapHistory, pilot: pilotNameInput.value, car: carModelInput.value,
                     timeLimit: raceTimeLimit, raceTimeMs: finalRaceTimeMs,
-                    raceStartTime, lapStartTimestamp, pauseStartTime,
-                    timestamp: Date.now()
+                    raceStartTime, lapStartTimestamp, pauseStartTime, timestamp: Date.now()
                 };
                 window.fs.setDoc(docRef, { state }, { merge: true });
             } catch(e) { console.warn("Error syncing state to cloud:", e); }
@@ -3965,6 +3966,8 @@
                 window.executeRemoteCommand(e.data.command, e.data.payload);
             } else if (e.data && e.data.type === 'STATE_UPDATE') {
                 if (isTVMode) applyStateToTV(e.data.state);
+            } else if (e.data && e.data.type === 'REQUEST_STATE') {
+                if (!isTVMode) { broadcastState(); syncToCloud(); }
             }
         });
 
