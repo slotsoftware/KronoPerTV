@@ -3214,7 +3214,7 @@
                     </div>
                     
                     <div class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-lg overflow-hidden border-2 border-slate-600/50 shadow-inner bg-black flex items-center justify-center relative z-10">
-                        <img id="${imgId}" src="" class="w-full h-full object-cover opacity-0 transition-opacity duration-300">
+                        <img id="${imgId}" src="" class="w-full h-full object-cover transition-opacity duration-300">
                     </div>
 
                     <div class="flex flex-col gap-1 mt-1 flex-1 min-w-0">
@@ -3252,14 +3252,9 @@
 
                 // Cargar imagen del coche de forma asíncrona usando la función base del garaje
                 const imgElement = document.getElementById(imgId);
-                // Extraer el objeto coche completo original desde garageCars para pasarlo a loadCarImageUI
-                const currentGarageCars = JSON.parse(localStorage.getItem('krono_garage_cars')) || [];
-                const originalCar = currentGarageCars.find(c => c.id === r.id);
-                if (originalCar && window.loadCarImageUI) {
-                    window.loadCarImageUI(originalCar, imgElement).then(() => {
-                        imgElement.classList.remove('opacity-0');
-                    }).catch(() => {
-                        imgElement.classList.remove('opacity-0'); // Mostrar placeholder si falla
+                if (imgElement && window.loadCarImageUI) {
+                    window.loadCarImageUI(r, imgElement).catch(err => {
+                        console.warn("Error cargando imagen en ranking personal:", err);
                     });
                 }
             }
