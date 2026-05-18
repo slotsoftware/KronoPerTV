@@ -2236,15 +2236,27 @@
                 const elapsedRace = isRaceActive ? (isPaused ? finalRaceTimeMs : now - raceStartTime) : finalRaceTimeMs;
                 const elapsedLap = isRaceActive ? (isPaused ? (pauseStartTime - lapStartTimestamp) : now - lapStartTimestamp) : 0;
 
+                let imageId = "";
+                const activeCarName = carModelInput.value;
+                if (garageCars && garageCars.length > 0) {
+                    const car = garageCars.find(c => {
+                        const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
+                        return cName === activeCarName;
+                    });
+                    if (car && car.image) imageId = car.image;
+                }
+
                 const docRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'rooms', window.myRoomCode);
                 const state = {
                     isRaceActive, isCountdown, countdownStep, isPaused, currentLap, totalLaps,
                     raceMode, bestLapTime, avgSpeed, maxSpeed, consistency, lastDelta,
-                    lapHistory, pilot: pilotNameInput.value, car: carModelInput.value,
+                    lapHistory, pilot: pilotNameInput.value, car: activeCarName, imageId: imageId,
                     timeLimit: raceTimeLimit, raceTimeMs: finalRaceTimeMs,
                     raceStartTime, lapStartTimestamp, elapsedRace, elapsedLap, timestamp: now
                 };
-                window.fs.setDoc(docRef, { state }, { merge: true });
+                window.fs.setDoc(docRef, { state }, { merge: true }).catch(e => {
+                    // Prevenir UNHANDLEDREJECTION si el cliente se queda sin conexión
+                });
             } catch(e) { console.warn("Error syncing state to cloud:", e); }
         };
 
@@ -3100,7 +3112,18 @@
         
         function saveRaceToHistory() {
             if(isTVMode) return;
-            const rec = { date: new Date().toLocaleString(), pilot: pilotNameInput.value, car: carModelInput.value, bestLap: formatTime(bestLapTime,false), avgSpeed: avgSpeed.toFixed(1) };
+            
+            let imageId = "";
+            const activeCarName = carModelInput.value;
+            if (garageCars && garageCars.length > 0) {
+                const car = garageCars.find(c => {
+                    const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
+                    return cName === activeCarName;
+                });
+                if (car && car.image) imageId = car.image;
+            }
+            
+            const rec = { date: new Date().toLocaleString(), pilot: pilotNameInput.value, car: activeCarName, imageId: imageId, bestLap: formatTime(bestLapTime,false), avgSpeed: avgSpeed.toFixed(1) };
             let h = JSON.parse(localStorage.getItem('scx_history')||'[]'); h.unshift(rec); if(h.length>50) h.pop();
             localStorage.setItem('scx_history', JSON.stringify(h));
         }
@@ -3111,10 +3134,33 @@
             if(!h.length) noHistoryMsg.classList.remove('hidden');
             else {
                 noHistoryMsg.classList.add('hidden');
-                h.forEach(r => {
+                h.forEach((r, idx) => {
                     const tr = document.createElement('tr');
-                    tr.innerHTML = `<td class="p-2 text-xs">${r.date}</td><td class="p-2 font-bold">${r.pilot}<br><span class="text-xs font-normal">${r.car}</span></td><td class="p-2 text-green-700">${r.bestLap}</td><td class="p-2">${r.avgSpeed}</td>`;
+                    tr.className = "border-b border-gray-200 hover:bg-gray-50 transition-colors";
+                    const imgIdStr = `hist-img-${idx}`;
+                    
+                    tr.innerHTML = `
+                        <td class="p-2 text-xs text-gray-500 whitespace-nowrap">${r.date}</td>
+                        <td class="p-2">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-md bg-gray-200 border border-gray-300 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                    <img id="${imgIdStr}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e5e7eb'/%3E%3Cpath d='M30 60 L40 40 L60 40 L70 60 Z' fill='%239ca3af'/%3E%3C/svg%3E" class="w-full h-full object-cover">
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="font-bold text-gray-800 leading-tight truncate">${r.pilot}</span>
+                                    <span class="text-[10px] font-normal text-gray-500 uppercase tracking-wider truncate">${r.car}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-2 text-green-700 font-bold font-arial">${r.bestLap}</td>
+                        <td class="p-2 text-gray-700 font-arial">${r.avgSpeed}</td>
+                    `;
                     fullHistoryBody.appendChild(tr);
+
+                    if (r.imageId) {
+                        const imgEl = document.getElementById(imgIdStr);
+                        if(imgEl) loadCarImageUI({image: r.imageId}, imgEl);
+                    }
                 });
             }
         }
@@ -3285,6 +3331,11 @@
                         </div>
                      `;
                      rankingBody.appendChild(div);
+
+                     if (r.imageId) {
+                         const imgEl = document.getElementById(imgIdStr);
+                         if(imgEl) loadCarImageUI({image: r.imageId}, imgEl);
+                     }
                  });
             }
         }
@@ -3354,37 +3405,14 @@
                 const carName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
                 const category = c.cat || 'Categoría S/C';
                 
-                // --- CARGAR IMAGEN ---
-                let imgSrc = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231f1b2e'/%3E%3Cpath d='M30 60 L40 40 L60 40 L70 60 Z' fill='%233b3259'/%3E%3Ccircle cx='40' cy='65' r='10' fill='%23110e1a'/%3E%3Ccircle cx='60' cy='65' r='10' fill='%23110e1a'/%3E%3C/svg%3E";
-                
-                if (c.image) {
-                    if (c.image.startsWith('data:image')) {
-                        imgSrc = c.image;
-                    } else if (c.image.startsWith('img_')) {
-                        const localB64 = await getImageFromIDB(c.image);
-                        if (localB64) {
-                            imgSrc = localB64;
-                        } else if (window.db && window.fs) {
-                            try {
-                                const appId = "app_krono";
-                                const docRef = window.fs.doc(window.db, 'artifacts', appId, 'public', 'data', 'cloud_garages_images', c.image);
-                                const docSnap = await window.fs.getDoc(docRef);
-                                if (docSnap.exists()) {
-                                    imgSrc = docSnap.data().data;
-                                    // Backup local en background
-                                    saveImageToIDB(c.image, imgSrc).catch(e=>console.warn(e));
-                                }
-                            } catch(e) { console.error("Error cargando imagen ranking personal", e); }
-                        }
-                    }
-                }
-                
                 // Determinar alineación alternada
                 const isLeft = index % 2 === 0;
 
                 let div = document.createElement('div');
                 div.className = `w-full md:w-[65%] ${isLeft ? 'self-start md:ml-4' : 'self-end md:mr-4'} relative backdrop-blur-md border border-l-4 ${borderGlow} ${accentBorder} rounded-xl p-3 sm:p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(168,85,247,0.3)] hover:border-purple-400/60 group overflow-hidden`;
                 
+                const imgIdStr = `pr-img-${index}`;
+
                 div.innerHTML = `
                     <div class="absolute -top-3 -right-3 w-32 h-32 bg-gradient-to-br from-purple-500/10 to-transparent rounded-full blur-2xl pointer-events-none group-hover:from-purple-400/20 transition-colors"></div>
                     
@@ -3400,8 +3428,8 @@
                         
                         <!-- Foto Coche -->
                         <div class="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 ${index < 3 ? 'border-purple-500/40' : 'border-slate-700'} overflow-hidden shadow-inner bg-black flex items-center justify-center relative group-hover:border-purple-400/80 transition-colors">
-                             <img src="${imgSrc}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Coche">
-                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                             <img id="${imgIdStr}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231f1b2e'/%3E%3Cpath d='M30 60 L40 40 L60 40 L70 60 Z' fill='%233b3259'/%3E%3Ccircle cx='40' cy='65' r='10' fill='%23110e1a'/%3E%3Ccircle cx='60' cy='65' r='10' fill='%23110e1a'/%3E%3C/svg%3E" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="Coche">
+                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"></div>
                         </div>
                         
                         <!-- Info Coche y Tiempos -->
@@ -3435,6 +3463,11 @@
                     </div>
                 `;
                 personalRankingBody.appendChild(div);
+
+                if (c.image) {
+                    const imgEl = document.getElementById(imgIdStr);
+                    if(imgEl) loadCarImageUI(c, imgEl);
+                }
             }
         }
 
@@ -3967,6 +4000,8 @@
                                     window.executeRemoteCommand(data.lastCommand.command, data.lastCommand.payload);
                                 }
                             }
+                        }).catch(e => {
+                            // Ignorar error si el dispositivo está offline y evitar UNHANDLEDREJECTION masivo
                         });
                     } catch(e) {}
                 }
@@ -4427,19 +4462,19 @@
                             // Forzamos un guardado inmediato por si es una cuenta nueva virgen
                             setTimeout(() => { saveGarageToCloud(); }, 1000);
                         }
+            // Observador inteligente: Si Krono inyecta el código con retraso, lo detectamos en vivo sin necesidad de salir.
+            setInterval(() => {
+                const pCode = getPortalRoomCode();
+                if (pCode && pCode !== window.myRoomCode) {
+                    window.myRoomCode = pCode;
+                    updateRoomCodeDisplay();
+                    if (!isTVMode) {
+                        broadcastState();
+                        syncToCloud();
+                    } else if (isTVMode && cloudRoomCode !== pCode) {
+                         cloudRoomCode = pCode;
+                         listenToCloudRoom();
                     }
-                });
-            }
-            
-            // Iniciar conexión automática al abrir la app
-            const initGarageCloudInterval = setInterval(() => {
-                if (window.db && window.auth && window.auth.currentUser) {
-                    clearInterval(initGarageCloudInterval);
-                    listenToCloudGarage();
-                    // Si el usuario ya tenía coches antes de esta actualización, subirlos
-                    if(garageCars.length > 0) saveGarageToCloud();
-                    // Iniciar migración de Base64 Legacy a IndexedDB
-                    migrateLegacyImagesToIDB();
                 }
             }, 1000);
         });
