@@ -3142,13 +3142,17 @@
             personalRankingBody.innerHTML = '';
 
             let records = [];
-            // Parsear datos locales del garaje
+            
+            // Usar la variable 'garageCars' global en memoria, que tiene las referencias exactas de las fotos actuales.
             garageCars.forEach(car => {
                 if (car.bestLap && car.bestLap !== "-" && car.bestLap !== "") {
-                    const bestLapSecs = parseFloat(car.bestLap);
+                    // Extraer los segundos (puede venir con 's' al final)
+                    const timeStr = typeof car.bestLap === 'string' ? car.bestLap.replace('s', '') : car.bestLap;
+                    const bestLapSecs = parseFloat(timeStr);
+                    
                     if (!isNaN(bestLapSecs)) {
                         records.push({
-                            ...car,
+                            ...car, // Incluimos todas las propiedades del coche (image, id, etc.)
                             bestLapMs: bestLapSecs * 1000,
                             avgSpeedNum: parseFloat(car.avgSpd) || 0,
                             consistencyNum: parseFloat(car.consistency) || 0
@@ -3205,7 +3209,6 @@
                 let div = document.createElement('div');
                 div.className = `w-[90%] md:w-[45%] ${isLeft ? 'self-start md:-mr-[5%]' : 'self-end md:-ml-[5%]'} relative backdrop-blur-md border border-l-4 ${borderGlow} ${accentBorder} rounded-r-xl rounded-l-md p-4 sm:p-5 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:border-blue-400/50 group flex flex-row items-center gap-3 sm:gap-4`;
                 
-                const imgId = `p-rank-img-${idx}`;
                 const carDisplayName = r.name || `${r.marca} ${r.ref}`.trim() || 'Coche Desconocido';
 
                 div.innerHTML = `
@@ -3214,7 +3217,7 @@
                     </div>
                     
                     <div class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-lg overflow-hidden border-2 border-slate-600/50 shadow-inner bg-black flex items-center justify-center relative z-10">
-                        <img id="${imgId}" src="" class="w-full h-full object-cover transition-opacity duration-300">
+                        <img src="" class="w-full h-full object-cover car-ranking-img">
                     </div>
 
                     <div class="flex flex-col gap-1 mt-1 flex-1 min-w-0">
@@ -3250,12 +3253,12 @@
                 `;
                 personalRankingBody.appendChild(div);
 
-                // Cargar imagen del coche de forma asíncrona usando la función base del garaje
-                const imgElement = document.getElementById(imgId);
-                if (imgElement && window.loadCarImageUI) {
-                    window.loadCarImageUI(r, imgElement).catch(err => {
-                        console.warn("Error cargando imagen en ranking personal:", err);
-                    });
+                // Capturamos específicamente la imagen de ESTA tarjeta recién inyectada
+                const imgElement = div.querySelector('.car-ranking-img');
+                
+                // Cargar imagen de forma segura a través del gestor Universal Base64/IndexedDB/Nube
+                if (window.loadCarImageUI && imgElement) {
+                    window.loadCarImageUI(r, imgElement).catch(err => console.warn("Aviso cargando foto ranking:", err));
                 }
             }
         }
