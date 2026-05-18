@@ -3252,8 +3252,11 @@
 
                 // Cargar imagen del coche de forma asíncrona usando la función base del garaje
                 const imgElement = document.getElementById(imgId);
-                if (typeof loadCarImageUI === 'function') {
-                    loadCarImageUI(r, imgElement).then(() => {
+                // Extraer el objeto coche completo original desde garageCars para pasarlo a loadCarImageUI
+                const currentGarageCars = JSON.parse(localStorage.getItem('krono_garage_cars')) || [];
+                const originalCar = currentGarageCars.find(c => c.id === r.id);
+                if (originalCar && window.loadCarImageUI) {
+                    window.loadCarImageUI(originalCar, imgElement).then(() => {
                         imgElement.classList.remove('opacity-0');
                     }).catch(() => {
                         imgElement.classList.remove('opacity-0'); // Mostrar placeholder si falla
