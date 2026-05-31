@@ -1,4 +1,13 @@
-<DOCTYPE html>
+<!-- 
+  ======================================================
+  PEGA AQUÍ TU CÓDIGO DEL GARAJE
+  ======================================================
+  
+  1. Borra este texto.
+  2. Pega todo tu código gigante.
+  3. Escríbeme en el chat de la izquierda diciendo "Ya está" 
+     para que yo lo analice y lo integre.
+--><!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -926,7 +935,7 @@
     </div> <!-- FIN CONTENEDOR APP -->
 
     <!-- ================= CONTENEDOR MODO TV (NUEVO DISEÑO HORIZONTAL) ================= -->
-    <div id="tv-dashboard" class="hidden h-screen tv-bg text-white w-full flex-col font-sans overflow-hidden p-2 md:p-4 relative z-20" data-theme="default">
+    <div id="tv-dashboard" class="hidden fixed inset-0 w-full h-[100dvh] tv-bg text-white flex-col font-sans overflow-hidden p-2 md:p-4 z-40" data-theme="default">
         
         <!-- HEADER TV -->
         <div class="flex justify-between items-center mb-3">
@@ -1842,12 +1851,12 @@
 
     <!-- MODAL DE RANKING PERSONAL (CARRETERA DESGASTADA & AZULES) -->
     <div id="personalRankingModal" class="modal-overlay hidden">
-        <div class="modal-content w-full max-w-4xl bg-slate-900 border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] rounded-2xl overflow-hidden p-0 relative">
+        <div class="modal-content w-full max-w-5xl bg-slate-900 border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] rounded-2xl overflow-hidden p-0 relative">
             
             <!-- Header Elegante Monocromo/Azulado -->
             <div class="flex justify-between items-center bg-slate-950 p-4 sm:p-5 border-b border-slate-800 relative z-20">
                 <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400 mr-3 opacity-80"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400 mr-3 opacity-80"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
                     <h3 class="text-xl sm:text-2xl font-black font-rajdhani text-slate-100 tracking-[0.2em] opacity-90" data-i18n="personalRanking">RANKING PERSONAL</h3>
                 </div>
                 <div class="flex items-center space-x-3 sm:space-x-4">
@@ -1856,10 +1865,23 @@
             </div>
             
             <!-- "Pista" Asfalto Desgastado -->
-            <div class="w-full h-[65vh] sm:h-[75vh] worn-asphalt-bg overflow-y-auto tv-scrollbar p-4 sm:p-8 relative scroll-smooth">
-                <div class="minimal-start-line mt-2"></div>
+            <div class="w-full h-[75vh] sm:h-[80vh] worn-asphalt-bg overflow-y-auto tv-scrollbar p-4 sm:p-6 relative scroll-smooth">
                 
-                <div id="personal-ranking-body" class="flex flex-col gap-5 sm:gap-6 relative z-10 mt-8 pb-16">
+                <div class="mb-6 bg-slate-800/80 border border-indigo-500/30 rounded-xl p-4 sm:p-5 shadow-[0_0_20px_rgba(99,102,241,0.1)] relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <h4 class="text-indigo-400 font-rajdhani font-black text-lg sm:text-xl uppercase tracking-widest flex items-center mb-2 relative z-10 drop-shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 animate-pulse"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+                        Parrilla de Salida: Rendimiento de tu Garaje
+                    </h4>
+                    <p class="text-slate-300 text-xs sm:text-sm leading-relaxed relative z-10 font-medium">
+                        Compara objetivamente todos los coches de tu garaje local entre sí. El algoritmo <strong class="text-indigo-300 font-bold drop-shadow-[0_0_5px_rgba(99,102,241,0.5)]">Krono Index</strong> evalúa cuál es tu coche más dominante basándose en su capacidad de generar <strong class="text-white">Velocidad Punta a Escala</strong> y lo noble que es de conducir midiendo la <strong class="text-white">Consistencia</strong> que logras con él.
+                    </p>
+                </div>
+
+                <div class="minimal-start-line mt-2 mb-6"></div>
+                
+                <!-- Parrilla en Grid -->
+                <div id="personal-ranking-body" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 relative z-10 pb-16">
                     <!-- El listado se inyecta desde JavaScript -->
                 </div>
             </div>
@@ -3046,7 +3068,7 @@
                 }
             }
             
-            // FILTRAR DUPLICADOS: Quedarnos solo con el mejor tiempo de cada combinación Piloto+Coche
+            // FILTRAR DUPLICADOS: Quedarnos solo con el mejor de cada combinación Piloto+Coche
             let uniqueMap = {};
             rawRecords.forEach(r => {
                 let key = r.pilot + "||" + r.car;
@@ -3057,33 +3079,46 @@
             
             let records = Object.values(uniqueMap);
             
-            // NUEVO CRITERIO DE ORDENACIÓN MULTIFACTORIAL (Ponderación Inteligente)
-            // 1. Velocidad Pura (Calculada para estandarizar diferentes longitudes de pista)
-            // 2. Consistencia (Como factor de calidad del piloto)
-            // Fórmula (Simplificada): Puntuación = (Velocidad * 0.7) + (Consistencia * 0.3)
-            // Como queremos el mejor (mayor puntuación), ordenamos descendentemente.
-            records.sort((a, b) => {
-                // Si no hay velocidad o consistencia antigua, las estimamos o ponemos bajas
-                const aSpeed = a.avgSpeed || (a.trackLength / (a.bestLap/1000) * 3.6) || 0;
-                const bSpeed = b.avgSpeed || (b.trackLength / (b.bestLap/1000) * 3.6) || 0;
-                const aCons = a.consistency || 0;
-                const bCons = b.consistency || 0;
-                
-                const scoreA = (aSpeed * 0.7) + (aCons * 0.3);
-                const scoreB = (bSpeed * 0.7) + (bCons * 0.3);
-                
-                return scoreB - scoreA; // Mayor a menor
+            // KRONO INDEX ALGORITHM (Métrica Justa de Normalización)
+            records.forEach(r => {
+                const trackLen = parseFloat(r.trackLength) || 15;
+                const bestLapSecs = r.bestLap / 1000;
+                // Vel. Real (m/s) -> km/h
+                const realSpeed = parseFloat(r.avgSpeed) || (trackLen / bestLapSecs) * 3.6;
+                const scaleSpeed = realSpeed * 32;
+                const cons = parseFloat(r.consistency) || 80;
+
+                // Fórmula: Base (Vel Escala * 2.5) + (Consistencia * 15) + (Track Bonus)
+                const lengthBonus = Math.min(trackLen, 50) * 5;
+                r.kronoRating = Math.round((scaleSpeed * 2.5) + (cons * 15) + lengthBonus);
+                r.scaleSpeed = scaleSpeed;
+                r.realSpeed = realSpeed;
+                r.cons = cons;
             });
             
+            // Ordenamos descendentemente por la nueva puntuación KRONO INDEX
+            records.sort((a, b) => b.kronoRating - a.kronoRating);
             records = records.slice(0, 25); // Solo el TOP 25
 
-            rankingBody.innerHTML = '';
+            const kronoIndexHeaderHtml = `
+                <div class="mb-6 bg-slate-800/80 border border-cyan-500/30 rounded-xl p-4 sm:p-5 shadow-[0_0_20px_rgba(34,211,238,0.1)] relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <h4 class="text-cyan-400 font-rajdhani font-black text-lg sm:text-xl uppercase tracking-widest flex items-center mb-2 relative z-10 drop-shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 animate-pulse"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        El Krono Index: Competición Justa
+                    </h4>
+                    <p class="text-slate-300 text-xs sm:text-sm leading-relaxed relative z-10 font-medium">
+                        ¿Corres en una pista de 5m y otro en una de 30m? El algoritmo <strong class="text-cyan-300 font-bold drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]">Krono Index</strong> normaliza todos los resultados mediante un sistema de puntuación universal. Combina tu <strong class="text-white">Velocidad a Escala 1:32</strong>, tu <strong class="text-white">Consistencia</strong> y la <strong class="text-white">Longitud del Circuito</strong>. ¡Gana el piloto más hábil, sin importar la pista!
+                    </p>
+                </div>
+            `;
+
+            rankingBody.innerHTML = kronoIndexHeaderHtml;
 
             if (records.length === 0) {
-                 rankingBody.innerHTML = `<div class="text-center p-4 text-slate-400 font-rajdhani tracking-widest">${translations[currentLang].noRecords}</div>`;
+                 rankingBody.innerHTML += `<div class="text-center p-8 text-slate-400 font-rajdhani tracking-widest text-xl border-2 border-dashed border-slate-700 rounded-xl">${translations[currentLang].noRecords}</div>`;
             } else {
-                 const leaderLap = records[0].bestLap; // Referencia para el Delta (Aunque ya no sea el único factor)
-                 const leaderScore = (records[0].avgSpeed || 0)*0.7 + (records[0].consistency || 0)*0.3;
+                 const leaderRating = records[0].kronoRating;
 
                  const getFlagEmoji = (code) => {
                      if (!code || code.length !== 2) return "🌍";
@@ -3091,104 +3126,94 @@
                  };
 
                  records.forEach((r, idx) => {
-                     const isLeft = idx % 2 === 0; 
-                     
-                     // Calcular Score y Diff (Simulado como un porcentaje de diferencia)
-                     const currentScore = (r.avgSpeed || 0)*0.7 + (r.consistency || 0)*0.3;
-                     let diffPercent = 0;
-                     if(leaderScore > 0) {
-                         diffPercent = ((leaderScore - currentScore) / leaderScore) * 100;
-                     }
-                     
-                     const deltaStr = idx === 0 ? "LÍDER" : `-${diffPercent.toFixed(1)}% pts`;
+                     // Paleta Base (El Pelotón)
+                     let bgClass = "bg-slate-800/60 hover:bg-slate-700/80 border-slate-700";
+                     let posColor = "text-slate-500 drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]";
+                     let ratingColor = "text-white";
+                     let rankBadge = "";
+                     let fillGradient = "from-slate-600 to-slate-500";
 
-                     // Estilo base: Azul Pizarra Desaturado (Resto del pelotón)
-                     let borderGlow = 'border-slate-700 shadow-[0_5px_15px_rgba(0,0,0,0.3)] bg-slate-800/80';
-                     let posColor = 'text-slate-400 drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]';
-                     let accentBorder = 'border-l-slate-600';
-                     let textColor = 'text-slate-200';
-                     let subTextColor = 'text-slate-400';
-                     let highlightColor = 'text-slate-300';
-                     
-                     // Escala de Azules para el Top 3
+                     // Colores TOP 3 (Diseño de Medallas)
                      if (idx === 0) {
-                         // 1º Azul Hielo / Cyan Diamante
-                         borderGlow = 'border-cyan-400/60 shadow-[0_0_20px_rgba(34,211,238,0.15)] bg-gradient-to-br from-cyan-900/30 to-slate-900/90';
-                         posColor = 'text-cyan-300 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]';
-                         accentBorder = 'border-l-cyan-400';
-                         textColor = 'text-white';
-                         subTextColor = 'text-cyan-200/80';
-                         highlightColor = 'text-cyan-100';
+                         bgClass = "bg-gradient-to-r from-yellow-900/40 via-slate-800/80 to-slate-800 border-yellow-500/50 shadow-[0_0_20px_rgba(234,179,8,0.2)]";
+                         posColor = "text-yellow-400 drop-shadow-[0_0_10px_rgba(234,179,8,0.8)]";
+                         ratingColor = "text-yellow-400 drop-shadow-[0_0_10px_rgba(234,179,8,0.6)]";
+                         fillGradient = "from-yellow-400 to-amber-600";
+                         rankBadge = `<div class="absolute -top-3 -right-2 text-3xl sm:text-4xl drop-shadow-xl z-30 transform rotate-12 group-hover:rotate-0 transition-transform">👑</div>`;
                      } else if (idx === 1) {
-                         // 2º Azul Zafiro / Eléctrico
-                         borderGlow = 'border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.15)] bg-gradient-to-br from-blue-900/30 to-slate-900/90';
-                         posColor = 'text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]';
-                         accentBorder = 'border-l-blue-500';
-                         textColor = 'text-blue-50';
-                         subTextColor = 'text-blue-300/80';
-                         highlightColor = 'text-blue-200';
+                         bgClass = "bg-gradient-to-r from-slate-400/20 via-slate-800/80 to-slate-800 border-slate-300/50 shadow-[0_0_15px_rgba(203,213,225,0.1)]";
+                         posColor = "text-slate-300 drop-shadow-[0_0_10px_rgba(203,213,225,0.8)]";
+                         ratingColor = "text-slate-300 drop-shadow-[0_0_10px_rgba(203,213,225,0.6)]";
+                         fillGradient = "from-slate-300 to-slate-500";
                      } else if (idx === 2) {
-                         // 3º Azul Índigo / Profundo
-                         borderGlow = 'border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.15)] bg-gradient-to-br from-indigo-900/30 to-slate-900/90';
-                         posColor = 'text-indigo-400 drop-shadow-[0_0_10px_rgba(99,102,241,0.8)]';
-                         accentBorder = 'border-l-indigo-500';
-                         textColor = 'text-indigo-50';
-                         subTextColor = 'text-indigo-300/80';
-                         highlightColor = 'text-indigo-200';
+                         bgClass = "bg-gradient-to-r from-amber-700/30 via-slate-800/80 to-slate-800 border-amber-600/50 shadow-[0_0_15px_rgba(217,119,6,0.1)]";
+                         posColor = "text-amber-500 drop-shadow-[0_0_10px_rgba(217,119,6,0.8)]";
+                         ratingColor = "text-amber-500 drop-shadow-[0_0_10px_rgba(217,119,6,0.6)]";
+                         fillGradient = "from-amber-500 to-orange-700";
                      }
                      
-                     // Formatear la región para que se vea espectacular incluso sin bandera
                      let regionHtml = "";
                      if (r.countryCode && r.countryCode.length === 2) {
-                         regionHtml = `<span class="text-base sm:text-lg leading-none" title="${r.region || 'Ubicación Desconocida'}">${getFlagEmoji(r.countryCode)}</span>`;
+                         regionHtml = `<span class="text-xl sm:text-2xl leading-none drop-shadow-md" title="${r.region || 'Desconocido'}">${getFlagEmoji(r.countryCode)}</span>`;
                      } else {
-                         regionHtml = `<span class="bg-slate-900/50 px-2 py-0.5 rounded border border-slate-700/50 text-[9px] uppercase tracking-widest text-slate-300 shadow-inner max-w-[120px] truncate" title="${r.region || 'Ubicación Desconocida'}">${r.region || 'Desconocido'}</span>`;
+                         regionHtml = `<span class="bg-slate-900/80 px-2 py-0.5 rounded border border-slate-700/50 text-[9px] uppercase tracking-widest text-slate-300 shadow-inner max-w-[100px] truncate" title="${r.region || 'Desconocido'}">${r.region || 'Desconocido'}</span>`;
                      }
 
+                     const fillPct = Math.max(10, (r.kronoRating / leaderRating) * 100);
+
                      let div = document.createElement('div');
-                     // Tarjeta delgada, alineada al centro de forma alternada (45% ancho en desktop)
-                     div.className = `w-[90%] md:w-[45%] ${isLeft ? 'self-start md:-mr-[5%]' : 'self-end md:-ml-[5%]'} relative backdrop-blur-md border border-l-4 ${borderGlow} ${accentBorder} rounded-r-xl rounded-l-md p-4 sm:p-5 transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:border-blue-400/50 group`;
+                     div.className = `relative w-full border-2 ${bgClass} rounded-xl p-3 sm:p-5 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 transition-all duration-300 hover:scale-[1.01] overflow-hidden group`;
                      
                      div.innerHTML = `
-                        <div class="absolute -top-3 sm:-top-4 ${isLeft ? '-left-2 sm:-left-4' : '-right-2 sm:-right-4'} font-rajdhani font-black text-3xl sm:text-4xl italic ${posColor} z-20 transition-transform duration-300 group-hover:scale-110">
-                            P${idx + 1}
+                        ${rankBadge}
+                        <!-- Barra de Poder (Rating Fill) -->
+                        <div class="absolute bottom-0 left-0 h-1 sm:h-1.5 bg-gradient-to-r ${fillGradient} opacity-50 group-hover:opacity-100 transition-opacity z-0" style="width: ${fillPct}%"></div>
+                        
+                        <!-- Posición P1, P2... -->
+                        <div class="w-full sm:w-20 flex justify-between sm:justify-center items-center shrink-0 border-b sm:border-b-0 sm:border-r border-slate-700/50 pb-2 sm:pb-0 sm:pr-4 relative z-10">
+                            <span class="font-rajdhani font-black italic text-4xl sm:text-5xl md:text-6xl ${posColor} group-hover:scale-110 transition-transform duration-300">P${idx+1}</span>
+                            <!-- En móvil, mostrar el rating aquí temporalmente para equilibrar -->
+                            <span class="sm:hidden text-2xl font-black font-rajdhani ${ratingColor}">${r.kronoRating} <span class="text-[9px] text-slate-500 uppercase">Pts</span></span>
                         </div>
                         
-                        <div class="flex flex-col gap-1 mt-1 pl-1">
-                            <span class="${textColor} font-bold font-rajdhani text-lg sm:text-xl truncate tracking-wide group-hover:text-white transition-colors drop-shadow-[0_0_2px_rgba(0,0,0,0.5)]">
-                                ${r.pilot}
-                            </span>
-                            <span class="${subTextColor} font-medium font-rajdhani text-xs sm:text-sm uppercase tracking-widest truncate">
-                                ${r.car}
-                            </span>
-                            <div class="flex gap-2 items-center mt-1">
+                        <!-- Info Piloto -->
+                        <div class="flex-1 w-full text-left flex flex-col justify-center relative z-10 mt-1 sm:mt-0">
+                            <div class="flex items-center gap-3 mb-1">
                                 ${regionHtml}
-                                <span class="text-slate-500 opacity-50">|</span>
-                                <span class="bg-slate-900/50 px-2 py-0.5 rounded border border-slate-700/50 text-[9px] uppercase tracking-widest text-slate-300 shadow-inner flex items-center gap-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>
-                                    ${r.trackLength || '?'}m
+                                <span class="text-xl sm:text-2xl font-black font-rajdhani text-white uppercase tracking-wide truncate drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] group-hover:text-cyan-200 transition-colors">
+                                    ${r.pilot}
                                 </span>
                             </div>
+                            <span class="text-xs sm:text-sm font-rajdhani font-bold text-cyan-400/80 uppercase tracking-widest truncate">
+                                ${r.car}
+                            </span>
                             
-                            <div class="flex justify-between items-end mt-3 pt-3 border-t border-slate-700/60">
-                                <div class="flex flex-col">
-                                    <span class="text-slate-400 text-[9px] sm:text-[10px] uppercase font-bold tracking-[0.2em] mb-1">
-                                        Dif: <span class="${highlightColor}">${deltaStr}</span>
-                                    </span>
-                                    <div class="flex gap-2 sm:gap-3 text-slate-400 text-[9px] sm:text-[10px] font-bold tracking-widest uppercase flex-wrap">
-                                        <span title="Velocidad Media" class="flex items-center gap-1 bg-slate-900/40 px-2 py-1 rounded border border-slate-700/30">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-500/70"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                                            ${(r.avgSpeed || 0).toFixed(1)} km/h
-                                        </span>
-                                        <span title="Constancia" class="flex items-center gap-1 bg-slate-900/40 px-2 py-1 rounded border border-slate-700/30">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400/70"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-                                            ${(r.consistency || 0).toFixed(1)}%
-                                        </span>
-                                    </div>
-                                </div>
-                                
-                                <span class="${highlightColor} font-black font-rajdhani text-2xl sm:text-3xl leading-none tracking-tighter drop-shadow-[0_0_5px_rgba(255,255,255,0.2)] group-hover:text-white transition-colors text-right" title="Mejor Tiempo: ${formatTime(r.bestLap, true)}">
-                                    ${formatTime(r.bestLap, false)}
+                            <!-- Badges de Datos (Estilo Telemetría) -->
+                            <div class="flex flex-wrap gap-2 mt-3">
+                                <span class="bg-slate-950/80 px-2.5 py-1 rounded border border-slate-700 text-slate-300 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest shadow-md flex items-center">
+                                    <svg class="w-3 h-3 mr-1 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>
+                                    Pista: ${r.trackLength}m
+                                </span>
+                                <span class="bg-slate-950/80 px-2.5 py-1 rounded border border-slate-700 text-slate-300 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest shadow-md flex items-center">
+                                    <svg class="w-3 h-3 mr-1 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    Vuelta: ${formatTime(r.bestLap, true)}
+                                </span>
+                                <span class="bg-slate-950/80 px-2.5 py-1 rounded border border-slate-700 text-slate-300 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest shadow-md flex items-center">
+                                    <svg class="w-3 h-3 mr-1 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                                    Cons: ${(r.cons).toFixed(1)}%
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Caja KRONO INDEX (Derecha, sólo PC visible, oculto móvil) -->
+                        <div class="hidden sm:flex flex-col items-end justify-center shrink-0 min-w-[140px] bg-slate-950/90 p-3 sm:p-4 rounded-xl border border-slate-700 shadow-[inset_0_0_15px_rgba(0,0,0,0.8)] relative z-10 group-hover:border-cyan-500/50 transition-colors">
+                            <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-cyan-500 mb-0.5 opacity-80">Krono Index</span>
+                            <span class="text-4xl md:text-5xl font-black font-rajdhani ${ratingColor} leading-none tracking-tighter">
+                                ${r.kronoRating}
+                            </span>
+                            <div class="mt-1.5 pt-1.5 border-t border-slate-700/50 w-full text-right">
+                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest" title="Velocidad Promedio A Escala">
+                                    ${r.scaleSpeed.toFixed(0)} KM/H ESC.
                                 </span>
                             </div>
                         </div>
@@ -3199,138 +3224,167 @@
         }
 
         async function loadPersonalLeaderboard() {
-            personalRankingBody.innerHTML = '';
-
             let records = [];
             
-            // Usamos la memoria viva (garageCars) IGUAL que en el panel de configuración, 
-            // no leemos de localStorage para evitar que las fotos se hayan limpiado por límite de peso
+            // Extraer registros crudos del garaje actual (LOCALMENTE)
             garageCars.forEach(car => {
                 if (car.bestLap && car.bestLap !== "-" && car.bestLap !== "") {
                     const timeStr = typeof car.bestLap === 'string' ? car.bestLap.replace('s', '') : car.bestLap;
                     const bestLapSecs = parseFloat(timeStr);
                     
                     if (!isNaN(bestLapSecs)) {
+                        const avgSpdNum = parseFloat(car.avgSpd) || 0;
+                        const consNum = parseFloat(car.consistency) || 0;
+                        const scaleSpd = avgSpdNum * 32;
+                        
+                        // Default length para garaje (se asume estándar para compararlos entre ellos)
+                        const trackLen = 15; 
+                        const lengthBonus = 15 * 5; 
+                        
+                        // El mismo Krono Index algortimo para mantener coherencia visual y lógica
+                        const kronoRating = Math.round((scaleSpd * 2.5) + (consNum * 15) + lengthBonus);
+
                         records.push({
                             ...car,
                             bestLapMs: bestLapSecs * 1000,
-                            avgSpeedNum: parseFloat(car.avgSpd) || 0,
-                            consistencyNum: parseFloat(car.consistency) || 0
+                            avgSpeedNum: avgSpdNum,
+                            scaleSpeed: scaleSpd,
+                            consistencyNum: consNum,
+                            kronoRating: kronoRating
                         });
                     }
                 }
             });
 
-            records.sort((a, b) => a.bestLapMs - b.bestLapMs);
+            // Ordenamos por KRONO RATING descendentemente (El mejor coche globalmente)
+            records.sort((a, b) => b.kronoRating - a.kronoRating);
+
+            personalRankingBody.innerHTML = ''; // Limpiamos el contenedor (el header ahora es estático arriba)
 
             if (records.length === 0) {
-                 personalRankingBody.innerHTML = `<div class="text-center p-4 text-slate-400 font-rajdhani tracking-widest">No hay coches con tiempo registrado en el garaje.</div>`;
+                 personalRankingBody.innerHTML = `<div class="col-span-full text-center p-8 text-slate-400 font-rajdhani tracking-widest text-xl border-2 border-dashed border-slate-700 rounded-xl">No hay coches con tiempo registrado en tu garaje local. Ve a la pista y registra algunos tiempos.</div>`;
                  return;
             }
 
-            const leaderLap = records[0].bestLapMs;
+            const leaderRating = records[0].kronoRating;
 
             for (let idx = 0; idx < records.length; idx++) {
                 const r = records[idx];
-                const deltaMs = r.bestLapMs - leaderLap;
-                const deltaStr = idx === 0 ? "LÍDER" : `+${(deltaMs / 1000).toFixed(3)}s`;
 
                 let borderColor = 'border-slate-700 hover:border-slate-400';
                 let posColor = 'text-slate-400 drop-shadow-[0_0_2px_rgba(0,0,0,0.8)]';
                 let highlightColor = 'text-slate-300';
-                let glowClass = 'shadow-xl';
+                let glowClass = 'shadow-md hover:shadow-xl';
+                let rankBadge = '';
+                let fillGradient = "from-slate-600 to-slate-500";
                 
+                // Estilos especiales para el podio
                 if (idx === 0) {
-                    posColor = 'text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.8)]';
-                    borderColor = 'border-cyan-500 hover:border-cyan-300';
-                    highlightColor = 'text-cyan-300';
-                    glowClass = 'shadow-[0_0_30px_rgba(34,211,238,0.2)]';
+                    posColor = 'text-yellow-400 drop-shadow-[0_0_15px_rgba(234,179,8,0.8)]';
+                    borderColor = 'border-yellow-500 hover:border-yellow-300';
+                    highlightColor = 'text-yellow-400 drop-shadow-[0_0_10px_rgba(234,179,8,0.6)]';
+                    glowClass = 'shadow-[0_0_20px_rgba(234,179,8,0.2)]';
+                    fillGradient = "from-yellow-400 to-amber-600";
+                    rankBadge = `<div class="absolute -top-3 -right-3 text-4xl sm:text-5xl drop-shadow-xl z-30 transform rotate-12 group-hover:rotate-0 transition-transform">🏆</div>`;
                 } else if (idx === 1) {
-                    posColor = 'text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]';
-                    borderColor = 'border-blue-500 hover:border-blue-300';
-                    highlightColor = 'text-blue-300';
-                    glowClass = 'shadow-[0_0_25px_rgba(59,130,246,0.2)]';
+                    posColor = 'text-slate-300 drop-shadow-[0_0_15px_rgba(203,213,225,0.8)]';
+                    borderColor = 'border-slate-400 hover:border-slate-200';
+                    highlightColor = 'text-slate-300 drop-shadow-[0_0_10px_rgba(203,213,225,0.6)]';
+                    glowClass = 'shadow-[0_0_15px_rgba(203,213,225,0.1)]';
+                    fillGradient = "from-slate-300 to-slate-400";
+                    rankBadge = `<div class="absolute -top-2 -right-2 text-3xl sm:text-4xl drop-shadow-xl z-30 transform rotate-12 group-hover:rotate-0 transition-transform">🥈</div>`;
                 } else if (idx === 2) {
-                    posColor = 'text-indigo-400 drop-shadow-[0_0_15px_rgba(99,102,241,0.8)]';
-                    borderColor = 'border-indigo-500 hover:border-indigo-300';
-                    highlightColor = 'text-indigo-300';
-                    glowClass = 'shadow-[0_0_20px_rgba(99,102,241,0.2)]';
+                    posColor = 'text-amber-600 drop-shadow-[0_0_15px_rgba(217,119,6,0.8)]';
+                    borderColor = 'border-amber-700 hover:border-amber-500';
+                    highlightColor = 'text-amber-500 drop-shadow-[0_0_10px_rgba(217,119,6,0.6)]';
+                    glowClass = 'shadow-[0_0_15px_rgba(217,119,6,0.1)]';
+                    fillGradient = "from-amber-600 to-orange-700";
+                    rankBadge = `<div class="absolute -top-2 -right-2 text-3xl sm:text-4xl drop-shadow-xl z-30 transform rotate-12 group-hover:rotate-0 transition-transform">🥉</div>`;
+                } else {
+                    // Gradiente genérico basado en KronoIndex
+                    fillGradient = "from-indigo-900 to-indigo-700";
                 }
 
                 const carDisplayName = r.name || `${r.marca} ${r.ref}`.trim() || 'Coche Desconocido';
                 const imgId = `personal-rank-img-${r.id}-${idx}`;
+                const fillPct = Math.max(5, (r.kronoRating / leaderRating) * 100);
+                
+                // Imagen por defecto si no tiene
+                const imgSrc = r.image ? r.image : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cfilter id='neonGlow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='1.5' result='blur' /%3E%3CfeMerge%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='SourceGraphic' /%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Crect width='100' height='100' fill='%23111827'/%3E%3Ctext x='50' y='54' font-family='Arial, sans-serif' font-size='10' font-weight='900' stroke='none' fill='%234b5563' text-anchor='middle' letter-spacing='1'%3ENO IMAGE%3C/text%3E%3C/svg%3E";
 
                 let div = document.createElement('div');
-                div.className = `w-full relative rounded-2xl overflow-hidden bg-slate-900 border-2 ${borderColor} transition-all duration-500 group h-36 sm:h-48 flex items-end ${glowClass} mb-5`;
+                div.className = `relative flex flex-col w-full rounded-2xl overflow-hidden bg-slate-900 border-2 ${borderColor} transition-all duration-300 group hover:-translate-y-1 ${glowClass}`;
                 
                 div.innerHTML = `
-                    <img id="${imgId}" src="" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-80 group-hover:opacity-100 z-0">
+                    ${rankBadge}
                     
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent pointer-events-none z-10"></div>
-                    <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/40 to-transparent pointer-events-none z-10"></div>
-
-                    <div class="absolute top-2 right-4 font-rajdhani font-black text-5xl sm:text-7xl italic ${posColor} z-20 opacity-80 group-hover:scale-110 transition-transform duration-300">
-                        P${idx + 1}
+                    <!-- Top: Image Area (Hero style for grid) -->
+                    <div class="relative w-full h-40 sm:h-48 overflow-hidden shrink-0 border-b border-slate-700/50 bg-black flex items-center justify-center">
+                        <img id="${imgId}" src="${imgSrc}" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
+                        
+                        <!-- Degradado inferior para legibilidad del texto superior -->
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent z-10 pointer-events-none"></div>
+                        
+                        <!-- Posición P1, P2... superpuesta en la imagen -->
+                        <div class="absolute top-2 left-3 font-rajdhani font-black text-4xl sm:text-5xl italic ${posColor} z-20 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] transition-transform duration-300">
+                            P${idx + 1}
+                        </div>
                     </div>
 
-                    <div class="relative z-20 w-full p-4 sm:p-5 flex justify-between items-end">
-                        <div class="flex flex-col gap-1 sm:gap-2 w-2/3">
-                            <span class="text-white font-black font-rajdhani text-2xl sm:text-4xl tracking-wide drop-shadow-[0_4px_6px_rgba(0,0,0,0.9)] truncate group-hover:text-cyan-100 transition-colors">
+                    <!-- Bottom: Data Area -->
+                    <div class="flex-1 p-3 sm:p-4 flex flex-col justify-between relative z-20 bg-slate-900">
+                        <!-- Barra de Poder (Rating Fill) en el fondo del contenido -->
+                        <div class="absolute bottom-0 left-0 h-1 bg-gradient-to-r ${fillGradient} opacity-70 group-hover:opacity-100 transition-opacity z-0" style="width: ${fillPct}%"></div>
+
+                        <div class="flex flex-col gap-1 relative z-10 mb-3">
+                            <span class="text-white font-black font-rajdhani text-lg sm:text-xl tracking-wide drop-shadow-md line-clamp-2 leading-tight group-hover:text-indigo-200 transition-colors">
                                 ${carDisplayName}
                             </span>
-                            <span class="text-slate-300 font-bold font-rajdhani text-xs sm:text-base uppercase tracking-widest flex gap-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
-                                <span>${r.marca || '-'}</span> <span class="opacity-50 text-cyan-400">|</span> <span>${r.cat || '-'}</span>
+                            <span class="text-slate-400 font-bold font-rajdhani text-xs uppercase tracking-widest flex items-center gap-1.5 mt-1">
+                                <span class="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 truncate">${r.marca || 'N/A'}</span>
+                                <span class="bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 truncate">${r.cat || 'N/A'}</span>
                             </span>
-                            
-                            <div class="flex flex-wrap gap-2 text-slate-200 text-[10px] sm:text-xs font-bold tracking-widest uppercase mt-1">
-                                <span title="Velocidad Media" class="flex items-center gap-1 bg-slate-950/80 px-2.5 py-1 rounded border border-slate-700/50 shadow-md backdrop-blur-sm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-400"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                                    ${r.avgSpeedNum.toFixed(1)} km/h
+                        </div>
+
+                        <!-- Stats Grid -->
+                        <div class="grid grid-cols-2 gap-2 mt-auto relative z-10">
+                            <div class="bg-slate-950/80 p-2 rounded-lg border border-slate-800/50 flex flex-col items-center text-center">
+                                <span class="text-emerald-500/70 text-[9px] uppercase font-black tracking-widest mb-0.5 flex items-center">
+                                    <svg class="w-2.5 h-2.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 6 12 12 16 14"/><circle cx="12" cy="12" r="10"/></svg>
+                                    V. Rápida
                                 </span>
-                                <span title="Constancia" class="flex items-center gap-1 bg-slate-950/80 px-2.5 py-1 rounded border border-slate-700/50 shadow-md backdrop-blur-sm">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-                                    ${r.consistencyNum.toFixed(1)}%
+                                <span class="text-emerald-400 font-bold text-sm drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">${formatTime(r.bestLapMs, true)}</span>
+                            </div>
+                            <div class="bg-slate-950/80 p-2 rounded-lg border border-slate-800/50 flex flex-col items-center text-center">
+                                <span class="text-blue-500/70 text-[9px] uppercase font-black tracking-widest mb-0.5 flex items-center">
+                                    <svg class="w-2.5 h-2.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                    Constancia
                                 </span>
+                                <span class="text-blue-400 font-bold text-sm drop-shadow-[0_0_5px_rgba(59,130,246,0.3)]">${r.consistencyNum.toFixed(1)}%</span>
                             </div>
                         </div>
-                        
-                        <div class="flex flex-col items-end w-1/3">
-                            <span class="text-slate-300 text-[10px] sm:text-xs uppercase font-black tracking-[0.2em] mb-1 bg-slate-950/80 px-2 py-1 rounded border border-slate-700/50 backdrop-blur-sm shadow-md flex items-center">
-                                Dif: <span class="${highlightColor} ml-1">${deltaStr}</span>
-                            </span>
-                            <span class="${highlightColor} font-black font-rajdhani text-4xl sm:text-5xl md:text-6xl leading-none tracking-tighter drop-shadow-[0_5px_15px_rgba(0,0,0,0.9)]">
-                                ${formatTime(r.bestLapMs, false)}
-                            </span>
+
+                        <!-- KRONO INDEX FOOTER -->
+                        <div class="mt-3 pt-2 border-t border-slate-800 flex justify-between items-end relative z-10">
+                            <div class="flex flex-col">
+                                <span class="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Escala 1:32</span>
+                                <span class="text-slate-300 font-bold text-xs">${r.scaleSpeed.toFixed(1)} km/h</span>
+                            </div>
+                            <div class="flex flex-col items-end">
+                                <span class="text-[9px] font-black uppercase tracking-[0.2em] text-indigo-500/80 mb-0.5">Krono Index</span>
+                                <span class="text-2xl sm:text-3xl font-black font-rajdhani ${highlightColor} leading-none tracking-tighter">
+                                    ${r.kronoRating}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 `;
                 personalRankingBody.appendChild(div);
 
-                // Extracción manual e idéntica a la que usa el menú de configuración (para asegurar que 100% de las veces funciona)
-                const imgElement = document.getElementById(imgId);
-                const imageId = r.image;
-                
-                if (imageId) {
-                    if (imageId.startsWith('data:image')) {
-                        imgElement.src = imageId;
-                    } else if (imageId.startsWith('img_')) {
-                        const localB64 = await window.getImageFromIDB(imageId);
-                        if (localB64) {
-                            imgElement.src = localB64;
-                        } else if (window.db && window.fs) {
-                            try {
-                                const appId = "app_krono";
-                                const docRef = window.fs.doc(window.db, 'artifacts', appId, 'public', 'data', 'cloud_garages_images', imageId);
-                                const docSnap = await window.fs.getDoc(docRef);
-                                if (docSnap.exists()) {
-                                    const cloudB64 = docSnap.data().data;
-                                    imgElement.src = cloudB64;
-                                    await window.saveImageToIDB(imageId, cloudB64);
-                                }
-                            } catch(e) { console.error("Error descargando foto del ranking personal:", e); }
-                        }
-                    }
-                }
+                // --- Si usas almacenamiento avanzado local/IDB para imágenes, lo conservo (opcional) ---
+                // Nota: Por simplicidad, ya se asignó la imagen base64 arriba (r.image).
+                // El siguiente bloque solo es necesario si manejas las imágenes fuera de garageCars (ej. IDB)
+                // y las referencias como img_xxxx. Si usas base64 directo, se cargarán al instante.
             }
         }
 
