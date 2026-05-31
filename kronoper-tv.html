@@ -1834,6 +1834,10 @@
                     <span class="ml-3 text-[10px] font-bold text-blue-300 border border-blue-800/50 bg-blue-900/20 px-2 py-0.5 rounded-full uppercase tracking-widest hidden sm:block">Top 25</span>
                 </div>
                 <div class="flex items-center space-x-3 sm:space-x-4">
+                    <button id="clear-racer1-btn" class="text-[10px] font-bold text-red-400 border border-red-800/50 bg-red-900/20 px-2 py-1 rounded hover:bg-red-800/40 transition flex items-center shadow-md" title="Borrar Récords de Racer 1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        <span class="hidden sm:inline uppercase tracking-widest">Del Racer 1</span>
+                    </button>
                     <button id="close-ranking-btn" class="text-slate-500 hover:text-white font-black text-2xl transition-colors px-2">X</button>
                 </div>
             </div>
@@ -2088,6 +2092,7 @@
         const rankingModal = document.getElementById('rankingModal');
         const closeRankingBtn = document.getElementById('close-ranking-btn');
         const rankingBody = document.getElementById('ranking-body');
+        const clearRacer1Btn = document.getElementById('clear-racer1-btn');
         
         // --- RANKING PERSONAL UI ---
         const personalRankingBtn = document.getElementById('personal-ranking-btn');
@@ -3152,11 +3157,14 @@
                          fillGradient = "from-amber-500 to-orange-700";
                      }
                      
-                     let regionHtml = "";
-                     if (r.countryCode && r.countryCode.length === 2) {
-                         regionHtml = `<span class="text-xl sm:text-2xl leading-none drop-shadow-md" title="${r.region || 'Desconocido'}">${getFlagEmoji(r.countryCode)}</span>`;
+                     // NUEVO BADGE: Reemplazo de Región por Info de Pista/Modalidad
+                     let modeBadgeHtml = "";
+                     if (r.kronoRating > 1000) {
+                         // Récords excepcionales: Categoría "PRO"
+                         modeBadgeHtml = `<span class="bg-gradient-to-r from-purple-900/80 to-fuchsia-900/80 px-2.5 py-0.5 rounded border border-fuchsia-500/50 text-[9px] uppercase tracking-widest text-fuchsia-300 shadow-[0_0_8px_rgba(217,70,239,0.4)] flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" class="text-fuchsia-400"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> PRO RECORD</span>`;
                      } else {
-                         regionHtml = `<span class="bg-slate-900/80 px-2 py-0.5 rounded border border-slate-700/50 text-[9px] uppercase tracking-widest text-slate-300 shadow-inner max-w-[100px] truncate" title="${r.region || 'Desconocido'}">${r.region || 'Desconocido'}</span>`;
+                         // Récords estándar: Categoría "TIME ATTACK"
+                         modeBadgeHtml = `<span class="bg-slate-900/80 px-2.5 py-0.5 rounded border border-cyan-700/50 text-[9px] uppercase tracking-widest text-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.2)] flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-cyan-500"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> TIME ATTACK</span>`;
                      }
 
                      const fillPct = Math.max(10, (r.kronoRating / leaderRating) * 100);
@@ -3179,7 +3187,7 @@
                         <!-- Info Piloto -->
                         <div class="flex-1 w-full text-left flex flex-col justify-center relative z-10 mt-1 sm:mt-0">
                             <div class="flex items-center gap-3 mb-1">
-                                ${regionHtml}
+                                ${modeBadgeHtml}
                                 <span class="text-xl sm:text-2xl font-black font-rajdhani text-white uppercase tracking-wide truncate drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] group-hover:text-cyan-200 transition-colors">
                                     ${r.pilot}
                                 </span>
@@ -3540,6 +3548,40 @@
             rankingBtn.addEventListener('click', () => { loadLeaderboard(); rankingModal.classList.remove('hidden'); setTimeout(()=>rankingModal.classList.add('open'),10); });
             closeRankingBtn.addEventListener('click', () => { rankingModal.classList.remove('open'); setTimeout(()=>rankingModal.classList.add('hidden'),300); });
             
+            if (clearRacer1Btn) {
+                clearRacer1Btn.addEventListener('click', async () => {
+                    if (!confirm("¿Seguro que quieres borrar todos los récords donde el piloto sea 'Racer 1'?")) return;
+                    if (window.db) {
+                        try {
+                            const appId = "app_krono";
+                            const colRef = window.fs.collection(window.db, 'artifacts', appId, 'public', 'data', 'leaderboard');
+                            const snapshot = await window.fs.getDocs(colRef);
+                            const deletePromises = [];
+                            
+                            snapshot.forEach(doc => {
+                                const data = doc.data();
+                                if (data.pilot && data.pilot.toUpperCase() === 'RACER 1') {
+                                    deletePromises.push(window.fs.deleteDoc(doc.ref));
+                                }
+                            });
+                            
+                            if (deletePromises.length > 0) {
+                                await Promise.all(deletePromises);
+                                alert(`Se han borrado exitosamente ${deletePromises.length} registros de 'Racer 1'.`);
+                                loadLeaderboard(); // Recargar el ranking en vivo
+                            } else {
+                                alert("No se encontraron registros en la nube que pertenezcan a 'Racer 1'.");
+                            }
+                        } catch (e) {
+                            console.error("Error borrando Racer 1", e);
+                            alert("Hubo un error borrando los registros de la nube.");
+                        }
+                    } else {
+                        alert("No hay conexión a la base de datos global.");
+                    }
+                });
+            }
+
             if (personalRankingBtn) {
                 personalRankingBtn.addEventListener('click', () => {
                     loadPersonalLeaderboard();
