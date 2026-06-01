@@ -5510,9 +5510,12 @@
             toggleGarageEdit(false);
         }
 
-        function openGarage() {
-            // Recargar localStorage por si se modificó en otra pestaña
+        async function openGarage() {
+            // 1. Recargar los textos del localStorage
             garageCars = JSON.parse(localStorage.getItem('krono_garage_cars')) || [];
+            
+            // 2. CRÍTICO: ESPERAR a que las imágenes se carguen de la base de datos ANTES de abrir
+            await initIndexedDBImages();
             
             if (garageCars.length === 0) {
                 initGarage();
@@ -5535,6 +5538,7 @@
                 carSelect.value = 0;
             }
             
+            // 3. Ahora que tenemos todo seguro en memoria, dibujamos
             renderGarageCar(currentGarageIndex);
             
             toggleGarageEdit(false);
