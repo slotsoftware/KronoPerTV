@@ -5060,10 +5060,8 @@
         // --- SISTEMA INDEXEDDB PARA IMÁGENES ILIMITADAS ---
         const IDB_NAME = "KronoGarageDB";
         const IDB_STORE = "images";
-        let kronoDBInstance = null; // Caché de la base de datos para no saturar conexiones
 
         function openKronoDB() {
-            if (kronoDBInstance) return Promise.resolve(kronoDBInstance);
             return new Promise((resolve, reject) => {
                 const req = indexedDB.open(IDB_NAME, 1);
                 req.onupgradeneeded = (e) => {
@@ -5072,10 +5070,7 @@
                         db.createObjectStore(IDB_STORE);
                     }
                 };
-                req.onsuccess = () => {
-                    kronoDBInstance = req.result;
-                    resolve(kronoDBInstance);
-                };
+                req.onsuccess = () => resolve(req.result);
                 req.onerror = () => reject(req.error);
             });
         }
@@ -5159,8 +5154,8 @@
                 let payload = { cars: garageCars, updatedAt: Date.now() };
                 let jsonStr = JSON.stringify(payload);
                 
-                // Límite Ultra-Seguro (400KB) para evitar que Firestore rechace el documento y cause un Rollback que borre el garaje
-                if (jsonStr.length > 400000) { 
+                // Evitar error de cuota si hay demasiadas fotos (Límite Firestore: 1MB por documento)
+                if (jsonStr.length > 900000) { 
                     const lightCars = garageCars.map(c => ({...c, image: ""}));
                     payload = { cars: lightCars, updatedAt: Date.now(), warning: "fotos_omitidas" };
                 }
@@ -5183,23 +5178,23 @@
                     isSyncingFromCloud = true;
                     const incomingCars = data.cars || [];
                     
-                    // ESCUDO ANTI-ROLLBACK: Si la nube dice que hay 0 coches, pero tenemos coches en local,
-                    // ignoramos la nube para evitar perder datos por un error de Firebase.
-                    if (incomingCars.length === 0 && garageCars.length > 0) {
-                        console.warn("Escudo activado: La nube ha devuelto 0 coches. Se ignora para evitar borrado local.");
-                        setTimeout(() => { isSyncingFromCloud = false; }, 500);
-                        return;
-                    }
-                    
                     // Si la nube nos trae imágenes, las guardamos en IndexedDB
                     // Si la nube omitió las fotos por tamaño, las recuperamos de la base de datos local para no perderlas
                     for (let car of incomingCars) {
                         if (car.image && car.image.length > 100) {
                             await saveImageToIDB(car.id, car.image);
                         } else {
-                            const localImg = await getImageFromIDB(car.id);
-                            if (localImg) {
-                                car.image = localImg;
+                            // FALLBACK SEGURO RAM + IDB: Recupera de memoria viva al instante para evitar parpadeos
+                            const ramCar = garageCars.find(c => c.id === car.id);
+                            if (ramCar && ramCar.image && ramCar.image.length > 100) {
+                                car.image = ramCar.image;
+                                // Aseguramos el guardado en segundo plano por si el IndexedDB hubiera fallado
+                                saveImageToIDB(car.id, ramCar.image).catch(e => console.error(e));
+                            } else {
+                                const localImg = await getImageFromIDB(car.id);
+                                if (localImg) {
+                                    car.image = localImg;
+                                }
                             }
                         }
                     }
@@ -5292,7 +5287,7 @@
                     const carName = car.name || `${car.marca || 'Coche'} ${car.ref || ''}`.trim() || 'Coche Desconocido';
                     opt.value = carName;
                     opt.textContent = carName;
-                    // ELIMINADO: opt.dataset.image = car.image; para no saturar el HTML
+                    if(car.image) opt.dataset.image = car.image;
                     carSelect.appendChild(opt);
                 });
             }
@@ -5322,14 +5317,9 @@
             const iconEl = document.getElementById('config-car-icon');
             if(!carSelect || !imgEl || !iconEl) return;
             
-            const selectedOptValue = carSelect.value;
-            const car = garageCars.find(c => {
-                const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
-                return cName === selectedOptValue;
-            });
-            
-            if (car && car.image && car.image.length > 100) {
-                imgEl.src = car.image;
+            const selectedOpt = carSelect.options[carSelect.selectedIndex];
+            if (selectedOpt && selectedOpt.dataset.image) {
+                imgEl.src = selectedOpt.dataset.image;
                 imgEl.classList.remove('hidden');
                 iconEl.classList.add('hidden');
             } else {
@@ -5757,16 +5747,13 @@
         inputCamara.addEventListener('change', (e) => processAndCompressImage(e.target.files[0]));
 
         exportBtn.addEventListener('click', () => {
-            const jsonStr = JSON.stringify(garageCars, null, 2);
-            const blob = new Blob([jsonStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(garageCars, null, 2));
             const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", url);
-            downloadAnchorNode.setAttribute("download", `garage_krono_${Date.now()}.json`);
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "garage_rt_slot.json");
             document.body.appendChild(downloadAnchorNode);
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
-            URL.revokeObjectURL(url);
         });
 
         // --- SISTEMA DE IMPORTACIÓN INTELIGENTE ---
@@ -5845,50 +5832,7 @@
             const reader = new FileReader();
             reader.onload = async (event) => {
                 try {
-                    let importedData;
-                    let txt = event.target.result;
-                    
-                    try {
-                        importedData = JSON.parse(txt);
-                    } catch (parseError) {
-                        // ALGORITMO AVANZADO DE RESCATE PARA ARCHIVOS ROTOS
-                        console.warn("Intentando reparar JSON cortado (Avanzado)...");
-                        let lastBrace = txt.lastIndexOf('}');
-                        
-                        if (lastBrace !== -1) {
-                            // Cortamos el archivo justo en el último coche válido
-                            txt = txt.substring(0, lastBrace + 1);
-                            
-                            // Analizamos la estructura para saber qué corchetes/llaves faltan
-                            let stack = [];
-                            let inString = false;
-                            let escapeNext = false;
-                            
-                            for (let i = 0; i < txt.length; i++) {
-                                let c = txt[i];
-                                if (escapeNext) { escapeNext = false; continue; }
-                                if (c === '\\') { escapeNext = true; continue; }
-                                if (c === '"') { inString = !inString; continue; }
-                                if (!inString) {
-                                    if (c === '{' || c === '[') stack.push(c);
-                                    if (c === '}') { if (stack[stack.length-1] === '{') stack.pop(); }
-                                    if (c === ']') { if (stack[stack.length-1] === '[') stack.pop(); }
-                                }
-                            }
-                            
-                            // Cerramos la estructura en el orden perfecto
-                            while(stack.length > 0) {
-                                let openChar = stack.pop();
-                                if (openChar === '{') txt += '}';
-                                if (openChar === '[') txt += ']';
-                            }
-                            
-                            importedData = JSON.parse(txt);
-                            alert("¡RESCATE EXITOSO!\n\nEl archivo de hace 10 minutos estaba cortado físicamente por el navegador debido al peso de las fotos.\n\nHemos reparado el código y rescatado los coches intactos.");
-                        } else {
-                            throw new Error("El archivo está demasiado dañado y no tiene recuperación posible.");
-                        }
-                    }
+                    let importedData = JSON.parse(event.target.result);
                     
                     // Flexibilidad en el formato del JSON: forzar conversión a Array si viene como Objeto
                     if (!Array.isArray(importedData)) {
@@ -5908,10 +5852,8 @@
                     }
                     
                     const parsedCars = parseImportedCars(importedData);
-
-                    let action = confirm(`Se han detectado ${parsedCars.length} coches en el archivo.\n\n¿Quieres REEMPLAZAR tu garaje actual con estos coches?\n\n- Dale a "Aceptar" para borrar los actuales y poner los nuevos.\n- Dale a "Cancelar" para añadirlos a los que ya tienes.`) ? "replace" : "append";
-
-                    if (action === "replace") {
+                    
+                    if (confirm(`Se han detectado ${parsedCars.length} coches en el archivo.\n\n¿Quieres REEMPLAZAR tu garaje actual con estos coches?\n\n- Dale a "Aceptar" para borrar los actuales y poner los nuevos.\n- Dale a "Cancelar" para añadirlos a los que ya tienes.`)) {
                         garageCars = parsedCars;
                         // Forzar borrado completo en el DOM y LocalStorage para evitar lectura sucia
                         document.getElementById('car-model-input').value = "";
@@ -5926,15 +5868,11 @@
                         }
                     }
                     
-                    // Asegurar que las fotos importadas se guardan en IndexedDB (Con seguro anti-cuelgue)
-                    try {
-                        for (let car of parsedCars) {
-                            if (car.image && car.image.length > 100) {
-                                await saveImageToIDB(car.id, car.image);
-                            }
+                    // Asegurar que las fotos importadas se guardan en IndexedDB ANTES de guardar en el garaje
+                    for (let car of parsedCars) {
+                        if (car.image && car.image.length > 100) {
+                            await saveImageToIDB(car.id, car.image);
                         }
-                    } catch (idbError) {
-                        console.warn("Nota: Algunas imágenes pesadas no pudieron cachearse a tiempo, pero el coche está a salvo.", idbError);
                     }
                     
                     currentGarageIndex = 0;
