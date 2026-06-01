@@ -5057,6 +5057,86 @@
         let currentGarageIndex = 0;
         let isGarageEditing = false;
         
+        // --- SISTEMA INDEXEDDB PARA IMÁGENES ILIMITADAS ---
+        const IDB_NAME = "KronoGarageDB";
+        const IDB_STORE = "images";
+
+        function openKronoDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(IDB_NAME, 1);
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(IDB_STORE)) {
+                        db.createObjectStore(IDB_STORE);
+                    }
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function saveImageToIDB(id, base64) {
+            if (!id) return;
+            const db = await openKronoDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(IDB_STORE, 'readwrite');
+                tx.objectStore(IDB_STORE).put(base64, id);
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        async function getImageFromIDB(id) {
+            if (!id) return null;
+            const db = await openKronoDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(IDB_STORE, 'readonly');
+                const req = tx.objectStore(IDB_STORE).get(id);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function deleteImageFromIDB(id) {
+            if (!id) return;
+            const db = await openKronoDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(IDB_STORE, 'readwrite');
+                tx.objectStore(IDB_STORE).delete(id);
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        async function initIndexedDBImages() {
+            let migrated = false;
+            for (let car of garageCars) {
+                if (car.image && car.image.length > 100) {
+                    // Migración: Mover imagen antigua del LocalStorage al IndexedDB
+                    await saveImageToIDB(car.id, car.image);
+                    migrated = true;
+                } else {
+                    // Carga normal: Obtener imagen de IndexedDB a la memoria RAM
+                    const img = await getImageFromIDB(car.id);
+                    if (img) car.image = img;
+                }
+            }
+            
+            if (migrated) {
+                saveGarageToLocal(); // Esto ahora guardará sin imágenes, liberando los 5MB
+            }
+            
+            // Refrescar UI tras cargar las imágenes pesadas
+            if (typeof updateConfigCarList === 'function') updateConfigCarList();
+            const gModal = document.getElementById('garageModal');
+            if (gModal && !gModal.classList.contains('hidden')) {
+                renderGarageCar(currentGarageIndex);
+            }
+        }
+        
+        // Ejecutar carga de imágenes en segundo plano al abrir la App
+        initIndexedDBImages();
+
         // --- VARIABLES SISTEMA NUBE ---
         let cloudGarageId = localStorage.getItem('krono_cloud_id');
         if (!cloudGarageId) {
@@ -5098,8 +5178,16 @@
                     isSyncingFromCloud = true;
                     garageCars = data.cars || [];
                     
-                    // Guardar silenciosamente en local
-                    localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
+                    // Si la nube nos trae imágenes, las guardamos en IndexedDB
+                    garageCars.forEach(car => {
+                        if (car.image && car.image.length > 100) {
+                            saveImageToIDB(car.id, car.image);
+                        }
+                    });
+                    
+                    // Guardar silenciosamente en local (omitiendo la imagen para no colapsar los 5MB)
+                    const carsToSave = garageCars.map(c => { const cCopy = {...c}; delete cCopy.image; return cCopy; });
+                    localStorage.setItem('krono_garage_cars', JSON.stringify(carsToSave));
                     
                     // Si el garaje está abierto, refrescar la interfaz en vivo
                     if (!document.getElementById('garageModal').classList.contains('hidden')) {
@@ -5253,39 +5341,22 @@
 
         function saveGarageToLocal() {
             try {
-                let jsonStr = JSON.stringify(garageCars);
+                // Mapeamos para quitar la imagen pesada ANTES de guardar en el almacenamiento local limitado
+                const carsToSave = garageCars.map(car => {
+                    const c = { ...car };
+                    delete c.image; // Eliminamos la imagen del guardado local
+                    return c;
+                });
                 
-                // Prevención proactiva: Si el JSON es mayor de ~4.5MB, es casi seguro que fallará en móviles
-                if (jsonStr.length > 4500000) {
-                    alert("⚠️ El archivo de garaje es demasiado grande para la memoria del móvil.\n\nPara poder guardarlo sin que falle la app, se van a limpiar las fotos. Los datos, especificaciones y tiempos de los coches se mantendrán intactos.");
-                    
-                    garageCars.forEach(car => car.image = "");
-                    jsonStr = JSON.stringify(garageCars);
-                    
-                    // Actualizar UI para reflejar pérdida de foto
-                    if (typeof updateConfigCarList === 'function') updateConfigCarList();
-                    renderGarageCar(currentGarageIndex);
-                }
-                
-                localStorage.setItem('krono_garage_cars', jsonStr);
+                localStorage.setItem('krono_garage_cars', JSON.stringify(carsToSave));
                 
                 // --- DISPARAR GUARDADO EN LA NUBE AUTOMÁTICAMENTE ---
+                // (La nube sigue usando el garageCars en memoria, que sí tiene las fotos)
                 saveGarageToCloud();
                 
             } catch (e) {
                 console.error("Error saving garage:", e);
-                // Si falla por CUALQUIER otro error de cuota o límite en móviles
-                alert("⚠️ Límite de memoria del navegador superado.\n\nLimpiando fotos de los coches para intentar guardar los datos a la fuerza...");
-                
-                garageCars.forEach(car => car.image = "");
-                try {
-                    localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
-                    saveGarageToCloud(); // <-- Intentar nube sin fotos
-                    if (typeof updateConfigCarList === 'function') updateConfigCarList();
-                    renderGarageCar(currentGarageIndex);
-                } catch (e2) {
-                    alert("Error crítico: No se ha podido guardar el garaje. Revisa el espacio del dispositivo.");
-                }
+                alert("Error crítico: No se ha podido guardar el garaje.");
             }
         }
 
@@ -5571,6 +5642,9 @@
         deleteBtn.addEventListener('click', () => {
             if (garageCars.length === 0) return;
             if (confirm("¿Seguro que quieres eliminar este coche del garaje?")) {
+                const carId = garageCars[currentGarageIndex].id;
+                deleteImageFromIDB(carId); // Limpiar la foto de la base de datos
+                
                 garageCars.splice(currentGarageIndex, 1);
                 currentGarageIndex = Math.max(0, currentGarageIndex - 1);
                 saveGarageToLocal();
@@ -5636,9 +5710,15 @@
                     const base64Str = canvas.toDataURL('image/jpeg', 0.75);
                     
                     if(garageCars[currentGarageIndex]) {
-                        garageCars[currentGarageIndex].image = base64Str;
+                        const car = garageCars[currentGarageIndex];
+                        car.image = base64Str;
                         document.getElementById('garage-img').src = base64Str;
-                        saveGarageToLocal();
+                        
+                        // Guardar en la nueva base de datos ilimitada y luego en el Storage local
+                        saveImageToIDB(car.id, base64Str).then(() => {
+                            saveGarageToLocal();
+                        }).catch(e => console.error("Error saving image to IDB", e));
+                        
                         if (typeof updateConfigCarList === 'function') updateConfigCarList();
                     }
                 };
@@ -5771,6 +5851,13 @@
                             localStorage.removeItem('krono_car_model');
                         }
                     }
+                    
+                    // Asegurar que las fotos importadas se guardan en IndexedDB
+                    parsedCars.forEach(car => {
+                        if (car.image && car.image.length > 100) {
+                            saveImageToIDB(car.id, car.image);
+                        }
+                    });
                     
                     currentGarageIndex = 0;
                     
