@@ -5060,8 +5060,10 @@
         // --- SISTEMA INDEXEDDB PARA IMÁGENES ILIMITADAS ---
         const IDB_NAME = "KronoGarageDB";
         const IDB_STORE = "images";
+        let kronoDBInstance = null; // Caché de la base de datos para no saturar conexiones
 
         function openKronoDB() {
+            if (kronoDBInstance) return Promise.resolve(kronoDBInstance);
             return new Promise((resolve, reject) => {
                 const req = indexedDB.open(IDB_NAME, 1);
                 req.onupgradeneeded = (e) => {
@@ -5070,7 +5072,10 @@
                         db.createObjectStore(IDB_STORE);
                     }
                 };
-                req.onsuccess = () => resolve(req.result);
+                req.onsuccess = () => {
+                    kronoDBInstance = req.result;
+                    resolve(kronoDBInstance);
+                };
                 req.onerror = () => reject(req.error);
             });
         }
@@ -5154,8 +5159,8 @@
                 let payload = { cars: garageCars, updatedAt: Date.now() };
                 let jsonStr = JSON.stringify(payload);
                 
-                // Evitar error de cuota si hay demasiadas fotos (Límite Firestore: 1MB por documento)
-                if (jsonStr.length > 900000) { 
+                // Límite Ultra-Seguro (400KB) para evitar que Firestore rechace el documento y cause un Rollback que borre el garaje
+                if (jsonStr.length > 400000) { 
                     const lightCars = garageCars.map(c => ({...c, image: ""}));
                     payload = { cars: lightCars, updatedAt: Date.now(), warning: "fotos_omitidas" };
                 }
@@ -5177,6 +5182,14 @@
                     // Bloqueamos la subida temporalmente para que la descarga no se re-suba en bucle
                     isSyncingFromCloud = true;
                     const incomingCars = data.cars || [];
+                    
+                    // ESCUDO ANTI-ROLLBACK: Si la nube dice que hay 0 coches, pero tenemos coches en local,
+                    // ignoramos la nube para evitar perder datos por un error de Firebase.
+                    if (incomingCars.length === 0 && garageCars.length > 0) {
+                        console.warn("Escudo activado: La nube ha devuelto 0 coches. Se ignora para evitar borrado local.");
+                        setTimeout(() => { isSyncingFromCloud = false; }, 500);
+                        return;
+                    }
                     
                     // Si la nube nos trae imágenes, las guardamos en IndexedDB
                     // Si la nube omitió las fotos por tamaño, las recuperamos de la base de datos local para no perderlas
@@ -5895,8 +5908,10 @@
                     }
                     
                     const parsedCars = parseImportedCars(importedData);
-                    
-                    if (confirm(`Se han detectado ${parsedCars.length} coches en el archivo.\n\n¿Quieres REEMPLAZAR tu garaje actual con estos coches?\n\n- Dale a "Aceptar" para borrar los actuales y poner los nuevos.\n- Dale a "Cancelar" para añadirlos a los que ya tienes.`)) {
+
+                    let action = confirm(`Se han detectado ${parsedCars.length} coches en el archivo.\n\n¿Quieres REEMPLAZAR tu garaje actual con estos coches?\n\n- Dale a "Aceptar" para borrar los actuales y poner los nuevos.\n- Dale a "Cancelar" para añadirlos a los que ya tienes.`) ? "replace" : "append";
+
+                    if (action === "replace") {
                         garageCars = parsedCars;
                         // Forzar borrado completo en el DOM y LocalStorage para evitar lectura sucia
                         document.getElementById('car-model-input').value = "";
@@ -5911,11 +5926,15 @@
                         }
                     }
                     
-                    // Asegurar que las fotos importadas se guardan en IndexedDB ANTES de guardar en el garaje
-                    for (let car of parsedCars) {
-                        if (car.image && car.image.length > 100) {
-                            await saveImageToIDB(car.id, car.image);
+                    // Asegurar que las fotos importadas se guardan en IndexedDB (Con seguro anti-cuelgue)
+                    try {
+                        for (let car of parsedCars) {
+                            if (car.image && car.image.length > 100) {
+                                await saveImageToIDB(car.id, car.image);
+                            }
                         }
+                    } catch (idbError) {
+                        console.warn("Nota: Algunas imágenes pesadas no pudieron cachearse a tiempo, pero el coche está a salvo.", idbError);
                     }
                     
                     currentGarageIndex = 0;
