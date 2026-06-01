@@ -5079,10 +5079,26 @@
             if (!id) return;
             const db = await openKronoDB();
             return new Promise((resolve, reject) => {
-                const tx = db.transaction(IDB_STORE, 'readwrite');
-                tx.objectStore(IDB_STORE).put(base64, id);
-                tx.oncomplete = () => resolve();
-                tx.onerror = () => reject(tx.error);
+                try {
+                    const tx = db.transaction(IDB_STORE, 'readwrite');
+                    const store = tx.objectStore(IDB_STORE);
+                    
+                    // Manejo dinámico: soporta bases de datos antiguas (con in-line keys) o nuevas (out-of-line)
+                    if (store.keyPath) {
+                        const keyProp = typeof store.keyPath === 'string' ? store.keyPath : 'id';
+                        const obj = { data: base64 };
+                        obj[keyProp] = id;
+                        store.put(obj);
+                    } else {
+                        store.put(base64, id);
+                    }
+                    
+                    tx.oncomplete = () => resolve();
+                    tx.onerror = () => reject(tx.error);
+                } catch (err) {
+                    console.error("Error fatal en IDB Put:", err);
+                    reject(err);
+                }
             });
         }
 
@@ -5092,7 +5108,15 @@
             return new Promise((resolve, reject) => {
                 const tx = db.transaction(IDB_STORE, 'readonly');
                 const req = tx.objectStore(IDB_STORE).get(id);
-                req.onsuccess = () => resolve(req.result);
+                req.onsuccess = () => {
+                    const res = req.result;
+                    // Soportar tanto formato objeto (versiones con keyPath) como string base64 directo
+                    if (res && typeof res === 'object' && res.data) {
+                        resolve(res.data);
+                    } else {
+                        resolve(res);
+                    }
+                };
                 req.onerror = () => reject(req.error);
             });
         }
