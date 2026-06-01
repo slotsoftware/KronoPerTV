@@ -5170,20 +5170,28 @@
             if (unsubGarageCloud) unsubGarageCloud(); // Matar escucha anterior
             
             const docRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'cloud_garages', cloudGarageId);
-            unsubGarageCloud = window.fs.onSnapshot(docRef, (docSnap) => {
+            unsubGarageCloud = window.fs.onSnapshot(docRef, async (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
                     // Bloqueamos la subida temporalmente para que la descarga no se re-suba en bucle
                     isSyncingFromCloud = true;
-                    garageCars = data.cars || [];
+                    const incomingCars = data.cars || [];
                     
                     // Si la nube nos trae imágenes, las guardamos en IndexedDB
-                    garageCars.forEach(car => {
+                    // Si la nube omitió las fotos por tamaño, las recuperamos de la base de datos local para no perderlas
+                    for (let car of incomingCars) {
                         if (car.image && car.image.length > 100) {
-                            saveImageToIDB(car.id, car.image);
+                            await saveImageToIDB(car.id, car.image);
+                        } else {
+                            const localImg = await getImageFromIDB(car.id);
+                            if (localImg) {
+                                car.image = localImg;
+                            }
                         }
-                    });
+                    }
+                    
+                    garageCars = incomingCars;
                     
                     // Guardar silenciosamente en local (omitiendo la imagen para no colapsar los 5MB)
                     const carsToSave = garageCars.map(c => { const cCopy = {...c}; delete cCopy.image; return cCopy; });
@@ -5684,8 +5692,8 @@
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     // Resolución máxima para que encaje bien sin pesar megas
-                    const MAX_WIDTH = 800;
-                    const MAX_HEIGHT = 800;
+                    const MAX_WIDTH = 400;
+                    const MAX_HEIGHT = 400;
                     let width = img.width;
                     let height = img.height;
 
@@ -5706,8 +5714,8 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // Comprimir a JPEG con calidad 75%
-                    const base64Str = canvas.toDataURL('image/jpeg', 0.75);
+                    // Comprimir a JPEG con calidad 70% para no saturar la nube
+                    const base64Str = canvas.toDataURL('image/jpeg', 0.70);
                     
                     if(garageCars[currentGarageIndex]) {
                         const car = garageCars[currentGarageIndex];
@@ -5814,7 +5822,7 @@
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = (event) => {
+            reader.onload = async (event) => {
                 try {
                     let importedData = JSON.parse(event.target.result);
                     
@@ -5852,12 +5860,12 @@
                         }
                     }
                     
-                    // Asegurar que las fotos importadas se guardan en IndexedDB
-                    parsedCars.forEach(car => {
+                    // Asegurar que las fotos importadas se guardan en IndexedDB ANTES de guardar en el garaje
+                    for (let car of parsedCars) {
                         if (car.image && car.image.length > 100) {
-                            saveImageToIDB(car.id, car.image);
+                            await saveImageToIDB(car.id, car.image);
                         }
-                    });
+                    }
                     
                     currentGarageIndex = 0;
                     
