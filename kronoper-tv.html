@@ -5279,7 +5279,7 @@
                     const carName = car.name || `${car.marca || 'Coche'} ${car.ref || ''}`.trim() || 'Coche Desconocido';
                     opt.value = carName;
                     opt.textContent = carName;
-                    if(car.image) opt.dataset.image = car.image;
+                    // ELIMINADO: opt.dataset.image = car.image; para no saturar el HTML
                     carSelect.appendChild(opt);
                 });
             }
@@ -5309,9 +5309,14 @@
             const iconEl = document.getElementById('config-car-icon');
             if(!carSelect || !imgEl || !iconEl) return;
             
-            const selectedOpt = carSelect.options[carSelect.selectedIndex];
-            if (selectedOpt && selectedOpt.dataset.image) {
-                imgEl.src = selectedOpt.dataset.image;
+            const selectedOptValue = carSelect.value;
+            const car = garageCars.find(c => {
+                const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
+                return cName === selectedOptValue;
+            });
+            
+            if (car && car.image && car.image.length > 100) {
+                imgEl.src = car.image;
                 imgEl.classList.remove('hidden');
                 iconEl.classList.add('hidden');
             } else {
@@ -5739,13 +5744,16 @@
         inputCamara.addEventListener('change', (e) => processAndCompressImage(e.target.files[0]));
 
         exportBtn.addEventListener('click', () => {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(garageCars, null, 2));
+            const jsonStr = JSON.stringify(garageCars, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
             const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "garage_rt_slot.json");
+            downloadAnchorNode.setAttribute("href", url);
+            downloadAnchorNode.setAttribute("download", `garage_krono_${Date.now()}.json`);
             document.body.appendChild(downloadAnchorNode);
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
+            URL.revokeObjectURL(url);
         });
 
         // --- SISTEMA DE IMPORTACIÓN INTELIGENTE ---
@@ -5824,7 +5832,50 @@
             const reader = new FileReader();
             reader.onload = async (event) => {
                 try {
-                    let importedData = JSON.parse(event.target.result);
+                    let importedData;
+                    let txt = event.target.result;
+                    
+                    try {
+                        importedData = JSON.parse(txt);
+                    } catch (parseError) {
+                        // ALGORITMO AVANZADO DE RESCATE PARA ARCHIVOS ROTOS
+                        console.warn("Intentando reparar JSON cortado (Avanzado)...");
+                        let lastBrace = txt.lastIndexOf('}');
+                        
+                        if (lastBrace !== -1) {
+                            // Cortamos el archivo justo en el último coche válido
+                            txt = txt.substring(0, lastBrace + 1);
+                            
+                            // Analizamos la estructura para saber qué corchetes/llaves faltan
+                            let stack = [];
+                            let inString = false;
+                            let escapeNext = false;
+                            
+                            for (let i = 0; i < txt.length; i++) {
+                                let c = txt[i];
+                                if (escapeNext) { escapeNext = false; continue; }
+                                if (c === '\\') { escapeNext = true; continue; }
+                                if (c === '"') { inString = !inString; continue; }
+                                if (!inString) {
+                                    if (c === '{' || c === '[') stack.push(c);
+                                    if (c === '}') { if (stack[stack.length-1] === '{') stack.pop(); }
+                                    if (c === ']') { if (stack[stack.length-1] === '[') stack.pop(); }
+                                }
+                            }
+                            
+                            // Cerramos la estructura en el orden perfecto
+                            while(stack.length > 0) {
+                                let openChar = stack.pop();
+                                if (openChar === '{') txt += '}';
+                                if (openChar === '[') txt += ']';
+                            }
+                            
+                            importedData = JSON.parse(txt);
+                            alert("¡RESCATE EXITOSO!\n\nEl archivo de hace 10 minutos estaba cortado físicamente por el navegador debido al peso de las fotos.\n\nHemos reparado el código y rescatado los coches intactos.");
+                        } else {
+                            throw new Error("El archivo está demasiado dañado y no tiene recuperación posible.");
+                        }
+                    }
                     
                     // Flexibilidad en el formato del JSON: forzar conversión a Array si viene como Objeto
                     if (!Array.isArray(importedData)) {
