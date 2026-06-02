@@ -5060,8 +5060,10 @@
         // --- NUEVO SISTEMA DE ALMACENAMIENTO DE IMÁGENES (INDEXEDDB + FIRESTORE SEPARADO) ---
         const ImageDB = {
             db: null,
+            initPromise: null,
             init: function() {
-                return new Promise((resolve, reject) => {
+                if(this.initPromise) return this.initPromise;
+                this.initPromise = new Promise((resolve, reject) => {
                     const req = indexedDB.open("KronoGarageDB", 1);
                     req.onupgradeneeded = (e) => { 
                         if (!e.target.result.objectStoreNames.contains("images")) {
@@ -5071,8 +5073,10 @@
                     req.onsuccess = (e) => { this.db = e.target.result; resolve(); };
                     req.onerror = (e) => reject(e);
                 });
+                return this.initPromise;
             },
-            save: function(id, base64) {
+            save: async function(id, base64) {
+                await this.init();
                 if(!this.db) return;
                 // Soporte retrocompatible por si había bbdd antiguas
                 const tx = this.db.transaction("images", "readwrite");
@@ -5083,7 +5087,8 @@
                     store.put(base64, id);
                 }
             },
-            get: function(id) {
+            get: async function(id) {
+                await this.init();
                 return new Promise((resolve) => {
                     if(!this.db) return resolve(null);
                     const tx = this.db.transaction("images", "readonly");
@@ -5096,7 +5101,8 @@
                     req.onerror = () => resolve(null);
                 });
             },
-            delete: function(id) {
+            delete: async function(id) {
+                await this.init();
                 if(!this.db) return;
                 const tx = this.db.transaction("images", "readwrite");
                 tx.objectStore("images").delete(id);
@@ -5254,7 +5260,8 @@
                     const carName = car.name || `${car.marca || 'Coche'} ${car.ref || ''}`.trim() || 'Coche Desconocido';
                     opt.value = carName;
                     opt.textContent = carName;
-                    if(car.image) opt.dataset.image = car.image;
+                    if(car.image && car.image.length > 100) opt.dataset.image = car.image;
+                    else if(car.imageId) opt.dataset.imageId = car.imageId;
                     carSelect.appendChild(opt);
                 });
             }
@@ -5278,21 +5285,32 @@
             }
         };
 
-        window.updateConfigCarImage = function() {
+        window.updateConfigCarImage = async function() {
             const carSelect = document.getElementById('car-model-input');
             const imgEl = document.getElementById('config-car-img');
             const iconEl = document.getElementById('config-car-icon');
             if(!carSelect || !imgEl || !iconEl) return;
             
             const selectedOpt = carSelect.options[carSelect.selectedIndex];
-            if (selectedOpt && selectedOpt.dataset.image) {
-                imgEl.src = selectedOpt.dataset.image;
-                imgEl.classList.remove('hidden');
-                iconEl.classList.add('hidden');
-            } else {
-                imgEl.src = "";
-                imgEl.classList.add('hidden');
-                iconEl.classList.remove('hidden');
+            
+            // Estado por defecto (oculto) mientras carga
+            imgEl.src = "";
+            imgEl.classList.add('hidden');
+            iconEl.classList.remove('hidden');
+
+            if (selectedOpt) {
+                if (selectedOpt.dataset.image) {
+                    imgEl.src = selectedOpt.dataset.image;
+                    imgEl.classList.remove('hidden');
+                    iconEl.classList.add('hidden');
+                } else if (selectedOpt.dataset.imageId) {
+                    const base64 = await ImageDB.get(selectedOpt.dataset.imageId);
+                    if (base64) {
+                        imgEl.src = base64;
+                        imgEl.classList.remove('hidden');
+                        iconEl.classList.add('hidden');
+                    }
+                }
             }
         };
 
