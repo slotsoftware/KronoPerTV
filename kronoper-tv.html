@@ -3317,8 +3317,8 @@
                 const imgId = `personal-rank-img-${r.id}-${idx}`;
                 const fillPct = Math.max(5, (r.kronoRating / leaderRating) * 100);
                 
-                // Imagen por defecto si no tiene
-                const imgSrc = r.image ? r.image : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cfilter id='neonGlow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='1.5' result='blur' /%3E%3CfeMerge%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='SourceGraphic' /%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Crect width='100' height='100' fill='%23111827'/%3E%3Ctext x='50' y='54' font-family='Arial, sans-serif' font-size='10' font-weight='900' stroke='none' fill='%234b5563' text-anchor='middle' letter-spacing='1'%3ENO IMAGE%3C/text%3E%3C/svg%3E";
+                // Imagen por defecto si no tiene (soporta base64 incrustado para coches viejos)
+                let imgSrc = (r.image && r.image.length > 100) ? r.image : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cfilter id='neonGlow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='1.5' result='blur' /%3E%3CfeMerge%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='SourceGraphic' /%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Crect width='100' height='100' fill='%23111827'/%3E%3Ctext x='50' y='54' font-family='Arial, sans-serif' font-size='10' font-weight='900' stroke='none' fill='%234b5563' text-anchor='middle' letter-spacing='1'%3ENO IMAGE%3C/text%3E%3C/svg%3E";
 
                 let div = document.createElement('div');
                 div.className = `relative flex flex-col w-full rounded-2xl overflow-hidden bg-slate-900 border-2 ${borderColor} transition-all duration-300 group hover:-translate-y-1 ${glowClass}`;
@@ -3389,10 +3389,25 @@
                 `;
                 personalRankingBody.appendChild(div);
 
-                // --- Si usas almacenamiento avanzado local/IDB para imágenes, lo conservo (opcional) ---
-                // Nota: Por simplicidad, ya se asignó la imagen base64 arriba (r.image).
-                // El siguiente bloque solo es necesario si manejas las imágenes fuera de garageCars (ej. IDB)
-                // y las referencias como img_xxxx. Si usas base64 directo, se cargarán al instante.
+                // --- CARGAR IMAGEN DESDE INDEXEDDB O NUBE (NUEVO SISTEMA) ---
+                if (r.imageId) {
+                    ImageDB.get(r.imageId).then(base64 => {
+                        const imgEl = document.getElementById(imgId);
+                        if (imgEl) {
+                            if (base64) {
+                                imgEl.src = base64;
+                            } else {
+                                // Rescate desde la nube si no está en la caché local
+                                fetchImageFromCloud(r.imageId).then(cloudBase64 => {
+                                    if (cloudBase64) {
+                                        ImageDB.save(r.imageId, cloudBase64);
+                                        imgEl.src = cloudBase64;
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
             }
         }
 
@@ -5299,25 +5314,32 @@
             iconEl.classList.remove('hidden');
 
             if (selectedOpt) {
-                if (selectedOpt.dataset.image) {
+                // Caso 1: Imagen base64 antigua incrustada directamente
+                if (selectedOpt.dataset.image && selectedOpt.dataset.image.length > 100) {
                     imgEl.src = selectedOpt.dataset.image;
                     imgEl.classList.remove('hidden');
                     iconEl.classList.add('hidden');
-                } else if (selectedOpt.dataset.imageId) {
-                    let base64 = await ImageDB.get(selectedOpt.dataset.imageId);
-                    
-                    // Si no está localmente, lo bajamos de la nube y lo guardamos
-                    if (!base64) {
-                        base64 = await fetchImageFromCloud(selectedOpt.dataset.imageId);
-                        if (base64) {
-                            ImageDB.save(selectedOpt.dataset.imageId, base64);
+                } 
+                // Caso 2: Nuevo sistema con ImageID (IndexedDB / Cloud)
+                else if (selectedOpt.dataset.imageId) {
+                    try {
+                        let base64 = await ImageDB.get(selectedOpt.dataset.imageId);
+                        
+                        // Si no está localmente, lo bajamos de la nube y lo guardamos
+                        if (!base64 && !isTVMode) { 
+                            base64 = await fetchImageFromCloud(selectedOpt.dataset.imageId);
+                            if (base64) {
+                                await ImageDB.save(selectedOpt.dataset.imageId, base64);
+                            }
                         }
-                    }
-                    
-                    if (base64) {
-                        imgEl.src = base64;
-                        imgEl.classList.remove('hidden');
-                        iconEl.classList.add('hidden');
+                        
+                        if (base64) {
+                            imgEl.src = base64;
+                            imgEl.classList.remove('hidden');
+                            iconEl.classList.add('hidden');
+                        }
+                    } catch (error) {
+                        console.error("Error cargando preview config:", error);
                     }
                 }
             }
