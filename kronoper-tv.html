@@ -35,7 +35,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, setLogLevel, collection, addDoc, getDocs, doc, setDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, setLogLevel, collection, addDoc, getDocs, doc, setDoc, onSnapshot, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const appId = "app_krono";
         const firebaseConfig = {
@@ -79,7 +79,7 @@
                 
                 window.db = db;
                 window.auth = auth;
-                window.fs = { collection, addDoc, getDocs, doc, setDoc, onSnapshot, deleteDoc };
+                window.fs = { collection, addDoc, getDocs, doc, setDoc, onSnapshot, deleteDoc, getDoc };
             } catch (error) {
                 console.error("Error initializing Firebase:", error);
             }
@@ -5304,7 +5304,16 @@
                     imgEl.classList.remove('hidden');
                     iconEl.classList.add('hidden');
                 } else if (selectedOpt.dataset.imageId) {
-                    const base64 = await ImageDB.get(selectedOpt.dataset.imageId);
+                    let base64 = await ImageDB.get(selectedOpt.dataset.imageId);
+                    
+                    // Si no está localmente, lo bajamos de la nube y lo guardamos
+                    if (!base64) {
+                        base64 = await fetchImageFromCloud(selectedOpt.dataset.imageId);
+                        if (base64) {
+                            ImageDB.save(selectedOpt.dataset.imageId, base64);
+                        }
+                    }
+                    
                     if (base64) {
                         imgEl.src = base64;
                         imgEl.classList.remove('hidden');
