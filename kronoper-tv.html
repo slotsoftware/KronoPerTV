@@ -3346,7 +3346,7 @@
                     
                     <!-- Top: Image Area (Hero style for grid) -->
                     <div class="relative w-full h-40 sm:h-48 overflow-hidden shrink-0 border-b border-slate-700/50 bg-black flex items-center justify-center">
-                        <img id="${imgId}" src="${imgSrc}" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
+                        <img id="${imgId}" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
                         
                         <!-- Degradado inferior para legibilidad del texto superior -->
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent z-10 pointer-events-none"></div>
@@ -3406,6 +3406,12 @@
                     </div>
                 `;
                 personalRankingBody.appendChild(div);
+
+                // ASIGNAR SRC DESPUÉS DE INSERTAR EL NODO PARA PREVENIR FALLOS DE PARSEO DE INNERHTML EN MÓVILES
+                const imgElement = document.getElementById(imgId);
+                if (imgElement) {
+                    imgElement.src = imgSrc;
+                }
             }
         }
 
