@@ -23,7 +23,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, setLogLevel, collection, addDoc, getDocs, doc, setDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, setLogLevel, collection, addDoc, getDocs, doc, setDoc, onSnapshot, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const appId = "app_krono";
         const firebaseConfig = {
@@ -65,7 +65,7 @@
                 
                 window.db = db;
                 window.auth = auth;
-                window.fs = { collection, addDoc, getDocs, doc, setDoc, onSnapshot, deleteDoc };
+                window.fs = { collection, addDoc, getDocs, doc, setDoc, onSnapshot, deleteDoc, getDoc };
             } catch (error) {
                 console.error("Error initializing Firebase:", error);
             }
