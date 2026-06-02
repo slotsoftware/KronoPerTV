@@ -5057,109 +5057,72 @@
         let currentGarageIndex = 0;
         let isGarageEditing = false;
         
-        // --- SISTEMA INDEXEDDB PARA IMÁGENES ILIMITADAS ---
-        const IDB_NAME = "KronoGarageDB";
-        const IDB_STORE = "images";
-
-        function openKronoDB() {
-            return new Promise((resolve, reject) => {
-                const req = indexedDB.open(IDB_NAME, 1);
-                req.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains(IDB_STORE)) {
-                        db.createObjectStore(IDB_STORE);
-                    }
-                };
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
-            });
-        }
-
-        async function saveImageToIDB(id, base64) {
-            if (!id) return;
-            const db = await openKronoDB();
-            return new Promise((resolve, reject) => {
-                try {
-                    const tx = db.transaction(IDB_STORE, 'readwrite');
-                    const store = tx.objectStore(IDB_STORE);
-                    
-                    // Manejo dinámico: soporta bases de datos antiguas (con in-line keys) o nuevas (out-of-line)
-                    if (store.keyPath) {
-                        const keyProp = typeof store.keyPath === 'string' ? store.keyPath : 'id';
-                        const obj = { data: base64 };
-                        obj[keyProp] = id;
-                        store.put(obj);
-                    } else {
-                        store.put(base64, id);
-                    }
-                    
-                    tx.oncomplete = () => resolve();
-                    tx.onerror = () => reject(tx.error);
-                } catch (err) {
-                    console.error("Error fatal en IDB Put:", err);
-                    reject(err);
-                }
-            });
-        }
-
-        async function getImageFromIDB(id) {
-            if (!id) return null;
-            const db = await openKronoDB();
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(IDB_STORE, 'readonly');
-                const req = tx.objectStore(IDB_STORE).get(id);
-                req.onsuccess = () => {
-                    const res = req.result;
-                    // Soportar tanto formato objeto (versiones con keyPath) como string base64 directo
-                    if (res && typeof res === 'object' && res.data) {
-                        resolve(res.data);
-                    } else {
-                        resolve(res);
-                    }
-                };
-                req.onerror = () => reject(req.error);
-            });
-        }
-
-        async function deleteImageFromIDB(id) {
-            if (!id) return;
-            const db = await openKronoDB();
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(IDB_STORE, 'readwrite');
-                tx.objectStore(IDB_STORE).delete(id);
-                tx.oncomplete = () => resolve();
-                tx.onerror = () => reject(tx.error);
-            });
-        }
-
-        async function initIndexedDBImages() {
-            let migrated = false;
-            for (let car of garageCars) {
-                if (car.image && car.image.length > 100) {
-                    // Migración: Mover imagen antigua del LocalStorage al IndexedDB
-                    await saveImageToIDB(car.id, car.image);
-                    migrated = true;
+        // --- NUEVO SISTEMA DE ALMACENAMIENTO DE IMÁGENES (INDEXEDDB + FIRESTORE SEPARADO) ---
+        const ImageDB = {
+            db: null,
+            init: function() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open("KronoGarageDB", 1);
+                    req.onupgradeneeded = (e) => { 
+                        if (!e.target.result.objectStoreNames.contains("images")) {
+                            e.target.result.createObjectStore("images", { keyPath: "id" }); 
+                        }
+                    };
+                    req.onsuccess = (e) => { this.db = e.target.result; resolve(); };
+                    req.onerror = (e) => reject(e);
+                });
+            },
+            save: function(id, base64) {
+                if(!this.db) return;
+                // Soporte retrocompatible por si había bbdd antiguas
+                const tx = this.db.transaction("images", "readwrite");
+                const store = tx.objectStore("images");
+                if (store.keyPath) {
+                    store.put({ id: id, data: base64 });
                 } else {
-                    // Carga normal: Obtener imagen de IndexedDB a la memoria RAM
-                    const img = await getImageFromIDB(car.id);
-                    if (img) car.image = img;
+                    store.put(base64, id);
                 }
+            },
+            get: function(id) {
+                return new Promise((resolve) => {
+                    if(!this.db) return resolve(null);
+                    const tx = this.db.transaction("images", "readonly");
+                    const req = tx.objectStore("images").get(id);
+                    req.onsuccess = () => {
+                        const res = req.result;
+                        if (res && typeof res === 'object' && res.data) resolve(res.data);
+                        else resolve(res); 
+                    };
+                    req.onerror = () => resolve(null);
+                });
+            },
+            delete: function(id) {
+                if(!this.db) return;
+                const tx = this.db.transaction("images", "readwrite");
+                tx.objectStore("images").delete(id);
             }
-            
-            if (migrated) {
-                saveGarageToLocal(); // Esto ahora guardará sin imágenes, liberando los 5MB
-            }
-            
-            // Refrescar UI tras cargar las imágenes pesadas
-            if (typeof updateConfigCarList === 'function') updateConfigCarList();
-            const gModal = document.getElementById('garageModal');
-            if (gModal && !gModal.classList.contains('hidden')) {
-                renderGarageCar(currentGarageIndex);
-            }
+        };
+
+        async function syncImageToCloud(imgId, base64) {
+            if (!window.db || !window.fs) return;
+            try {
+                const docRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'cloud_garages_images', imgId);
+                await window.fs.setDoc(docRef, { data: base64, ts: Date.now() });
+            } catch(e) { console.error("Error subiendo imagen a la nube:", e); }
         }
-        
-        // Ejecutar carga de imágenes en segundo plano al abrir la App
-        initIndexedDBImages();
+
+        async function fetchImageFromCloud(imgId) {
+            if (!window.db || !window.fs) return null;
+            try {
+                const docRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'cloud_garages_images', imgId);
+                const snap = await window.fs.getDoc(docRef);
+                if (snap.exists()) return snap.data().data;
+            } catch(e) { console.error("Error bajando imagen de la nube:", e); }
+            return null;
+        }
+
+        // Iniciar base de datos local
+        ImageDB.init();
 
         // --- VARIABLES SISTEMA NUBE ---
         let cloudGarageId = localStorage.getItem('krono_cloud_id');
@@ -5175,13 +5138,19 @@
             if (!window.db || !window.fs || isSyncingFromCloud) return;
             try {
                 const docRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'cloud_garages', cloudGarageId);
-                let payload = { cars: garageCars, updatedAt: Date.now() };
+                let exportCars = JSON.parse(JSON.stringify(garageCars));
+                let payload = { cars: exportCars, updatedAt: Date.now() };
                 let jsonStr = JSON.stringify(payload);
                 
-                // Evitar error de cuota si hay demasiadas fotos (Límite Firestore: 1MB por documento)
+                // Limpieza solo de imágenes antiguas incrustadas, el nuevo sistema no las incluye
                 if (jsonStr.length > 900000) { 
-                    const lightCars = garageCars.map(c => ({...c, image: ""}));
-                    payload = { cars: lightCars, updatedAt: Date.now(), warning: "fotos_omitidas" };
+                    for (let i = 0; i < exportCars.length; i++) {
+                        if (exportCars[i].image) {
+                            exportCars[i].image = "";
+                            payload.warning = "fotos_antiguas_omitidas_nube";
+                            if (JSON.stringify(payload).length <= 900000) break;
+                        }
+                    }
                 }
                 await window.fs.setDoc(docRef, payload);
             } catch(e) {
@@ -5191,43 +5160,17 @@
 
         function listenToCloudGarage() {
             if (!window.db || !window.fs) return;
-            if (unsubGarageCloud) unsubGarageCloud(); // Matar escucha anterior
+            if (unsubGarageCloud) unsubGarageCloud(); 
             
             const docRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'cloud_garages', cloudGarageId);
             unsubGarageCloud = window.fs.onSnapshot(docRef, async (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     
-                    // Bloqueamos la subida temporalmente para que la descarga no se re-suba en bucle
                     isSyncingFromCloud = true;
-                    const incomingCars = data.cars || [];
+                    garageCars = data.cars || [];
                     
-                    // Si la nube nos trae imágenes, las guardamos en IndexedDB
-                    // Si la nube omitió las fotos por tamaño, las recuperamos de la base de datos local para no perderlas
-                    for (let car of incomingCars) {
-                        if (car.image && car.image.length > 100) {
-                            await saveImageToIDB(car.id, car.image);
-                        } else {
-                            // FALLBACK SEGURO RAM + IDB: Recupera de memoria viva al instante para evitar parpadeos
-                            const ramCar = garageCars.find(c => c.id === car.id);
-                            if (ramCar && ramCar.image && ramCar.image.length > 100) {
-                                car.image = ramCar.image;
-                                // Aseguramos el guardado en segundo plano por si el IndexedDB hubiera fallado
-                                saveImageToIDB(car.id, ramCar.image).catch(e => console.error(e));
-                            } else {
-                                const localImg = await getImageFromIDB(car.id);
-                                if (localImg) {
-                                    car.image = localImg;
-                                }
-                            }
-                        }
-                    }
-                    
-                    garageCars = incomingCars;
-                    
-                    // Guardar silenciosamente en local (omitiendo la imagen para no colapsar los 5MB)
-                    const carsToSave = garageCars.map(c => { const cCopy = {...c}; delete cCopy.image; return cCopy; });
-                    localStorage.setItem('krono_garage_cars', JSON.stringify(carsToSave));
+                    localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
                     
                     // Si el garaje está abierto, refrescar la interfaz en vivo
                     if (!document.getElementById('garageModal').classList.contains('hidden')) {
@@ -5364,7 +5307,7 @@
         function initGarage() {
             if (garageCars.length === 0) {
                 garageCars.push({
-                    id: "ID0187", name: "Seat 850 E - Rally Arrabassada 1972", image: "",
+                    id: "ID0187", name: "Seat 850 E - Rally Arrabassada 1972", image: "", imageId: "",
                     marca: "Scalextric", ref: "U10613S300", year: "1972", cat: "Rally", pilot: "Anton Guasch", copilot: "Sin Nombre", sys: "Analógico C. Advance",
                     motor: "Scalextric FR45", posicion: "In Line", pinon: "Scalextric Original Bronce 9z", corona: "Scalextric Original Plástico Blanco 27z",
                     relacion: "9:27", chasis: "Scalextric Original", guia: "Scalextric Original Presión suspensión...", trencillas: "Dobles",
@@ -5381,22 +5324,38 @@
 
         function saveGarageToLocal() {
             try {
-                // Mapeamos para quitar la imagen pesada ANTES de guardar en el almacenamiento local limitado
-                const carsToSave = garageCars.map(car => {
-                    const c = { ...car };
-                    delete c.image; // Eliminamos la imagen del guardado local
-                    return c;
-                });
+                let exportCars = JSON.parse(JSON.stringify(garageCars));
+                let jsonStr = JSON.stringify(exportCars);
                 
-                localStorage.setItem('krono_garage_cars', JSON.stringify(carsToSave));
+                // Límite de seguridad para LocalStorage
+                if (jsonStr.length > 4500000) {
+                    for(let i = 0; i < exportCars.length; i++) {
+                        if (exportCars[i].image) {
+                            exportCars[i].image = "";
+                            if (JSON.stringify(exportCars).length <= 4500000) break;
+                        }
+                    }
+                    jsonStr = JSON.stringify(exportCars);
+                    garageCars = exportCars; 
+                }
+                
+                localStorage.setItem('krono_garage_cars', jsonStr);
                 
                 // --- DISPARAR GUARDADO EN LA NUBE AUTOMÁTICAMENTE ---
-                // (La nube sigue usando el garageCars en memoria, que sí tiene las fotos)
                 saveGarageToCloud();
                 
             } catch (e) {
                 console.error("Error saving garage:", e);
-                alert("Error crítico: No se ha podido guardar el garaje.");
+                alert("⚠️ Error crítico de memoria. Liberando espacio de fotos antiguas...");
+                garageCars.forEach(car => car.image = "");
+                try {
+                    localStorage.setItem('krono_garage_cars', JSON.stringify(garageCars));
+                    saveGarageToCloud(); 
+                    if (typeof updateConfigCarList === 'function') updateConfigCarList();
+                    renderGarageCar(currentGarageIndex);
+                } catch (e2) {
+                    alert("Error crítico: No se ha podido guardar el garaje.");
+                }
             }
         }
 
@@ -5417,7 +5376,32 @@
             const car = garageCars[index];
             
             document.getElementById('garage-car-id').textContent = car.id || "ID---";
-            document.getElementById('garage-img').src = car.image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cfilter id='neonGlow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='1.5' result='blur' /%3E%3CfeMerge%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='SourceGraphic' /%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Ctext x='50' y='54' font-family='Arial, sans-serif' font-size='12' font-weight='900' stroke='none' fill='%2322d3ee' text-anchor='middle' letter-spacing='1' filter='url(%23neonGlow)'%3EPHOTO CAR%3C/text%3E%3C/svg%3E";
+            const defaultImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cfilter id='neonGlow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='1.5' result='blur' /%3E%3CfeMerge%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='SourceGraphic' /%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Ctext x='50' y='54' font-family='Arial, sans-serif' font-size='12' font-weight='900' stroke='none' fill='%2322d3ee' text-anchor='middle' letter-spacing='1' filter='url(%23neonGlow)'%3EPHOTO CAR%3C/text%3E%3C/svg%3E";
+            
+            const imgEl = document.getElementById('garage-img');
+            imgEl.src = ""; // Limpiar visualmente para cargar
+
+            if (car.imageId) {
+                ImageDB.get(car.imageId).then(base64 => {
+                    if (base64) {
+                        imgEl.src = base64;
+                    } else {
+                        // Rescate en la nube si no está en caché
+                        fetchImageFromCloud(car.imageId).then(cloudBase64 => {
+                            if (cloudBase64) {
+                                ImageDB.save(car.imageId, cloudBase64);
+                                imgEl.src = cloudBase64;
+                            } else {
+                                imgEl.src = defaultImg;
+                            }
+                        });
+                    }
+                });
+            } else if (car.image && car.image.length > 100) {
+                imgEl.src = car.image; // Mantiene compatibilidad con coches guardados antes de esta actualización
+            } else {
+                imgEl.src = defaultImg;
+            }
             
             document.getElementById('g-inp-name').value = car.name || "";
 
@@ -5513,9 +5497,6 @@
         async function openGarage() {
             // 1. Recargar los textos del localStorage
             garageCars = JSON.parse(localStorage.getItem('krono_garage_cars')) || [];
-            
-            // 2. CRÍTICO: ESPERAR a que las imágenes se carguen de la base de datos ANTES de abrir
-            await initIndexedDBImages();
             
             if (garageCars.length === 0) {
                 initGarage();
@@ -5686,8 +5667,8 @@
         deleteBtn.addEventListener('click', () => {
             if (garageCars.length === 0) return;
             if (confirm("¿Seguro que quieres eliminar este coche del garaje?")) {
-                const carId = garageCars[currentGarageIndex].id;
-                deleteImageFromIDB(carId); // Limpiar la foto de la base de datos
+                const carId = garageCars[currentGarageIndex].imageId || garageCars[currentGarageIndex].id;
+                ImageDB.delete(carId); // Limpiar la foto de la base de datos
                 
                 garageCars.splice(currentGarageIndex, 1);
                 currentGarageIndex = Math.max(0, currentGarageIndex - 1);
@@ -5719,7 +5700,7 @@
             if(isGarageEditing) inputCamara.click();
         });
 
-        // Compresión de imagen antes de guardar (previene exceder el límite de 5MB de LocalStorage)
+        // Compresión de imagen antes de guardar
         function processAndCompressImage(file) {
             if (!file) return;
             const reader = new FileReader();
@@ -5727,7 +5708,7 @@
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    // Resolución máxima para que encaje bien sin pesar megas
+                    // Resolución máxima
                     const MAX_WIDTH = 400;
                     const MAX_HEIGHT = 400;
                     let width = img.width;
@@ -5750,19 +5731,21 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // Comprimir a JPEG con calidad 70% para no saturar la nube
+                    // Comprimir a JPEG con calidad 70%
                     const base64Str = canvas.toDataURL('image/jpeg', 0.70);
                     
                     if(garageCars[currentGarageIndex]) {
                         const car = garageCars[currentGarageIndex];
-                        car.image = base64Str;
+                        const imgId = "img_" + (car.id || Date.now()) + "_" + Date.now();
+                        
+                        car.imageId = imgId; 
+                        car.image = ""; // Vaciamos el antiguo base64 para liberar el JSON
+                        
+                        ImageDB.save(imgId, base64Str);
                         document.getElementById('garage-img').src = base64Str;
                         
-                        // Guardar en la nueva base de datos ilimitada y luego en el Storage local
-                        saveImageToIDB(car.id, base64Str).then(() => {
-                            saveGarageToLocal();
-                        }).catch(e => console.error("Error saving image to IDB", e));
-                        
+                        saveGarageToLocal();
+                        syncImageToCloud(imgId, base64Str);
                         if (typeof updateConfigCarList === 'function') updateConfigCarList();
                     }
                 };
