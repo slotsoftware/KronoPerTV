@@ -5279,8 +5279,7 @@
                     const carName = car.name || `${car.marca || 'Coche'} ${car.ref || ''}`.trim() || 'Coche Desconocido';
                     opt.value = carName;
                     opt.textContent = carName;
-                    if(car.image && car.image.length > 100) opt.dataset.image = car.image;
-                    else if(car.imageId) opt.dataset.imageId = car.imageId;
+                    // FIX MÓVIL: Ya no guardamos la imagen en el dataset del option para evitar fallos de memoria en Safari
                     carSelect.appendChild(opt);
                 });
             }
@@ -5310,30 +5309,38 @@
             const iconEl = document.getElementById('config-car-icon');
             if(!carSelect || !imgEl || !iconEl) return;
             
-            const selectedOpt = carSelect.options[carSelect.selectedIndex];
+            const carName = carSelect.value;
             
             // Estado por defecto (oculto) mientras carga
             imgEl.src = "";
             imgEl.classList.add('hidden');
             iconEl.classList.remove('hidden');
 
-            if (selectedOpt) {
+            if (!carName) return;
+
+            // FIX MÓVIL: Buscamos el coche directamente en la memoria en lugar de leer el dataset del HTML
+            const car = garageCars.find(c => {
+                const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
+                return cName === carName;
+            });
+
+            if (car) {
                 // Caso 1: Imagen base64 antigua incrustada directamente
-                if (selectedOpt.dataset.image && selectedOpt.dataset.image.length > 100) {
-                    imgEl.src = selectedOpt.dataset.image;
+                if (car.image && car.image.length > 100) {
+                    imgEl.src = car.image;
                     imgEl.classList.remove('hidden');
                     iconEl.classList.add('hidden');
                 } 
                 // Caso 2: Nuevo sistema con ImageID (IndexedDB / Cloud)
-                else if (selectedOpt.dataset.imageId) {
+                else if (car.imageId) {
                     try {
-                        let base64 = await ImageDB.get(selectedOpt.dataset.imageId);
+                        let base64 = await ImageDB.get(car.imageId);
                         
                         // Si no está localmente, lo bajamos de la nube y lo guardamos
                         if (!base64 && !isTVMode) { 
-                            base64 = await fetchImageFromCloud(selectedOpt.dataset.imageId);
+                            base64 = await fetchImageFromCloud(car.imageId);
                             if (base64) {
-                                await ImageDB.save(selectedOpt.dataset.imageId, base64);
+                                await ImageDB.save(car.imageId, base64);
                             }
                         }
                         
