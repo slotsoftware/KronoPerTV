@@ -626,14 +626,14 @@
                     <label for="pilot-name-input" class="block text-xs font-bold text-gray-500 mb-1 uppercase" data-i18n="pilotName">Nombre del Piloto</label>
                     <input type="text" id="pilot-name-input" value="Racer 1" class="silver-input w-full p-2 rounded-md" />
                 </div>
-                <div>
-                    <label for="car-model-input" class="block text-xs font-bold text-gray-500 mb-1 uppercase" data-i18n="carModel">Modelo del Coche</label>
-                    <div class="flex items-center relative z-10">
-                        <select id="car-model-input" class="silver-input w-full p-2 rounded-md truncate pr-12"></select>
-                        <div class="absolute right-0 -top-2 transform translate-x-2 -translate-y-1/4 w-24 h-24 sm:w-32 sm:h-32 bg-white border-2 border-gray-300 rounded-lg overflow-hidden flex items-center justify-center shadow-2xl z-20 pointer-events-none">
-                            <img id="config-car-img" src="" class="w-full h-full object-cover hidden" alt="Coche">
-                            <svg id="config-car-icon" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-300"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+                <div class="bg-gray-50/50 p-3 rounded-xl border border-gray-200 shadow-inner">
+                    <label for="car-model-input" class="block text-xs font-bold text-gray-500 mb-3 uppercase text-center" data-i18n="carModel">Modelo del Coche</label>
+                    <div class="flex flex-col items-center gap-3">
+                        <div class="w-28 h-24 rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 border-4 border-white shadow-[0_4px_10px_rgba(0,0,0,0.15),inset_0_2px_5px_rgba(0,0,0,0.1)] shrink-0 flex items-center justify-center relative">
+                            <svg id="config-car-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+                            <img id="config-car-img" src="" class="absolute inset-0 w-full h-full object-contain p-1 hidden transition-opacity duration-300">
                         </div>
+                        <select id="car-model-input" class="silver-input w-full p-2 rounded-md truncate font-bold text-center text-sm shadow-sm"></select>
                     </div>
                 </div>
                 
@@ -747,11 +747,11 @@
                         <span class="text-[10px] font-bold uppercase tracking-wider font-rajdhani" data-i18n="leaderboard">Global</span>
                     </button>
 
-                    <button id="personal-ranking-btn" class="shrink-0 flex items-center text-indigo-300 hover:text-indigo-100 transition-all duration-300 px-3 py-1.5 rounded-lg bg-gradient-to-b from-indigo-900/60 to-indigo-950/80 hover:from-indigo-800/80 hover:to-indigo-900/90 border border-indigo-500/50 shadow-[0_0_10px_rgba(99,102,241,0.3)] hover:shadow-[0_0_15px_rgba(99,102,241,0.6)] group" title="Ranking Personal">
+                    <button id="personal-ranking-btn" class="shrink-0 flex items-center text-indigo-300 hover:text-indigo-100 transition-all duration-300 px-3 py-1.5 rounded-lg bg-gradient-to-b from-indigo-900/60 to-indigo-950/80 hover:from-indigo-800/80 hover:to-indigo-900/90 border border-indigo-500/50 shadow-[0_0_10px_rgba(99,102,241,0.3)] hover:shadow-[0_0_15px_rgba(99,102,241,0.6)] group" title="Rankings Garaje">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1 group-hover:-translate-y-0.5 transition-transform">
                             <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/>
                         </svg>
-                        <span class="text-[10px] font-bold uppercase tracking-wider font-rajdhani" data-i18n="personalRanking">Coches</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider font-rajdhani" data-i18n="personalRanking">Rankings Garaje</span>
                     </button>
 
                     <button id="direct-tv-btn" class="shrink-0 flex items-center text-cyan-300 hover:text-cyan-100 transition-all duration-300 px-3 py-1.5 rounded-lg bg-gradient-to-b from-cyan-900/60 to-cyan-950/80 hover:from-cyan-800/80 hover:to-cyan-900/90 border border-cyan-500/50 shadow-[0_0_10px_rgba(34,211,238,0.3)] hover:shadow-[0_0_15px_rgba(34,211,238,0.6)] group relative overflow-hidden" title="Cambiar a Dashboard TV">
@@ -1330,13 +1330,17 @@
                         <div class="absolute inset-0 bg-gradient-to-t from-cyan-900/30 via-transparent to-transparent pointer-events-none"></div>
                         <img id="garage-img" src="" alt="Coche" class="absolute inset-0 w-full h-full object-contain z-0">
                         <div id="garage-img-overlay" class="absolute inset-0 bg-black/80 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity hidden z-10 gap-3 backdrop-blur-sm">
-                            <button id="btn-galeria" class="text-cyan-300 text-[11px] font-bold uppercase tracking-widest border border-cyan-400 px-4 py-2 rounded flex items-center hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_20px_rgba(34,211,238,0.8)] transition-all">
+                            <button id="btn-galeria" class="text-cyan-300 text-[11px] font-bold uppercase tracking-widest border border-cyan-400 px-4 py-2 rounded flex items-center hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_20px_rgba(34,211,238,0.8)] transition-all w-36 justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
                                 Galería
                             </button>
-                            <button id="btn-camara" class="text-cyan-300 text-[11px] font-bold uppercase tracking-widest border border-cyan-400 px-4 py-2 rounded flex items-center hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_20px_rgba(34,211,238,0.8)] transition-all">
+                            <button id="btn-camara" class="text-cyan-300 text-[11px] font-bold uppercase tracking-widest border border-cyan-400 px-4 py-2 rounded flex items-center hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_20px_rgba(34,211,238,0.8)] transition-all w-36 justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
                                 Cámara
+                            </button>
+                            <button id="btn-buscar-web" class="text-yellow-300 text-[11px] font-bold uppercase tracking-widest border border-yellow-400 px-4 py-2 rounded flex items-center hover:bg-yellow-400 hover:text-black hover:shadow-[0_0_20px_rgba(250,204,21,0.8)] transition-all w-36 justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                                Buscar Web
                             </button>
                             <input type="file" id="garage-img-input-galeria" accept="image/jpeg, image/png, image/webp" class="hidden">
                             <input type="file" id="garage-img-input-camara" accept="image/jpeg, image/png, image/webp" capture="environment" class="hidden">
@@ -1726,20 +1730,24 @@
                     <h3 class="text-xl sm:text-2xl font-black font-rajdhani text-slate-100 tracking-[0.2em] opacity-90" data-i18n="personalRanking">RANKING PERSONAL</h3>
                 </div>
                 <div class="flex items-center space-x-3 sm:space-x-4">
+                    <button id="clear-personal-ranking-btn" class="text-[10px] font-bold text-red-400 border border-red-800/50 bg-red-900/20 px-2 py-1 rounded hover:bg-red-800/40 transition flex items-center shadow-md" title="Borrar tiempos de todos los coches">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        <span class="hidden sm:inline uppercase tracking-widest">Reset Tiempos</span>
+                    </button>
                     <button id="close-personal-ranking-btn" class="text-slate-500 hover:text-white font-black text-2xl transition-colors px-2">X</button>
                 </div>
             </div>
             
             <div class="w-full h-[75vh] sm:h-[80vh] worn-asphalt-bg overflow-y-auto tv-scrollbar p-4 sm:p-6 relative scroll-smooth">
                 
-                <div class="mb-6 bg-slate-800/80 border border-indigo-500/30 rounded-xl p-4 sm:p-5 shadow-[0_0_20px_rgba(99,102,241,0.1)] relative overflow-hidden">
-                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                    <h4 class="text-indigo-400 font-rajdhani font-black text-lg sm:text-xl uppercase tracking-widest flex items-center mb-2 relative z-10 drop-shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 animate-pulse"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
-                        Parrilla de Salida: Rendimiento de tu Garaje
+                <div class="mb-6 bg-slate-800/80 border border-emerald-500/30 rounded-xl p-4 sm:p-5 shadow-[0_0_20px_rgba(16,185,129,0.1)] relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <h4 class="text-emerald-400 font-rajdhani font-black text-lg sm:text-xl uppercase tracking-widest flex items-center mb-2 relative z-10 drop-shadow-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2 animate-pulse"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Parrilla de Salida: Los Más Rápidos
                     </h4>
                     <p class="text-slate-300 text-xs sm:text-sm leading-relaxed relative z-10 font-medium">
-                        Compara objetivamente todos los coches de tu garaje local entre sí. El algoritmo <strong class="text-indigo-300 font-bold drop-shadow-[0_0_5px_rgba(99,102,241,0.5)]">Krono Index</strong> evalúa cuál es tu coche más dominante basándose en su capacidad de generar <strong class="text-white">Velocidad Punta a Escala</strong> y lo noble que es de conducir midiendo la <strong class="text-white">Consistencia</strong> que logras con él.
+                        Compara objetivamente todos los coches de tu garaje local entre sí. Clasificación oficial ordenada por el <strong class="text-emerald-300 font-bold drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]">Tiempo de la Mejor Vuelta</strong>. Descubre qué bólido es el rey absoluto de la pista.
                     </p>
                 </div>
 
@@ -1803,7 +1811,7 @@
                 tvStatusWaiting: "ESPERANDO...", tvStatusUplink: "ESTABLECIENDO UPLINK...",
                 tvStatusSearching: "BUSCANDO SEÑAL DE TELEMETRÍA",
                 tvStatusRoomClosed: "SALA INACTIVA O CERRADA", tvStatusError: "ERROR DE CONEXIÓN", clearRanking: "Borrar Ranking",
-                personalRanking: "P. Ranking"
+                personalRanking: "Rankings Garaje"
             },
             en: {
                 langLabel: "Language / Idioma", history: "History", tvMode: "TV", tvSetupTitle: "Connect TV Screen",
@@ -1831,9 +1839,9 @@
                 liveHistory: "Live History", lapShort: "L", directTv: "TV Telemetry", hideConfig: "HIDE CONFIGURATION",
                 tvStatusYellowFlag: "YELLOW FLAG (PAUSED)", tvStatusFalseStart: "FALSE START", tvStatusReady: "GET READY...",
                 tvStatusRacing: "RACE IN PROGRESS", tvStatusFinished: "RACE FINISHED", tvStatusLinkActive: "LINK ACTIVE. WAITING FOR CAR...",
-                tvStatusWaiting: "WAITING...", tvStatusUplink: "ESTABLISHING UPLINK...", tvStatusSearching: "SEARCHING FOR TELEMETRY SIGNAL",
+                tvStatusSearching: "SEARCHING FOR TELEMETRY SIGNAL",
                 tvStatusRoomClosed: "INACTIVE OR CLOSED ROOM", tvStatusError: "CONNECTION ERROR", clearRanking: "Clear Ranking",
-                personalRanking: "Personal Ranking"
+                personalRanking: "Garage Rankings"
             },
             fr: {
                 langLabel: "Langue / Language", history: "Historique", tvMode: "TV", tvSetupTitle: "Connecter Écran TV",
@@ -1861,9 +1869,9 @@
                 liveHistory: "Historique en Direct", lapShort: "T", directTv: "Télémétrie TV", hideConfig: "MASQUER LA CONFIGURATION",
                 tvStatusYellowFlag: "DRAPEAU JAUNE (PAUSE)", tvStatusFalseStart: "FAUX DÉPART", tvStatusReady: "PRÊT...",
                 tvStatusRacing: "COURSE EN COURS", tvStatusFinished: "COURSE TERMINÉE", tvStatusLinkActive: "LIEN ACTIF. EN ATTENTE DE VOITURE...",
-                tvStatusWaiting: "EN ATTENTE...", tvStatusUplink: "ÉTABLISSEMENT DU LIEN...", tvStatusSearching: "RECHERCHE DU SIGNAL DE TÉLÉMÉTRIE",
+                tvStatusSearching: "RECHERCHE DU SIGNAL DE TÉLÉMÉTRIE",
                 tvStatusRoomClosed: "SALLE INACTIVE OU FERMÉE", tvStatusError: "ERREUR DE CONNEXION", clearRanking: "Effacer Classement",
-                personalRanking: "Clas. Personnel"
+                personalRanking: "Classement Garage"
             }
         };
 
@@ -1956,6 +1964,7 @@
         const personalRankingModal = document.getElementById('personalRankingModal');
         const closePersonalRankingBtn = document.getElementById('close-personal-ranking-btn');
         const personalRankingBody = document.getElementById('personal-ranking-body');
+        const clearPersonalRankingBtn = document.getElementById('clear-personal-ranking-btn');
 
         // --- TV SETUP MODAL ---
         const tvSetupModal = document.getElementById('tvSetupModal');
@@ -3047,7 +3056,7 @@
         async function loadPersonalLeaderboard() {
             let records = [];
             
-            garageCars.forEach(car => {
+            garageCars.forEach((car, index) => {
                 if (car.bestLap && car.bestLap !== "-" && car.bestLap !== "") {
                     const timeStr = typeof car.bestLap === 'string' ? car.bestLap.replace('s', '') : car.bestLap;
                     const bestLapSecs = parseFloat(timeStr);
@@ -3056,11 +3065,6 @@
                         const avgSpdNum = parseFloat(car.avgSpd) || 0;
                         const consNum = parseFloat(car.consistency) || 0;
                         const scaleSpd = avgSpdNum * 32;
-                        
-                        const trackLen = 15; 
-                        const lengthBonus = 15 * 5; 
-                        
-                        const kronoRating = Math.round((scaleSpd * 2.5) + (consNum * 15) + lengthBonus);
 
                         records.push({
                             ...car,
@@ -3068,13 +3072,14 @@
                             avgSpeedNum: avgSpdNum,
                             scaleSpeed: scaleSpd,
                             consistencyNum: consNum,
-                            kronoRating: kronoRating
+                            originalIndex: index
                         });
                     }
                 }
             });
 
-            records.sort((a, b) => b.kronoRating - a.kronoRating);
+            // Ordenamos del MÁS RÁPIDO al MÁS LENTO por Mejor Vuelta
+            records.sort((a, b) => a.bestLapMs - b.bestLapMs);
 
             personalRankingBody.innerHTML = ''; 
 
@@ -3083,7 +3088,7 @@
                  return;
             }
 
-            const leaderRating = records[0].kronoRating;
+            const leaderTime = records[0].bestLapMs;
 
             for (let idx = 0; idx < records.length; idx++) {
                 const r = records[idx];
@@ -3100,31 +3105,36 @@
                     borderColor = 'border-yellow-500 hover:border-yellow-300';
                     highlightColor = 'text-yellow-400 drop-shadow-[0_0_10px_rgba(234,179,8,0.6)]';
                     glowClass = 'shadow-[0_0_20px_rgba(234,179,8,0.2)]';
-                    fillGradient = "from-yellow-400 to-amber-600";
+                    fillGradient = "from-emerald-500 to-emerald-700";
                     rankBadge = `<div class="absolute -top-3 -right-3 text-4xl sm:text-5xl drop-shadow-xl z-30 transform rotate-12 group-hover:rotate-0 transition-transform">🏆</div>`;
                 } else if (idx === 1) {
                     posColor = 'text-slate-300 drop-shadow-[0_0_15px_rgba(203,213,225,0.8)]';
                     borderColor = 'border-slate-400 hover:border-slate-200';
                     highlightColor = 'text-slate-300 drop-shadow-[0_0_10px_rgba(203,213,225,0.6)]';
                     glowClass = 'shadow-[0_0_15px_rgba(203,213,225,0.1)]';
-                    fillGradient = "from-slate-300 to-slate-400";
+                    fillGradient = "from-emerald-600 to-emerald-800";
                     rankBadge = `<div class="absolute -top-2 -right-2 text-3xl sm:text-4xl drop-shadow-xl z-30 transform rotate-12 group-hover:rotate-0 transition-transform">🥈</div>`;
                 } else if (idx === 2) {
                     posColor = 'text-amber-600 drop-shadow-[0_0_15px_rgba(217,119,6,0.8)]';
                     borderColor = 'border-amber-700 hover:border-amber-500';
                     highlightColor = 'text-amber-500 drop-shadow-[0_0_10px_rgba(217,119,6,0.6)]';
                     glowClass = 'shadow-[0_0_15px_rgba(217,119,6,0.1)]';
-                    fillGradient = "from-amber-600 to-orange-700";
+                    fillGradient = "from-emerald-700 to-emerald-900";
                     rankBadge = `<div class="absolute -top-2 -right-2 text-3xl sm:text-4xl drop-shadow-xl z-30 transform rotate-12 group-hover:rotate-0 transition-transform">🥉</div>`;
                 } else {
-                    fillGradient = "from-indigo-900 to-indigo-700";
+                    fillGradient = "from-slate-700 to-slate-900";
                 }
 
                 const carDisplayName = r.name || `${r.marca} ${r.ref}`.trim() || 'Coche Desconocido';
                 const imgId = `personal-rank-img-${r.id}-${idx}`;
-                const fillPct = Math.max(5, (r.kronoRating / leaderRating) * 100);
+                
+                // Barra de llenado en función del tiempo del líder (menor = mejor)
+                const fillPct = Math.max(5, (leaderTime / r.bestLapMs) * 100);
                 
                 const defaultImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3Cfilter id='neonGlow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='1.5' result='blur' /%3E%3CfeMerge%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='blur' /%3E%3CfeMergeNode in='SourceGraphic' /%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Crect width='100' height='100' fill='%23111827'/%3E%3Ctext x='50' y='54' font-family='Arial, sans-serif' font-size='10' font-weight='900' stroke='none' fill='%234b5563' text-anchor='middle' letter-spacing='1'%3ENO IMAGE%3C/text%3E%3C/svg%3E";
+
+                const timeFormatted = formatTime(r.bestLapMs, true);
+                const deltaStr = idx === 0 ? "0.000" : "+" + formatDeltaTime(r.bestLapMs - leaderTime);
 
                 let div = document.createElement('div');
                 div.className = `relative flex flex-col w-full rounded-2xl overflow-hidden bg-slate-900 border-2 ${borderColor} transition-all duration-300 group hover:-translate-y-1 ${glowClass}`;
@@ -3132,6 +3142,11 @@
                 div.innerHTML = `
                     ${rankBadge}
                     
+                    <button class="btn-buscar-web-ranking absolute top-2 right-2 z-40 bg-yellow-500/90 hover:bg-yellow-400 text-black text-[10px] font-black px-2 py-1.5 rounded shadow-[0_0_15px_rgba(250,204,21,0.6)] uppercase tracking-widest flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity border border-yellow-300" data-original-index="${r.originalIndex}" data-display-index="${idx}" title="Buscar foto en Google">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        WEB
+                    </button>
+
                     <div class="relative w-full h-40 sm:h-48 overflow-hidden shrink-0 border-b border-slate-700/50 bg-black flex items-center justify-center">
                         <img id="${imgId}" src="${defaultImg}" class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500">
                         
@@ -3146,7 +3161,7 @@
                         <div class="absolute bottom-0 left-0 h-1 bg-gradient-to-r ${fillGradient} opacity-70 group-hover:opacity-100 transition-opacity z-0" style="width: ${fillPct}%"></div>
 
                         <div class="flex flex-col gap-1 relative z-10 mb-3">
-                            <span class="text-white font-black font-rajdhani text-lg sm:text-xl tracking-wide drop-shadow-md line-clamp-2 leading-tight group-hover:text-indigo-200 transition-colors">
+                            <span class="text-white font-black font-rajdhani text-lg sm:text-xl tracking-wide drop-shadow-md line-clamp-2 leading-tight group-hover:text-emerald-200 transition-colors">
                                 ${carDisplayName}
                             </span>
                             <span class="text-slate-400 font-bold font-rajdhani text-xs uppercase tracking-widest flex items-center gap-1.5 mt-1">
@@ -3157,32 +3172,44 @@
 
                         <div class="grid grid-cols-2 gap-2 mt-auto relative z-10">
                             <div class="bg-slate-950/80 p-2 rounded-lg border border-slate-800/50 flex flex-col items-center text-center">
-                                <span class="text-emerald-500/70 text-[9px] uppercase font-black tracking-widest mb-0.5 flex items-center">
-                                    <svg class="w-2.5 h-2.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 6 12 12 16 14"/><circle cx="12" cy="12" r="10"/></svg>
-                                    V. Rápida
+                                <span class="text-cyan-500/70 text-[9px] uppercase font-black tracking-widest mb-0.5 flex items-center">
+                                    <svg class="w-2.5 h-2.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                    Vel. Media
                                 </span>
-                                <span class="text-emerald-400 font-bold text-sm drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">${formatTime(r.bestLapMs, true)}</span>
+                                <span class="text-cyan-400 font-bold text-sm drop-shadow-[0_0_5px_rgba(34,211,238,0.3)]">${r.avgSpeedNum.toFixed(1)} km/h</span>
                             </div>
                             <div class="bg-slate-950/80 p-2 rounded-lg border border-slate-800/50 flex flex-col items-center text-center">
                                 <span class="text-blue-500/70 text-[9px] uppercase font-black tracking-widest mb-0.5 flex items-center">
-                                    <svg class="w-2.5 h-2.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                                    <svg class="w-2.5 h-2.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                                     Constancia
                                 </span>
                                 <span class="text-blue-400 font-bold text-sm drop-shadow-[0_0_5px_rgba(59,130,246,0.3)]">${r.consistencyNum.toFixed(1)}%</span>
                             </div>
                         </div>
 
-                        <div class="mt-3 pt-2 border-t border-slate-800 flex justify-between items-end relative z-10">
+                        <div class="mt-3 pt-2 border-t border-slate-800 flex justify-between items-end relative z-10 sm:hidden">
                             <div class="flex flex-col">
-                                <span class="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Escala 1:32</span>
-                                <span class="text-slate-300 font-bold text-xs">${r.scaleSpeed.toFixed(1)} km/h</span>
+                                <span class="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Diferencia</span>
+                                <span class="text-slate-300 font-bold text-xs">${idx === 0 ? '-' : deltaStr}</span>
                             </div>
                             <div class="flex flex-col items-end">
-                                <span class="text-[9px] font-black uppercase tracking-[0.2em] text-indigo-500/80 mb-0.5">Krono Index</span>
-                                <span class="text-2xl sm:text-3xl font-black font-rajdhani ${highlightColor} leading-none tracking-tighter">
-                                    ${r.kronoRating}
+                                <span class="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-500/80 mb-0.5">Mejor Vuelta</span>
+                                <span class="text-2xl font-black font-rajdhani ${highlightColor} leading-none tracking-tighter">
+                                    ${timeFormatted}
                                 </span>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="hidden sm:flex absolute bottom-3 right-3 flex-col items-end justify-center shrink-0 min-w-[140px] bg-slate-950/90 p-3 sm:p-4 rounded-xl border border-slate-700 shadow-[inset_0_0_15px_rgba(0,0,0,0.8)] z-30 group-hover:border-emerald-500/50 transition-colors">
+                        <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500 mb-0.5 opacity-80">Mejor Vuelta</span>
+                        <span class="text-3xl md:text-4xl font-black font-rajdhani ${highlightColor} leading-none tracking-tighter">
+                            ${timeFormatted}
+                        </span>
+                        <div class="mt-1.5 pt-1.5 border-t border-slate-700/50 w-full text-right">
+                            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                                Δ ${idx === 0 ? '-' : deltaStr}
+                            </span>
                         </div>
                     </div>
                 `;
@@ -3204,6 +3231,35 @@
                     }
                 }, 10);
             }
+
+            // Añadir eventos a los botones de búsqueda web del ranking
+            document.querySelectorAll('.btn-buscar-web-ranking').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const origIndex = btn.getAttribute('data-original-index');
+                    const displayIndex = btn.getAttribute('data-display-index');
+                    const car = garageCars[origIndex];
+                    if (!car) return;
+                    
+                    const query = encodeURIComponent(`${car.marca || ''} ${car.name || car.ref || ''} slot car 1 32`.trim());
+                    window.open(`https://www.google.com/search?tbm=isch&q=${query}`, '_blank');
+                    
+                    setTimeout(() => {
+                        const url = prompt("1. Copia la dirección (URL) de la imagen en Google.\n2. Pégala aquí abajo:");
+                        if (url && url.startsWith('http')) {
+                            car.imageId = ""; 
+                            car.image = url;
+                            const imgEl = document.getElementById(`personal-rank-img-${car.id}-${displayIndex}`);
+                            if(imgEl) imgEl.src = url;
+                            saveGarageToLocal();
+                            if (typeof updateConfigCarList === 'function') updateConfigCarList();
+                            if (currentGarageIndex == origIndex) {
+                                document.getElementById('garage-img').src = url;
+                            }
+                        }
+                    }, 500);
+                });
+            });
         }
 
         function updateTexts() {
@@ -3402,6 +3458,27 @@
                 closePersonalRankingBtn.addEventListener('click', () => {
                     personalRankingModal.classList.remove('open');
                     setTimeout(()=>personalRankingModal.classList.add('hidden'), 300);
+                });
+            }
+            if (clearPersonalRankingBtn) {
+                clearPersonalRankingBtn.addEventListener('click', () => {
+                    if (confirm("¿Seguro que quieres resetear los tiempos de todos los coches de tu garaje? (No se borrarán los coches, solo las estadísticas de pista)")) {
+                        garageCars.forEach(car => {
+                            car.bestLap = "-";
+                            car.totalTime = "0h 0m 0s";
+                            car.totalDist = "0.000 km";
+                            car.avgSpd = "0.0 km/h";
+                            car.avgSpd32 = "0.0 km/h";
+                            car.consistency = "0";
+                            car._rawTotalTime = 0;
+                            car._rawTotalDist = 0;
+                        });
+                        saveGarageToLocal();
+                        loadPersonalLeaderboard();
+                        if (!document.getElementById('garageModal').classList.contains('hidden')) {
+                            renderGarageCar(currentGarageIndex);
+                        }
+                    }
                 });
             }
 
@@ -4974,39 +5051,54 @@
             const carSelect = document.getElementById('car-model-input');
             const imgEl = document.getElementById('config-car-img');
             const iconEl = document.getElementById('config-car-icon');
+            
             if(!carSelect || !imgEl || !iconEl) return;
             
-            const selectedOpt = carSelect.options[carSelect.selectedIndex];
-            const currentSelectionVal = carSelect.value; // GUARDIA: Guardamos el valor actual
+            const selectedCarName = carSelect.value;
+            if (!selectedCarName) {
+                imgEl.src = "";
+                imgEl.classList.add('hidden');
+                iconEl.classList.remove('hidden');
+                return;
+            }
+
+            // Buscar el coche directamente en la base de datos de coches (garageCars)
+            const car = garageCars.find(c => {
+                const cName = c.name || `${c.marca || 'Coche'} ${c.ref || ''}`.trim() || 'Coche Desconocido';
+                return cName === selectedCarName;
+            });
             
-            if (selectedOpt) {
-                let imgId = selectedOpt.dataset.imageId;
-                let imgSrc = selectedOpt.dataset.image;
-
-                if (imgId) {
-                    let base64 = await ImageDB.get(imgId);
+            if (car) {
+                if (car.imageId) {
+                    // Buscar en IndexedDB
+                    let base64 = await ImageDB.get(car.imageId);
                     
-                    // GUARDIA: Si tras la espera asíncrona el usuario ya cambió de coche, cancelamos.
-                    if (carSelect.value !== currentSelectionVal) return; 
+                    // GUARDIA: Si mientras cargaba el usuario cambió de coche, abortamos
+                    if (carSelect.value !== selectedCarName) return; 
 
-                    if (!base64) {
-                        base64 = await fetchImageFromCloud(imgId);
-                        if (carSelect.value !== currentSelectionVal) return; // GUARDIA NUBE
-                        if (base64) ImageDB.save(imgId, base64);
+                    // Buscar en la Nube si no está en local
+                    if (!base64 && typeof fetchImageFromCloud === 'function') {
+                        base64 = await fetchImageFromCloud(car.imageId);
+                        if (carSelect.value !== selectedCarName) return; // GUARDIA NUBE
+                        if (base64) ImageDB.save(car.imageId, base64);
                     }
+
                     if (base64) {
                         imgEl.src = base64;
                         imgEl.classList.remove('hidden');
                         iconEl.classList.add('hidden');
                         return;
                     }
-                } else if (imgSrc && imgSrc.length > 100) {
-                    imgEl.src = imgSrc;
+                } else if (car.image && car.image.length > 100) {
+                    // Carga por base64 directa antigua
+                    imgEl.src = car.image;
                     imgEl.classList.remove('hidden');
                     iconEl.classList.add('hidden');
                     return;
                 }
             }
+            
+            // Si el coche no tiene imagen o falló todo lo anterior, mostrar icono
             imgEl.src = "";
             imgEl.classList.add('hidden');
             iconEl.classList.remove('hidden');
@@ -5398,6 +5490,30 @@
             e.stopPropagation();
             if(isGarageEditing) inputCamara.click();
         });
+
+        const btnBuscarWeb = document.getElementById('btn-buscar-web');
+        if (btnBuscarWeb) {
+            btnBuscarWeb.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!isGarageEditing) return;
+                const car = garageCars[currentGarageIndex];
+                const query = encodeURIComponent(`${car.marca || ''} ${car.name || car.ref || ''} slot car 1 32`.trim());
+                
+                // Abrimos Google Imágenes en otra pestaña
+                window.open(`https://www.google.com/search?tbm=isch&q=${query}`, '_blank');
+                
+                setTimeout(() => {
+                    const url = prompt("1. Copia la dirección (URL) de la imagen en Google.\n2. Pégala aquí abajo:");
+                    if (url && url.startsWith('http')) {
+                        car.imageId = ""; 
+                        car.image = url;
+                        document.getElementById('garage-img').src = url;
+                        saveGarageToLocal();
+                        if (typeof updateConfigCarList === 'function') updateConfigCarList();
+                    }
+                }, 500);
+            });
+        }
 
         function processAndCompressImage(file) {
             if (!file) return;
