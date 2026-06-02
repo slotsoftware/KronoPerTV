@@ -5882,7 +5882,10 @@
                     // Asegurar que las fotos importadas se guardan en IndexedDB ANTES de guardar en el garaje
                     for (let car of parsedCars) {
                         if (car.image && car.image.length > 100) {
-                            await saveImageToIDB(car.id, car.image);
+                            const imgId = car.imageId || "img_" + car.id + "_" + Date.now();
+                            car.imageId = imgId;
+                            ImageDB.save(imgId, car.image);
+                            car.image = ""; // Evitamos saturar el LocalStorage
                         }
                     }
                     
