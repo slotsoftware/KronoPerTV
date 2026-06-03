@@ -1576,6 +1576,9 @@
                     <span class="text-blue-300 text-[10px] sm:text-xs uppercase font-bold tracking-widest shrink-0">ID Nube:</span>
                     <input type="text" id="garage-cloud-id" class="bg-black/80 border border-blue-400/50 text-white text-xs sm:text-sm font-black text-center w-24 sm:w-28 py-1 rounded outline-none uppercase focus:border-blue-400 focus:shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all tracking-widest" maxlength="6" title="Código para sincronizar tu garaje entre dispositivos">
                     <button id="garage-cloud-sync-btn" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded text-xs font-bold uppercase transition shadow-[0_0_10px_rgba(37,99,235,0.4)] hover:shadow-[0_0_15px_rgba(37,99,235,0.8)] shrink-0">Vincular</button>
+                    <button id="garage-push-remote-btn" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1 rounded text-xs font-bold uppercase transition shadow-[0_0_10px_rgba(147,51,234,0.4)] hover:shadow-[0_0_15px_rgba(147,51,234,0.8)] shrink-0 flex items-center" title="Compartir garaje con el otro dispositivo">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg> Push
+                    </button>
                     <div class="w-px h-4 bg-blue-500/50 mx-1"></div>
                     <button id="garage-bottom-close-btn" class="bg-red-900/60 hover:bg-red-600 border border-red-500/50 text-white px-3 py-1 rounded text-xs font-bold uppercase transition shadow-[0_0_10px_rgba(239,68,68,0.3)] hover:shadow-[0_0_15px_rgba(239,68,68,0.8)] shrink-0">Salir</button>
                 </div>
@@ -4773,6 +4776,17 @@
                     if(typeof broadcastState === 'function') broadcastState();
                     if(typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
                 }
+            } else if (action === 'SYNC_GARAGE_ID') {
+                const targetId = data.cloudId;
+                if (targetId && targetId !== cloudGarageId) {
+                    if (confirm(`El otro dispositivo quiere compartir su garaje contigo (ID Nube: ${targetId}).\n\n¿Aceptar y sincronizar tus coches con los suyos?`)) {
+                        cloudGarageId = targetId;
+                        localStorage.setItem('krono_cloud_id', cloudGarageId);
+                        const cloudIdInput = document.getElementById('garage-cloud-id');
+                        if(cloudIdInput) cloudIdInput.value = cloudGarageId;
+                        if(typeof listenToCloudGarage === 'function') listenToCloudGarage();
+                    }
+                }
             }
         }
 
@@ -5011,6 +5025,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             const cloudIdInput = document.getElementById('garage-cloud-id');
             const cloudSyncBtn = document.getElementById('garage-cloud-sync-btn');
+            const pushRemoteBtn = document.getElementById('garage-push-remote-btn');
             
             if (cloudIdInput) cloudIdInput.value = cloudGarageId;
             
@@ -5026,6 +5041,17 @@
                             listenToCloudGarage();
                             
                             setTimeout(() => { saveGarageToCloud(); }, 1000);
+                        }
+                    }
+                });
+            }
+
+            if (pushRemoteBtn) {
+                pushRemoteBtn.addEventListener('click', () => {
+                    if (confirm("Se va a enviar una solicitud al otro dispositivo enlazado para que sincronice tu garaje actual.\n\n¿Deseas continuar?")) {
+                        if(typeof saveGarageToCloud === 'function') saveGarageToCloud();
+                        if (typeof window.sendRemoteCommand === 'function') {
+                            window.sendRemoteCommand('SYNC_GARAGE_ID', { cloudId: cloudGarageId });
                         }
                     }
                 });
