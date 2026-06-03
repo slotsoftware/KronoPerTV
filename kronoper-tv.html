@@ -4613,13 +4613,7 @@
                     }
                 } catch(e) {}
                 
-                kronoChannel.addEventListener('message', (event) => {
-                    if(event.data.type === 'STATE_UPDATE') { 
-                        tvData = event.data.payload; 
-                        lastReceivedLocalTime = Date.now();
-                        window.updateTVUI(); 
-                    }
-                });
+                // El listener global de kronoChannel se encarga de recibir STATE_UPDATE
             }
 
             if (tvIntervalId) clearInterval(tvIntervalId);
@@ -4763,16 +4757,16 @@
 
         window.sendRemoteCommand = function(action, data = null) {
             const now = Date.now();
-            if (!isTVMode && typeof handleRemoteCommand === 'function') {
-                lastProcessedCmdTs = now;
-                handleRemoteCommand(action, data);
-            }
+            const senderType = isTVMode ? 'TV' : 'MOBILE';
 
-            kronoChannel.postMessage({ type: 'REMOTE_CMD', command: action, data: data, ts: now });
-            if (cloudRoomCode && window.db && window.fs) {
+            kronoChannel.postMessage({ type: 'REMOTE_CMD', command: action, data: data, ts: now, sender: senderType });
+            
+            const activeRoomCode = isTVMode ? cloudRoomCode : window.myRoomCode;
+            
+            if (activeRoomCode && window.db && window.fs) {
                 try {
-                    const cmdDocRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'tv_commands', cloudRoomCode);
-                    window.fs.setDoc(cmdDocRef, { action: action, data: data, ts: now });
+                    const cmdDocRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'tv_commands', activeRoomCode);
+                    window.fs.setDoc(cmdDocRef, { action: action, data: data, ts: now, sender: senderType });
                 } catch (e) {
                     console.error("Error enviando comando remoto:", e);
                 }
@@ -4781,41 +4775,43 @@
 
         function handleRemoteCommand(action, data = null) {
             if (action === 'PAUSE') {
-                if (isRaceActive) togglePause();
+                if (!isTVMode && isRaceActive) togglePause();
             } else if (action === 'RESET') {
-                if (isRaceActive || lapHistory.length > 0) stopRace(false);
+                if (!isTVMode && (isRaceActive || lapHistory.length > 0)) stopRace(false);
             } else if (action === 'NEW_RACE') {
-                if (resultsModal && !resultsModal.classList.contains('hidden')) {
-                    resultsModal.classList.remove('open');
-                    setTimeout(() => resultsModal.classList.add('hidden'), 300);
-                    referencePixels = null; 
+                if (!isTVMode) {
+                    if (resultsModal && !resultsModal.classList.contains('hidden')) {
+                        resultsModal.classList.remove('open');
+                        setTimeout(() => resultsModal.classList.add('hidden'), 300);
+                        referencePixels = null; 
+                    }
+                    stopRace(false); 
                 }
-
-                stopRace(false); 
             } else if (action === 'START_RACE') {
-                if (!isRaceActive && !isCountdown) {
+                if (!isTVMode && !isRaceActive && !isCountdown) {
                     startTrafficLight();
                 }
             } else if (action === 'CHANGE_CAR') {
-                const carInput = document.getElementById('car-model-input');
-                
-                let carName = typeof data === 'string' ? data : (data && data.car ? data.car : null);
+                if (!isTVMode) {
+                    const carInput = document.getElementById('car-model-input');
+                    let carName = typeof data === 'string' ? data : (data && data.car ? data.car : null);
 
-                if (carInput && carName) {
-                    let exists = Array.from(carInput.options).some(opt => opt.value === carName);
-                    if (!exists) {
-                        const newOpt = document.createElement('option');
-                        newOpt.value = carName;
-                        newOpt.textContent = carName;
-                        carInput.appendChild(newOpt);
+                    if (carInput && carName) {
+                        let exists = Array.from(carInput.options).some(opt => opt.value === carName);
+                        if (!exists) {
+                            const newOpt = document.createElement('option');
+                            newOpt.value = carName;
+                            newOpt.textContent = carName;
+                            carInput.appendChild(newOpt);
+                        }
+                        
+                        carInput.value = carName;
+                        localStorage.setItem('krono_car_model', carName);
+
+                        if(typeof updateConfigCarImage === 'function') updateConfigCarImage();
+                        if(typeof broadcastState === 'function') broadcastState();
+                        if(typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
                     }
-                    
-                    carInput.value = carName;
-                    localStorage.setItem('krono_car_model', carName);
-
-                    if(typeof updateConfigCarImage === 'function') updateConfigCarImage();
-                    if(typeof broadcastState === 'function') broadcastState();
-                    if(typeof triggerDebouncedCloudSync === 'function') triggerDebouncedCloudSync();
                 }
             } else if (action === 'SYNC_GARAGE_ID') {
                 const targetId = data.cloudId;
@@ -4823,7 +4819,7 @@
                     if (targetId !== cloudGarageId) {
                         showCustomConfirm(
                             "NUEVO GARAJE RECIBIDO",
-                            `El otro dispositivo quiere compartir su garaje contigo.\n(ID Nube: ${targetId}).\n\n¿Aceptar y sobreescribir tus coches actuales con los recibidos?`,
+                            `El otro dispositivo quiere compartir su garaje contigo.\n(ID Nube: ${targetId}).\n\n¿Aceptar y descargar todos sus coches a tu garaje actual?`,
                             () => {
                                 cloudGarageId = targetId;
                                 localStorage.setItem('krono_cloud_id', cloudGarageId);
@@ -4837,34 +4833,45 @@
                             }
                         );
                     } else {
-                        // Si ya tienen el mismo ID, forzamos la descarga para actualizar los datos
                         if(typeof listenToCloudGarage === 'function') listenToCloudGarage();
+                        showCustomConfirm(
+                            "GARAJE SINCRONIZADO",
+                            "Tu garaje ya está vinculado con el otro dispositivo. Los datos se han actualizado correctamente.",
+                            null
+                        );
                     }
                 }
             }
         }
 
-        if(!isTVMode) {
-            kronoChannel.addEventListener('message', (event) => {
-                if (event.data.type === 'REQUEST_STATE') {
-                    broadcastState();
-                } else if (event.data.type === 'REMOTE_CMD') {
-                    const cmdTs = event.data.ts || Date.now();
-                    if (cmdTs > lastProcessedCmdTs) {
-                        lastProcessedCmdTs = cmdTs;
-                        handleRemoteCommand(event.data.command, event.data.data);
-                    }
+        kronoChannel.addEventListener('message', (event) => {
+            if (!isTVMode && event.data.type === 'REQUEST_STATE') {
+                if(typeof broadcastState === 'function') broadcastState();
+            } else if (isTVMode && event.data.type === 'STATE_UPDATE') {
+                tvData = event.data.payload; 
+                lastReceivedLocalTime = Date.now();
+                if(typeof window.updateTVUI === 'function') window.updateTVUI(); 
+            } else if (event.data.type === 'REMOTE_CMD') {
+                const cmd = event.data;
+                const mySenderType = isTVMode ? 'TV' : 'MOBILE';
+                if (cmd.sender !== mySenderType && cmd.ts > lastProcessedCmdTs) {
+                    lastProcessedCmdTs = cmd.ts;
+                    handleRemoteCommand(cmd.command, cmd.data);
                 }
-            });
+            }
+        });
 
-            const initCloudRemoteListener = setInterval(() => {
-                if (window.db && window.auth && window.auth.currentUser && window.myRoomCode && window.fs) {
+        const initCloudRemoteListener = setInterval(() => {
+            if (window.db && window.auth && window.auth.currentUser && window.fs) {
+                const activeRoomCode = isTVMode ? cloudRoomCode : window.myRoomCode;
+                if (activeRoomCode) {
                     clearInterval(initCloudRemoteListener);
-                    const cmdDocRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'tv_commands', window.myRoomCode);
+                    const cmdDocRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'tv_commands', activeRoomCode);
                     window.fs.onSnapshot(cmdDocRef, (docSnap) => {
                         if (docSnap.exists()) {
                             const cmd = docSnap.data();
-                            if (cmd.ts > lastProcessedCmdTs) {
+                            const mySenderType = isTVMode ? 'TV' : 'MOBILE';
+                            if (cmd.sender !== mySenderType && cmd.ts > lastProcessedCmdTs) {
                                 lastProcessedCmdTs = cmd.ts;
                                 handleRemoteCommand(cmd.action, cmd.data);
                             }
@@ -4873,8 +4880,8 @@
                         console.error("Error escuchando comandos remotos: ", err);
                     });
                 }
-            }, 1000);
-        }
+            }
+        }, 1000);
 
         const garageModal = document.getElementById('garageModal');
         const closeGarageBtn = document.getElementById('close-garage-btn');
