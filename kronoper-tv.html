@@ -1700,6 +1700,18 @@
         </div>
     </div>
 
+    <!-- NUEVO MODAL PERSONALIZADO PARA SINCRONIZAR EL GARAJE -->
+    <div id="garageSyncConfirmModal" class="modal-overlay hidden" style="z-index: 9999;">
+        <div class="modal-content p-6 w-full max-w-sm text-center bg-slate-900 border border-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+            <h3 id="garage-sync-title" class="text-xl font-bold text-cyan-400 mb-2 font-rajdhani tracking-widest">SINCRONIZAR</h3>
+            <p id="garage-sync-msg" class="text-slate-300 text-sm mt-2 mb-6"></p>
+            <div class="flex justify-center space-x-3">
+                <button id="garage-sync-cancel" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded font-bold transition-colors">Cancelar</button>
+                <button id="garage-sync-accept" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-bold shadow-[0_0_10px_rgba(34,211,238,0.4)] transition-colors">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
     <div id="rankingModal" class="modal-overlay hidden">
         <div class="modal-content w-full max-w-4xl bg-slate-900 border border-slate-700 shadow-[0_0_40px_rgba(0,0,0,0.5)] rounded-2xl overflow-hidden p-0 relative">
             
@@ -1773,6 +1785,35 @@
         let cloudRoomCode = null;
         
         const kronoChannel = new BroadcastChannel('krono_telemetry_channel');
+
+        // FUNCIÓN GLOBAL PARA MOSTRAR AVISOS SIN USAR confirm() (QUE SE BLOQUEA EN IFRAMES)
+        function showCustomConfirm(title, message, onAccept) {
+            const modal = document.getElementById('garageSyncConfirmModal');
+            document.getElementById('garage-sync-title').textContent = title;
+            document.getElementById('garage-sync-msg').innerHTML = message.replace(/\n/g, '<br>');
+            
+            const cancelBtn = document.getElementById('garage-sync-cancel');
+            const acceptBtn = document.getElementById('garage-sync-accept');
+            
+            const newCancel = cancelBtn.cloneNode(true);
+            const newAccept = acceptBtn.cloneNode(true);
+            cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+            acceptBtn.parentNode.replaceChild(newAccept, acceptBtn);
+            
+            newCancel.addEventListener('click', () => {
+                modal.classList.remove('open');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            });
+            
+            newAccept.addEventListener('click', () => {
+                modal.classList.remove('open');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+                if (onAccept) onAccept();
+            });
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('open'), 10);
+        }
 
         function getPortalRoomCode() {
             return localStorage.getItem('doc_id_app_krono_tv') || new URLSearchParams(window.location.search).get('room');
@@ -4778,12 +4819,25 @@
                 }
             } else if (action === 'SYNC_GARAGE_ID') {
                 const targetId = data.cloudId;
-                if (targetId && targetId !== cloudGarageId) {
-                    if (confirm(`El otro dispositivo quiere compartir su garaje contigo (ID Nube: ${targetId}).\n\n¿Aceptar y sincronizar tus coches con los suyos?`)) {
-                        cloudGarageId = targetId;
-                        localStorage.setItem('krono_cloud_id', cloudGarageId);
-                        const cloudIdInput = document.getElementById('garage-cloud-id');
-                        if(cloudIdInput) cloudIdInput.value = cloudGarageId;
+                if (targetId) {
+                    if (targetId !== cloudGarageId) {
+                        showCustomConfirm(
+                            "NUEVO GARAJE RECIBIDO",
+                            `El otro dispositivo quiere compartir su garaje contigo.\n(ID Nube: ${targetId}).\n\n¿Aceptar y sobreescribir tus coches actuales con los recibidos?`,
+                            () => {
+                                cloudGarageId = targetId;
+                                localStorage.setItem('krono_cloud_id', cloudGarageId);
+                                const cloudIdInput = document.getElementById('garage-cloud-id');
+                                if(cloudIdInput) cloudIdInput.value = cloudGarageId;
+                                if(typeof listenToCloudGarage === 'function') listenToCloudGarage();
+                                
+                                if (document.getElementById('garageModal').classList.contains('hidden')) {
+                                    if(typeof openGarage === 'function') openGarage();
+                                }
+                            }
+                        );
+                    } else {
+                        // Si ya tienen el mismo ID, forzamos la descarga para actualizar los datos
                         if(typeof listenToCloudGarage === 'function') listenToCloudGarage();
                     }
                 }
@@ -4804,7 +4858,7 @@
             });
 
             const initCloudRemoteListener = setInterval(() => {
-                if (window.db && window.auth && window.myRoomCode && window.fs) {
+                if (window.db && window.auth && window.auth.currentUser && window.myRoomCode && window.fs) {
                     clearInterval(initCloudRemoteListener);
                     const cmdDocRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'tv_commands', window.myRoomCode);
                     window.fs.onSnapshot(cmdDocRef, (docSnap) => {
@@ -5033,27 +5087,46 @@
                 cloudSyncBtn.addEventListener('click', () => {
                     const newId = cloudIdInput.value.trim().toUpperCase();
                     if (newId.length > 0 && newId !== cloudGarageId) {
-                        if (confirm(`Vas a vincular tu garaje al código de la nube [ ${newId} ].\n\n- Si la cuenta existe, descargarás esos coches aquí.\n- Si es una cuenta nueva, tus coches actuales se subirán a ella.\n\n¿Deseas continuar?`)) {
-                            cloudGarageId = newId;
-                            localStorage.setItem('krono_cloud_id', cloudGarageId);
-                            cloudSyncBtn.textContent = "CONECTANDO...";
-                            
-                            listenToCloudGarage();
-                            
-                            setTimeout(() => { saveGarageToCloud(); }, 1000);
-                        }
+                        showCustomConfirm(
+                            "VINCULAR NUBE",
+                            `Vas a vincular tu garaje al código de la nube [ ${newId} ].\n\n- Si la cuenta existe, descargarás esos coches aquí.\n- Si es una cuenta nueva, tus coches actuales se subirán a ella.\n\n¿Deseas continuar?`,
+                            () => {
+                                cloudGarageId = newId;
+                                localStorage.setItem('krono_cloud_id', cloudGarageId);
+                                cloudSyncBtn.textContent = "CONECTANDO...";
+                                
+                                listenToCloudGarage();
+                                
+                                setTimeout(() => { saveGarageToCloud(); }, 1000);
+                            }
+                        );
                     }
                 });
             }
 
             if (pushRemoteBtn) {
                 pushRemoteBtn.addEventListener('click', () => {
-                    if (confirm("Se va a enviar una solicitud al otro dispositivo enlazado para que sincronice tu garaje actual.\n\n¿Deseas continuar?")) {
-                        if(typeof saveGarageToCloud === 'function') saveGarageToCloud();
-                        if (typeof window.sendRemoteCommand === 'function') {
-                            window.sendRemoteCommand('SYNC_GARAGE_ID', { cloudId: cloudGarageId });
+                    showCustomConfirm(
+                        "COMPARTIR GARAJE (PUSH)",
+                        "Se va a enviar una solicitud al otro dispositivo enlazado para que importe tu garaje actual de forma automática.\n\n¿Deseas continuar?",
+                        () => {
+                            if(typeof saveGarageToCloud === 'function') saveGarageToCloud();
+                            if (typeof window.sendRemoteCommand === 'function') {
+                                window.sendRemoteCommand('SYNC_GARAGE_ID', { cloudId: cloudGarageId });
+                            }
+                            
+                            // Mostrar mensaje de éxito temporal
+                            const originalText = pushRemoteBtn.innerHTML;
+                            pushRemoteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><polyline points="20 6 9 17 4 12"></polyline></svg> ENVIADO`;
+                            pushRemoteBtn.classList.replace('bg-purple-600', 'bg-green-600');
+                            pushRemoteBtn.classList.replace('hover:bg-purple-500', 'hover:bg-green-500');
+                            setTimeout(() => {
+                                pushRemoteBtn.innerHTML = originalText;
+                                pushRemoteBtn.classList.replace('bg-green-600', 'bg-purple-600');
+                                pushRemoteBtn.classList.replace('hover:bg-green-500', 'hover:bg-purple-500');
+                            }, 3000);
                         }
-                    }
+                    );
                 });
             }
             
