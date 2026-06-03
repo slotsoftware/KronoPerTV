@@ -4837,6 +4837,11 @@
             init: function() {
                 if (this.initPromise) return this.initPromise;
                 this.initPromise = new Promise((resolve) => {
+                    const timeoutId = setTimeout(() => {
+                        console.warn("IndexedDB init timeout (iframe block)");
+                        resolve(false);
+                    }, 1500);
+
                     try {
                         const req = indexedDB.open("KronoGarageDB", 1);
                         req.onupgradeneeded = (e) => { 
@@ -4844,10 +4849,18 @@
                                 e.target.result.createObjectStore("images", { keyPath: "id" }); 
                             }
                         };
-                        // Resolviendo SIEMPRE, incluso si falla, para que no rompa los "awaits"
-                        req.onsuccess = (e) => { this.db = e.target.result; resolve(true); };
-                        req.onerror = (e) => { console.warn("IndexedDB error:", e); resolve(false); };
+                        req.onsuccess = (e) => { 
+                            clearTimeout(timeoutId);
+                            this.db = e.target.result; 
+                            resolve(true); 
+                        };
+                        req.onerror = (e) => { 
+                            clearTimeout(timeoutId);
+                            console.warn("IndexedDB error:", e); 
+                            resolve(false); 
+                        };
                     } catch(e) {
+                        clearTimeout(timeoutId);
                         console.warn("IndexedDB bloqueado o no soportado:", e);
                         resolve(false);
                     }
@@ -4855,32 +4868,39 @@
                 return this.initPromise;
             },
             save: async function(id, base64) {
-                if (!this.db) await this.init();
-                if(!this.db || !id) return;
+                const inited = await Promise.race([this.init(), new Promise(r => setTimeout(() => r(false), 1500))]);
+                if(!inited || !this.db || !id) return;
                 try {
                     const tx = this.db.transaction("images", "readwrite");
                     tx.objectStore("images").put({ id: id, data: base64 });
                 } catch(e) { console.warn("Error al guardar imagen IndexedDB", e); }
             },
             get: async function(id) {
-                if (!this.db) await this.init();
+                const inited = await Promise.race([this.init(), new Promise(r => setTimeout(() => r(false), 1500))]);
                 return new Promise((resolve) => {
-                    if(!this.db || !id) return resolve(null);
+                    if(!inited || !this.db || !id) return resolve(null);
+                    
+                    const timeoutId = setTimeout(() => {
+                        console.warn("IndexedDB get timeout");
+                        resolve(null);
+                    }, 1500);
+
                     try {
                         const tx = this.db.transaction("images", "readonly");
                         const req = tx.objectStore("images").get(id);
                         req.onsuccess = () => {
+                            clearTimeout(timeoutId);
                             const res = req.result;
                             if (res && typeof res === 'object' && res.data) resolve(res.data);
                             else resolve(res); 
                         };
-                        req.onerror = () => resolve(null);
-                    } catch(e) { resolve(null); }
+                        req.onerror = () => { clearTimeout(timeoutId); resolve(null); };
+                    } catch(e) { clearTimeout(timeoutId); resolve(null); }
                 });
             },
             delete: async function(id) {
-                if (!this.db) await this.init();
-                if(!this.db || !id) return;
+                const inited = await Promise.race([this.init(), new Promise(r => setTimeout(() => r(false), 1500))]);
+                if(!inited || !this.db || !id) return;
                 try {
                     const tx = this.db.transaction("images", "readwrite");
                     tx.objectStore("images").delete(id);
@@ -4898,6 +4918,17 @@
 
         async function fetchImageFromCloud(imgId) {
             if (!window.db || !window.fs) return null;
+            
+            let retries = 30;
+            while ((!window.auth || !window.auth.currentUser) && retries > 0) {
+                await new Promise(r => setTimeout(r, 100));
+                retries--;
+            }
+            if (!window.auth || !window.auth.currentUser) {
+                console.warn("Firebase Auth no está listo para descargar imagen.");
+                return null;
+            }
+
             try {
                 const docRef = window.fs.doc(window.db, 'artifacts', 'app_krono', 'public', 'data', 'cloud_garages_images', imgId);
                 const snap = await window.fs.getDoc(docRef);
@@ -5072,19 +5103,34 @@
             });
             
             if (car) {
+                // INDICADOR VISUAL: Icono parpadeante en azul mientras carga
+                iconEl.classList.remove('text-gray-400');
+                iconEl.classList.add('text-blue-500', 'animate-pulse');
+
                 if (car.imageId) {
                     // Buscar en IndexedDB
                     let base64 = await ImageDB.get(car.imageId);
                     
                     // GUARDIA: Si mientras cargaba el usuario cambió de coche, abortamos
-                    if (carSelect.value !== selectedCarName) return; 
+                    if (carSelect.value !== selectedCarName) {
+                        iconEl.classList.remove('text-blue-500', 'animate-pulse');
+                        iconEl.classList.add('text-gray-400');
+                        return; 
+                    }
 
                     // Buscar en la Nube si no está en local
                     if (!base64 && typeof fetchImageFromCloud === 'function') {
                         base64 = await fetchImageFromCloud(car.imageId);
-                        if (carSelect.value !== selectedCarName) return; // GUARDIA NUBE
+                        if (carSelect.value !== selectedCarName) {
+                            iconEl.classList.remove('text-blue-500', 'animate-pulse');
+                            iconEl.classList.add('text-gray-400');
+                            return; 
+                        }
                         if (base64) ImageDB.save(car.imageId, base64);
                     }
+
+                    iconEl.classList.remove('text-blue-500', 'animate-pulse');
+                    iconEl.classList.add('text-gray-400');
 
                     if (base64) {
                         imgEl.src = base64;
@@ -5094,11 +5140,16 @@
                     }
                 } else if (car.image && car.image.length > 100) {
                     // Carga por base64 directa antigua
+                    iconEl.classList.remove('text-blue-500', 'animate-pulse');
+                    iconEl.classList.add('text-gray-400');
                     imgEl.src = car.image;
                     imgEl.classList.remove('hidden');
                     iconEl.classList.add('hidden');
                     return;
                 }
+                
+                iconEl.classList.remove('text-blue-500', 'animate-pulse');
+                iconEl.classList.add('text-gray-400');
             }
             
             // Si el coche no tiene imagen o falló todo lo anterior, mostrar icono
@@ -5189,6 +5240,7 @@
             
             const imgEl = document.getElementById('garage-img');
             imgEl.src = ""; 
+            imgEl.classList.add('opacity-50', 'animate-pulse'); // Indicador de carga visual
 
             if (car.imageId) {
                 ImageDB.get(car.imageId).then(base64 => {
@@ -5196,10 +5248,12 @@
 
                     if (base64) {
                         imgEl.src = base64;
+                        imgEl.classList.remove('opacity-50', 'animate-pulse');
                     } else {
                         fetchImageFromCloud(car.imageId).then(cloudBase64 => {
                             if (currentGarageIndex !== index) return; // GUARDIA NUBE
                             
+                            imgEl.classList.remove('opacity-50', 'animate-pulse');
                             if (cloudBase64) {
                                 ImageDB.save(car.imageId, cloudBase64);
                                 imgEl.src = cloudBase64;
@@ -5211,8 +5265,10 @@
                 });
             } else if (car.image && car.image.length > 100) {
                 imgEl.src = car.image; 
+                imgEl.classList.remove('opacity-50', 'animate-pulse');
             } else {
                 imgEl.src = defaultImg;
+                imgEl.classList.remove('opacity-50', 'animate-pulse');
             }
             
             document.getElementById('g-inp-name').value = car.name || "";
