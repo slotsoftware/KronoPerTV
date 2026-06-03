@@ -5093,7 +5093,9 @@
             if (cloudSyncBtn) {
                 cloudSyncBtn.addEventListener('click', () => {
                     const newId = cloudIdInput.value.trim().toUpperCase();
-                    if (newId.length > 0 && newId !== cloudGarageId) {
+                    if (newId.length === 0) return;
+                    
+                    if (newId !== cloudGarageId) {
                         showCustomConfirm(
                             "VINCULAR NUBE",
                             `Vas a vincular tu garaje al código de la nube [ ${newId} ].\n\n- Si la cuenta existe, descargarás esos coches aquí.\n- Si es una cuenta nueva, tus coches actuales se subirán a ella.\n\n¿Deseas continuar?`,
@@ -5107,6 +5109,15 @@
                                 setTimeout(() => { saveGarageToCloud(); }, 1000);
                             }
                         );
+                    } else {
+                        // El ID es el mismo, forzamos sincronización y damos feedback
+                        listenToCloudGarage();
+                        cloudSyncBtn.textContent = "¡SINCRONIZADO!";
+                        cloudSyncBtn.classList.add('bg-green-600', 'shadow-[0_0_15px_#16a34a]');
+                        setTimeout(() => {
+                            cloudSyncBtn.textContent = "VINCULAR";
+                            cloudSyncBtn.classList.remove('bg-green-600', 'shadow-[0_0_15px_#16a34a]');
+                        }, 2000);
                     }
                 });
             }
@@ -5117,21 +5128,34 @@
                         "COMPARTIR GARAJE (PUSH)",
                         "Se va a enviar una solicitud al otro dispositivo enlazado para que importe tu garaje actual de forma automática.\n\n¿Deseas continuar?",
                         () => {
-                            if(typeof saveGarageToCloud === 'function') saveGarageToCloud();
-                            if (typeof window.sendRemoteCommand === 'function') {
-                                window.sendRemoteCommand('SYNC_GARAGE_ID', { cloudId: cloudGarageId });
-                            }
-                            
-                            // Mostrar mensaje de éxito temporal
                             const originalText = pushRemoteBtn.innerHTML;
-                            pushRemoteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><polyline points="20 6 9 17 4 12"></polyline></svg> ENVIADO`;
-                            pushRemoteBtn.classList.replace('bg-purple-600', 'bg-green-600');
-                            pushRemoteBtn.classList.replace('hover:bg-purple-500', 'hover:bg-green-500');
-                            setTimeout(() => {
-                                pushRemoteBtn.innerHTML = originalText;
-                                pushRemoteBtn.classList.replace('bg-green-600', 'bg-purple-600');
-                                pushRemoteBtn.classList.replace('hover:bg-green-500', 'hover:bg-purple-500');
-                            }, 3000);
+                            pushRemoteBtn.innerHTML = "SUBIENDO FOTOS...";
+                            pushRemoteBtn.classList.add('animate-pulse');
+                            
+                            // Aseguramos que todas las fotos locales estén en la nube antes del push
+                            setTimeout(async () => {
+                                for (let car of garageCars) {
+                                    if (car.imageId) {
+                                        let base64 = await ImageDB.get(car.imageId);
+                                        if (base64) await syncImageToCloud(car.imageId, base64);
+                                    }
+                                }
+                                
+                                if(typeof saveGarageToCloud === 'function') await saveGarageToCloud();
+                                if (typeof window.sendRemoteCommand === 'function') {
+                                    window.sendRemoteCommand('SYNC_GARAGE_ID', { cloudId: cloudGarageId });
+                                }
+                                
+                                pushRemoteBtn.classList.remove('animate-pulse');
+                                pushRemoteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><polyline points="20 6 9 17 4 12"></polyline></svg> ENVIADO`;
+                                pushRemoteBtn.classList.replace('bg-purple-600', 'bg-green-600');
+                                pushRemoteBtn.classList.replace('hover:bg-purple-500', 'hover:bg-green-500');
+                                setTimeout(() => {
+                                    pushRemoteBtn.innerHTML = originalText;
+                                    pushRemoteBtn.classList.replace('bg-green-600', 'bg-purple-600');
+                                    pushRemoteBtn.classList.replace('hover:bg-green-500', 'hover:bg-purple-500');
+                                }, 3000);
+                            }, 50);
                         }
                     );
                 });
@@ -5850,6 +5874,7 @@
                         if (car.image && car.image.length > 100) {
                             if (!car.imageId) car.imageId = "img_" + car.id + "_" + Date.now();
                             await ImageDB.save(car.imageId, car.image);
+                            syncImageToCloud(car.imageId, car.image); // Asegurar que la nube recibe la foto del archivo importado
                         }
                     }
                     
