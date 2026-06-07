@@ -1722,9 +1722,9 @@
                     <span class="ml-3 text-[10px] font-bold text-blue-300 border border-blue-800/50 bg-blue-900/20 px-2 py-0.5 rounded-full uppercase tracking-widest hidden sm:block">Top 25</span>
                 </div>
                 <div class="flex items-center space-x-3 sm:space-x-4">
-                    <button id="clear-racer1-btn" class="text-[10px] font-bold text-red-400 border border-red-800/50 bg-red-900/20 px-2 py-1 rounded hover:bg-red-800/40 transition flex items-center shadow-md" title="Borrar Récords de Racer 1">
+                    <button id="clear-racer1-btn" class="text-[10px] font-bold text-red-400 border border-red-800/50 bg-red-900/20 px-2 py-1 rounded hover:bg-red-800/40 transition flex items-center shadow-md" title="Borrar Récords de Racer 1 y ALBERT">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        <span class="hidden sm:inline uppercase tracking-widest">Del Racer 1</span>
+                        <span class="hidden sm:inline uppercase tracking-widest">Del Racer 1 / ALBERT</span>
                     </button>
                     <button id="close-ranking-btn" class="text-slate-500 hover:text-white font-black text-2xl transition-colors px-2">X</button>
                 </div>
@@ -3462,7 +3462,7 @@
             
             if (clearRacer1Btn) {
                 clearRacer1Btn.addEventListener('click', async () => {
-                    if (!confirm("¿Seguro que quieres borrar todos los récords donde el piloto sea 'Racer 1'?")) return;
+                    if (!confirm("¿Seguro que quieres borrar todos los récords donde el piloto sea 'Racer 1' o 'ALBERT'?")) return;
                     if (window.db) {
                         try {
                             const appId = "app_krono";
@@ -3472,20 +3472,20 @@
                             
                             snapshot.forEach(doc => {
                                 const data = doc.data();
-                                if (data.pilot && data.pilot.toUpperCase() === 'RACER 1') {
+                                if (data.pilot && (data.pilot.toUpperCase() === 'RACER 1' || data.pilot.toUpperCase() === 'ALBERT')) {
                                     deletePromises.push(window.fs.deleteDoc(doc.ref));
                                 }
                             });
                             
                             if (deletePromises.length > 0) {
                                 await Promise.all(deletePromises);
-                                alert(`Se han borrado exitosamente ${deletePromises.length} registros de 'Racer 1'.`);
+                                alert(`Se han borrado exitosamente ${deletePromises.length} registros de 'Racer 1' y 'ALBERT'.`);
                                 loadLeaderboard(); 
                             } else {
-                                alert("No se encontraron registros en la nube que pertenezcan a 'Racer 1'.");
+                                alert("No se encontraron registros en la nube que pertenezcan a 'Racer 1' o 'ALBERT'.");
                             }
                         } catch (e) {
-                            console.error("Error borrando Racer 1", e);
+                            console.error("Error borrando Racer 1 y ALBERT", e);
                             alert("Hubo un error borrando los registros de la nube.");
                         }
                     } else {
