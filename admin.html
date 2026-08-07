@@ -108,7 +108,20 @@
 
         <!-- HISTORIAL -->
         <div class="glass p-5 rounded-xl border border-slate-700">
-            <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Licencias Generadas</h3>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+                <h3 class="text-xs font-bold text-slate-400 uppercase">Licencias Generadas</h3>
+                <div class="flex gap-1">
+                    <button onclick="copyEmails('active')" class="bg-emerald-700 hover:bg-emerald-600 text-white text-[10px] font-bold py-1 px-2 rounded border border-emerald-500 transition shadow" title="Copiar activos">
+                        <i class="fas fa-copy mr-1"></i> ACTIVOS
+                    </button>
+                    <button onclick="copyEmails('inactive')" class="bg-slate-700 hover:bg-slate-600 text-white text-[10px] font-bold py-1 px-2 rounded border border-slate-500 transition shadow" title="Copiar inactivos">
+                        <i class="fas fa-copy mr-1"></i> INACTIVOS
+                    </button>
+                    <button onclick="copyEmails('all')" class="bg-blue-700 hover:bg-blue-600 text-white text-[10px] font-bold py-1 px-2 rounded border border-blue-500 transition shadow" title="Copiar todos">
+                        <i class="fas fa-copy mr-1"></i> TODOS
+                    </button>
+                </div>
+            </div>
             <div class="overflow-x-auto">
                 <table class="history-table">
                     <thead><tr><th>EMAIL</th><th>CÓDIGO</th><th>ESTADO</th></tr></thead>
@@ -209,18 +222,71 @@
                 onSnapshot(collection(db, 'artifacts', APP_ID, 'public', 'data', 'access_codes'), (snap) => {
                     const body = document.getElementById('history-body');
                     body.innerHTML = "";
+                    // Estructura para separar los correos según su estado
+                    window.emailsData = { active: [], inactive: [], all: [] };
+                    
                     snap.docs.forEach(d => {
                         const data = d.data();
+                        const isActive = data.current_session_sensor || data.current_session_tv;
+                        
+                        // Clasificar el email en las listas correspondientes
+                        if(data.email) {
+                            window.emailsData.all.push(data.email);
+                            if (isActive) {
+                                window.emailsData.active.push(data.email);
+                            } else {
+                                window.emailsData.inactive.push(data.email);
+                            }
+                        }
+
+                        // Generar fila diferenciando visualmente el estado
                         body.innerHTML += `<tr>
                             <td>${data.email}</td>
                             <td class="font-mono text-slate-300 font-bold">${data.code}</td>
-                            <td>${data.current_session_sensor || data.current_session_tv ? 'Activo' : '-'}</td>
+                            <td><span class="${isActive ? 'text-emerald-400 font-bold' : 'text-slate-500'}">${isActive ? 'Activo' : 'Inactivo'}</span></td>
                         </tr>`;
                     });
                 });
             } catch(e) {
                 console.error("Error cargando historial:", e);
             }
+        }
+
+        // --- FUNCIÓN PARA COPIAR CORREOS SEGÚN ESTADO ---
+        window.copyEmails = function(type) {
+            const emailsToCopy = window.emailsData ? window.emailsData[type] : [];
+            
+            if (!emailsToCopy || emailsToCopy.length === 0) {
+                const typeName = type === 'active' ? 'activos' : (type === 'inactive' ? 'inactivos' : 'registrados');
+                return showAlert(`No hay correos ${typeName} en el historial para copiar.`);
+            }
+            
+            // Unir todos los correos separados por coma y un espacio
+            const textToCopy = emailsToCopy.join(", ");
+            
+            // Crear un elemento de texto temporal para poder copiar su contenido
+            const textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            
+            // Evitar que la pantalla haga scroll al añadir el elemento
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                // Copiar al portapapeles usando execCommand (compatible con iframes)
+                document.execCommand('copy');
+                const typeName = type === 'active' ? 'activos' : (type === 'inactive' ? 'inactivos' : 'en total');
+                showAlert(`¡Copiado con éxito!\n\nSe han copiado ${emailsToCopy.length} correos ${typeName} al portapapeles.`);
+            } catch (err) {
+                showAlert("Error al intentar copiar los correos.");
+            }
+            
+            // Limpiar el elemento temporal
+            document.body.removeChild(textArea);
         }
 
         // --- FASE 1: ENVIAR DATOS DE PAGO ---
